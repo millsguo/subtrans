@@ -114,6 +114,8 @@ class CheckSub
     {
         $videoFileInfo = pathinfo($videoFile);
 
+        $currentDirPath = $videoFileInfo['dirname'];
+
         $seasonEpisode = self::getSeasonEpisode($videoFileInfo['filename']);
 
         $currentFileArray = Misc::scanDir($videoFileInfo['dirname']);
@@ -134,7 +136,8 @@ class CheckSub
             switch ($fileExtension) {
                 case 'zip':
                     $zipFile = new \ZipArchive();
-                    if ($zipFile->open($currentFile) === true) {
+                    if ($zipFile->open($currentDirPath . '/' . $currentFile) === true) {
+                        Log::info('找到字幕压缩包' . $currentFile);
                         $outFileArray = [];
                         for ($i = 0; $i < $zipFile->count(); $i++) {
                             $zipFileName = $zipFile->getNameIndex($i);
