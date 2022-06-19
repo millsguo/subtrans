@@ -8,11 +8,11 @@ ENV TZ=Asia/Shanghai PERMS=true \
 RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt-get update \
     && apt-get install --no-install-recommends -y yasm ffmpeg\
-    && apt-get install libzip-dev zlib1g-dev -y\
-    && /usr/local/bin/docker-php-ext-install zip\
     # 通用
     ca-certificates \
     wget \
+    libzip-dev zlib1g-dev\
+    && /usr/local/bin/docker-php-ext-install zip\
     # cleanup
     && apt-get clean \
     && rm -rf \
