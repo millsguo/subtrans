@@ -1,0 +1,27 @@
+{
+  "name": "millsguo/subtrans",
+  "description": "使用机器翻译电影或剧集的字幕",
+  "minimum-stability": "stable",
+  "license": "GPL-2.0-only",
+  "authors": [
+    {
+      "name": "millsguo",
+      "email": "millsguo@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "~7.4",
+    "alibabacloud/sdk": "^1.8",
+    "php-ffmpeg/php-ffmpeg": "^0.19.0",
+    "ext-json": "*",
+    "shardj/zf1-future": "^1.20",
+    "ext-zip": "*",
+    "ext-rar": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "EasyTranslation\\": "library/EasyTranslation/src/",
+      "EasySub\\": "library/EasySub/src/"
+    }
+  }
+}
