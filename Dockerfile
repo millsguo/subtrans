@@ -8,6 +8,7 @@ ENV TZ=Asia/Shanghai PERMS=true \
 RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt-get update \
     && apt-get install --no-install-recommends -y \
+    && apt-get install php-zip -y\
     yasm ffmpeg \
     # 通用
     ca-certificates \
