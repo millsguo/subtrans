@@ -8,9 +8,13 @@ docker pull millsguo/subtrans
 ## 安装后，配置环境变量，暂时仅支持aliyun的翻译接口
 ````
 API_NAME=aliyun
-ACCESS_KEY=#阿里云的ACCESS_KEY#
-ACCESS_SECRET=#阿里云的ACCESS_SECRET#
 USE_PRO=true #是否使用专业翻译接口，专业接口稍贵一点，但也有100W字符的免费额度
+ACCESS_KEY_1=#阿里云的ACCESS_KEY#
+ACCESS_SECRET_1=#阿里云的ACCESS_SECRET#
+USE_PRO_2=true #是否使用第二个接口
+ACCESS_KEY_2=#ACCESS_KEY
+ACCESS_SECRET_2=#ACCESS_SECRET
+EANBLE_TRANS=true #是否启用翻译
 ````
 
 ## 再设置挂载目录，目前暂时支持以下6个挂载目录
