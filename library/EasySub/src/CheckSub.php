@@ -170,11 +170,8 @@ class CheckSub
                         Log::info($currentFile . '压缩文件打开失败');
                     }
                     continue 2;
-                    break;
                 case 'rar':
-                    $rarFile = @rar_open($currentFile);
                     return false;
-                    break;
             }
         }
         return false;
@@ -223,8 +220,9 @@ class CheckSub
         }
 
         foreach ($currentDirFileArray as $currentFileName) {
-            $checkFileInfo = pathinfo($currentFileName);
-            if (str_contains($checkFileInfo['filename'], $videoFileName)) {
+            $currentFullFilePath = $videoDirPath . '/' . $currentFileName;
+            $checkFileInfo = pathinfo($currentFullFilePath);
+            if (stripos($checkFileInfo['filename'], $videoFileName) !== false) {
                 //当前文件名中包含视频文件名
                 Log::info('找到' . $currentFileName . '字幕文件');
                 $extensionName = strtolower($checkFileInfo['extension']);
@@ -233,8 +231,8 @@ class CheckSub
                     case 'srt':
                     case 'ass':
                     case 'ssa':
-                        if (str_contains($subRangeStr, $subLanguage)) {
-                            $checkResult = self::checkSubTitleFileSize($currentFileName);
+                        if (stripos($subRangeStr, $subLanguage) !== false) {
+                            $checkResult = self::checkSubTitleFileSize($currentFullFilePath);
                             if ($checkResult) {
                                 return $currentFileName;
                             }
@@ -259,7 +257,7 @@ class CheckSub
             if (is_writeable($subFileName)) {
                 unlink($subFileName);
             } else {
-                Log::info('没有删除权限，文件删除失败:' . $subFileName);
+                Log::info('没有写权限，文件删除失败:' . $subFileName);
             }
 
             return false;
