@@ -157,10 +157,8 @@ class CheckSub
                             //再将解压的字幕文件改名
                             foreach ($outFileArray as $subFile) {
                                 $subFileInfo = pathinfo($videoFileInfo['dirname'] . '/' . $subFile);
-                                $newSubFile = $videoFileInfo['dirname'] . '/' . $videoFileInfo['filename'] . '.zh.' . $subFileInfo['extension'];
-                                @rename($videoFileInfo['dirname'] . '/' . $subFile, $newSubFile);
-                                Log::info($subFile . '文件已解压并改名为：[' . $newSubFile . ']');
-                                unlink($videoFileInfo['dirname'] . '/' . $subFile);
+
+                                self::renameSubFilename($videoFileInfo, $subFileInfo);
                             }
                             $zipFile->close();
                             return true;
@@ -175,9 +173,29 @@ class CheckSub
                     continue 2;
                 case 'rar':
                     return false;
+                case 'srt':
+                case 'ssa':
+                case 'ass':
+                    $subFileInfo = pathinfo($videoFileInfo['dirname'] . '/' . $currentFile);
+                    self::renameSubFilename($videoFileInfo, $subFileInfo);
+                    break;
             }
         }
         return false;
+    }
+
+    /**
+     * 将字幕文件匹配视频文件
+     *
+     * @param array $videoFileInfo
+     * @param array $subFileInfo
+     * @return void
+     */
+    protected static function renameSubFilename(array $videoFileInfo, array $subFileInfo)
+    {
+        $newSubFile = $videoFileInfo['dirname'] . '/' . $videoFileInfo['filename'] . '.zh.' . $subFileInfo['extension'];
+        @rename($videoFileInfo['dirname'] . '/' . $subFileInfo['basename'], $newSubFile);
+        Log::info($subFileInfo['basename'] . '文件已解压并改名为：[' . $newSubFile . ']');
     }
 
     /**
