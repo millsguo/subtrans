@@ -247,13 +247,16 @@ class CheckSub
 
                     $fileArray = Misc::scanDir($seasonDir);
                     foreach ($fileArray as $file) {
+                        $filePathInfo = pathinfo($seasonDir . '/' . $file);
+                        if ($filePathInfo['extension'] != 'mp4' && $filePathInfo['extension'] != 'mkv') {
+                            continue;
+                        }
                         $fileSeasonName = self::getSeasonEpisode($file);
                         if ($subSeasonName == $fileSeasonName) {
                             //找到字幕相对应的视频集数
-                            $videoFileInfo = pathinfo($seasonDir . '/' . $file);
                             $subFileInfo = pathinfo($seasonDir . '/' . $subFile);
 
-                            self::renameSubFilename($videoFileInfo, $subFileInfo);
+                            self::renameSubFilename($filePathInfo, $subFileInfo);
                             Log::info($subSeasonName . '字幕处理完成');
                         }
                     }
