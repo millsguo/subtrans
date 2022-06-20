@@ -56,7 +56,7 @@ class CheckSub
                 $fullPath = $dirPath . $fileName;
                 if (is_dir($fullPath)) {
                     //目录
-                    if (substr($fullPath, 0, 6) == 'Season') {
+                    if (substr($fileName, 0, 6) == 'Season') {
                         Log::info('Season目录');
                         self::checkFullSeasonSubZip($fullPath);
                     } else {
@@ -73,7 +73,7 @@ class CheckSub
                     switch ($fileExt) {
                         case 'mp4':
                         case 'mkv':
-                            Log::info('找到视频文件:' . $fullPath);
+                            Log::info('找到视频文件:' . $fileName);
                             //视频文件
                             $subFileName = self::checkSubTitleFile($fullPath, 'zh');
                             if ($subFileName) {
@@ -92,17 +92,17 @@ class CheckSub
                             $engSubFile = self::checkSubTitleFile($fullPath, 'eng');
                             if (!$engSubFile) {
                                 //没有英文字幕
-                                Log::info('没有英文字幕文件');
+                                Log::info('没有英文外挂字幕文件');
                                 $srtObj = new Srt();
                                 $exportSubResult = $srtObj->exportInsideSubTitle($fullPath, 'eng');
                                 if ($exportSubResult === true) {
                                     //有内置中文字幕
-                                    Log::info('字幕导出成功');
+                                    Log::info('内置中文字幕处理完成');
                                     continue 2;
                                 }
                                 if ($exportSubResult === false) {
                                     //导出失败
-                                    Log::info('字幕文件从视频中导出失败');
+                                    Log::info('导出内置英文字幕失败');
                                     continue 2;
                                 }
                                 $engSubFile = $exportSubResult;
@@ -317,13 +317,13 @@ class CheckSub
             $checkFileInfo = pathinfo($currentFullFilePath);
             if (stripos($checkFileInfo['filename'], $videoFileName) !== false) {
                 //当前文件名中包含视频文件名
-                Log::info('找到' . $currentFileName . '字幕文件');
                 $extensionName = strtolower($checkFileInfo['extension']);
                 $subRangeStr = mb_substr($checkFileInfo['filename'], $videoFileNameLen);
                 switch ($extensionName) {
                     case 'srt':
                     case 'ass':
                     case 'ssa':
+                        Log::info('找到' . $currentFileName . '字幕文件');
                         if (stripos($subRangeStr, $subLanguage) !== false) {
                             $checkResult = self::checkSubTitleFileSize($currentFullFilePath);
                             if ($checkResult) {

@@ -96,7 +96,7 @@ class Srt
 
         //有中文字幕时，停止处理
         if ($haveChineseSub) {
-            Log::info('发现内置中文字幕');
+            Log::info('发现内置中文字幕，不需要导出英文字幕');
             return true;
         }
 
@@ -109,7 +109,6 @@ class Srt
             case 0:
                 //没有字幕
                 return false;
-                break;
             case 1:
                 //只有默认字幕，导出默认字幕
                 if (!isset($subTitleInfoArray[0]['tags']['language'])) {
@@ -167,6 +166,7 @@ class Srt
             //导出字幕失败
             return false;
         }
+        Log::info('导出字幕成功');
         return $subTitleFilePath;
     }
 
