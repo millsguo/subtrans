@@ -225,7 +225,7 @@ class CheckSub
     protected static function checkFullSeasonSubZip(string $seasonDir): bool
     {
         $dirPathInfo = pathinfo($seasonDir);
-        $seasonNumber = trim(substr($dirPathInfo['basename'], 6));
+        $seasonNumber = str_pad(trim(substr($dirPathInfo['basename'], 6)),2,"0",STR_PAD_LEFT);
         $fullSeasonSubFile = $seasonDir . '/s' . $seasonNumber . '.zip';
         if (!file_exists($fullSeasonSubFile)) {
             $fullSeasonSubFile = $seasonDir . '/S' . $seasonNumber . '.zip';
