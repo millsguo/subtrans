@@ -1,4 +1,4 @@
 <?php
 
 //版本号
-const ST_VERSION = '0.2.4';
+const ST_VERSION = '0.2.5';
