@@ -14,7 +14,7 @@ ACCESS_SECRET_1=#阿里云的ACCESS_SECRET#
 USE_PRO_2=true #是否使用第二个接口
 ACCESS_KEY_2=#ACCESS_KEY
 ACCESS_SECRET_2=#ACCESS_SECRET
-EANBLE_TRANS=true #是否启用翻译
+ENABLE_TRANS=true #是否启用翻译
 ````
 
 ## 再设置挂载目录，目前暂时支持以下6个挂载目录
