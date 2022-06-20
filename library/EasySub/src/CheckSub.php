@@ -6,14 +6,15 @@ use EasySub\SubTitle\Srt;
 use EasySub\Tools\Log;
 use EasySub\Tools\Misc;
 use Exception;
+use ZipArchive;
 
 class CheckSub
 {
     /**
-     * @param \ZipArchive $fullSubZip
+     * @param ZipArchive $fullSubZip
      * @return array
      */
-    public static function getSubFileNameByZip(\ZipArchive $fullSubZip): array
+    public static function getSubFileNameByZip(ZipArchive $fullSubZip): array
     {
         $fullSubFileArray = [];
         for ($i = 0; $i < $fullSubZip->count(); $i++) {
@@ -38,7 +39,7 @@ class CheckSub
      * @param bool $isSeason
      * @return void
      */
-    public static function scanDir(string $dirPath, bool $isSeason = false)
+    public static function scanDir(string $dirPath, bool $isSeason = false): void
     {
         if (empty($dirPath)) {
             Log::info('空目录');
@@ -56,7 +57,7 @@ class CheckSub
                 $fullPath = $dirPath . $fileName;
                 if (is_dir($fullPath)) {
                     //目录
-                    if (substr($fileName, 0, 6) == 'Season') {
+                    if (str_starts_with($fileName, 'Season')) {
                         Log::info('Season目录');
                         self::checkFullSeasonSubZip($fullPath);
                     }
@@ -166,7 +167,7 @@ class CheckSub
             $fileExtension = strtolower($currentFileInfo['extension']);
             switch ($fileExtension) {
                 case 'zip':
-                    $zipFile = new \ZipArchive();
+                    $zipFile = new ZipArchive();
                     if ($zipFile->open($currentDirPath . '/' . $currentFile) === true) {
                         Log::info('找到字幕压缩包' . $currentFile);
                         $outFileArray = self::getSubFileNameByZip($zipFile);
@@ -210,7 +211,7 @@ class CheckSub
      * @param array $subFileInfo
      * @return void
      */
-    protected static function renameSubFilename(array $videoFileInfo, array $subFileInfo)
+    protected static function renameSubFilename(array $videoFileInfo, array $subFileInfo): void
     {
         $seasonStr = self::getSeasonEpisode($subFileInfo['basename']);
         $seasonPos = mb_stripos($subFileInfo['filename'], $seasonStr);
@@ -237,7 +238,7 @@ class CheckSub
                 return false;
             }
         }
-        $fullSubZip = new \ZipArchive();
+        $fullSubZip = new ZipArchive();
         if ($fullSubZip->open($fullSeasonSubFile) === true) {
             Log::info('找到第' . $seasonNumber . '季字幕压缩包');
             $fullSubFileArray = self::getSubFileNameByZip($fullSubZip);
@@ -251,6 +252,10 @@ class CheckSub
                     $fileArray = Misc::scanDir($seasonDir);
                     foreach ($fileArray as $file) {
                         $filePathInfo = pathinfo($seasonDir . '/' . $file);
+                        if (!isset($filePathInfo['extension'])) {
+                            //如果是目录，没有扩展名，则直接跳过
+                            continue;
+                        }
                         if ($filePathInfo['extension'] != 'mp4' && $filePathInfo['extension'] != 'mkv') {
                             continue;
                         }
@@ -280,9 +285,9 @@ class CheckSub
     /**
      * 获取文件名中的集数
      * @param string $videoFile
-     * @return false|mixed
+     * @return false|string
      */
-    protected static function getSeasonEpisode(string $videoFile)
+    protected static function getSeasonEpisode(string $videoFile): bool|string
     {
         $matchRegex = '/s\d+e\d+/i';
 
@@ -300,7 +305,7 @@ class CheckSub
      * @param string $subLanguage
      * @return false|string
      */
-    public static function checkSubTitleFile(string $videoFile, string $subLanguage)
+    public static function checkSubTitleFile(string $videoFile, string $subLanguage): bool|string
     {
         if (!is_readable($videoFile)) {
             Log::info($videoFile . '视频文件不存在');
@@ -365,23 +370,5 @@ class CheckSub
 
             return true;
         }
-    }
-
-    /**
-     * 获取视频文件对应的字幕文件名及路径
-     * @param string $videoFilePath
-     * @param string $subLanguage
-     * @param string $subType
-     * @return false|string
-     */
-    public static function getSubTitleFileName(string $videoFilePath, string $subLanguage, string $subType = 'srt')
-    {
-        if (!is_readable($videoFilePath)) {
-            Log::info($videoFilePath . '视频文件不存在');
-            return false;
-        }
-        $fileInfo = pathinfo($videoFilePath);
-
-        return $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.' . $subLanguage . '.' . $subType;
     }
 }

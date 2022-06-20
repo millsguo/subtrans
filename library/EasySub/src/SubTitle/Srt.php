@@ -51,7 +51,7 @@ class Srt
      * @return void
      * @throws Exception
      */
-    public function writeSrt(string $filePath, $content)
+    public function writeSrt(string $filePath, $content): void
     {
         if (is_array($content) && count($content) <= 2) {
             Log::info("数组内容为空，保存失败");
@@ -77,7 +77,7 @@ class Srt
      * @return bool|string
      * @throws Exception
      */
-    public function exportInsideSubTitle(string $videoFilePath, string $exportLanguage)
+    public function exportInsideSubTitle(string $videoFilePath, string $exportLanguage): bool|string
     {
         $subTitleInfoArray = $this->getVideoInsideSubTitleInfo($videoFilePath);
 
@@ -101,7 +101,7 @@ class Srt
         }
 
         //导出字幕结果
-        $subTitleFilePath = false;
+//        $subTitleFilePath = false;
 
         //字幕数量
         $subTitleCount = count($subTitleInfoArray);
@@ -208,7 +208,7 @@ class Srt
      * @param string $subLanguageCode 导出字幕的语言代码
      * @return bool|string
      */
-    protected function exportInsideSubTitleToSrt(string $videoFilePath, int $subTitleIndex, string $subLanguageCode)
+    protected function exportInsideSubTitleToSrt(string $videoFilePath, int $subTitleIndex, string $subLanguageCode): bool|string
     {
         switch (strtoupper($subLanguageCode)) {
             case 'ZH':

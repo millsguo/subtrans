@@ -15,7 +15,7 @@ class Config
      * @param string $configFile
      * @return void
      */
-    public static function setConfig(string $configFile)
+    public static function setConfig(string $configFile): void
     {
         try {
             if (file_exists($configFile)) {
@@ -32,7 +32,7 @@ class Config
      * @param string $section
      * @return array|false|mixed
      */
-    public static function getConfig(string $section = '')
+    public static function getConfig(string $section = ''): mixed
     {
         if (!isset(self::$config)) {
             return false;
