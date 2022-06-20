@@ -10,6 +10,28 @@ use Exception;
 class CheckSub
 {
     /**
+     * @param \ZipArchive $fullSubZip
+     * @return array
+     */
+    public static function getSubFileNameByZip(\ZipArchive $fullSubZip): array
+    {
+        $fullSubFileArray = [];
+        for ($i = 0; $i < $fullSubZip->count(); $i++) {
+            $zipFileName = $fullSubZip->getNameIndex($i);
+            $zipFileType = mb_substr($zipFileName, -3);
+            switch (strtolower($zipFileType)) {
+                case 'srt':
+                case 'ass':
+                case 'ssa':
+                    $fullSubFileArray[] = $zipFileName;
+                    Log::info('找到压缩包中的字幕文件：' . $zipFileName);
+                    break;
+            }
+        }
+        return $fullSubFileArray;
+    }
+
+    /**
      *扫描目录
      *
      * @param string $dirPath
@@ -34,7 +56,12 @@ class CheckSub
                 $fullPath = $dirPath . $fileName;
                 if (is_dir($fullPath)) {
                     //目录
-                    self::scanDir($fullPath);
+                    if (substr($fullPath, 0, 6) == 'Season') {
+                        Log::info('Season目录');
+                        self::checkFullSeasonSubZip($fullPath);
+                    } else {
+                        self::scanDir($fullPath);
+                    }
                 } elseif (is_readable($fullPath)) {
                     //可读文件
                     $fileInfo = pathinfo($fullPath);
@@ -56,7 +83,7 @@ class CheckSub
                             //中文字幕文件名
                             $chineseSubFileName = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.zh.srt';
                             //检查是否有已下载的字幕文件
-                            $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath);
+                            $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, $isSeason);
                             if ($checkChineseSubZip) {
                                 Log::info('找到中文字幕包，并处理完成');
                                 continue 2;
@@ -108,15 +135,20 @@ class CheckSub
      * 检查对应视频文件相对应的集数是否已下载相关字幕ZIP包，ZIP包以S01E01命名，找到并解压成功返回TRUE
      *
      * @param string $videoFile
+     * @param bool $isSeason
      * @return bool
      */
-    public static function checkTvDownloadedSubZip(string $videoFile): bool
+    public static function checkTvDownloadedSubZip(string $videoFile, bool $isSeason = false): bool
     {
         $videoFileInfo = pathinfo($videoFile);
 
         $currentDirPath = $videoFileInfo['dirname'];
 
-        $seasonEpisode = self::getSeasonEpisode($videoFileInfo['filename']);
+        if ($isSeason) {
+            $seasonEpisode = self::getSeasonEpisode($videoFileInfo['filename']);
+        } else {
+            $seasonEpisode = 's00e00';
+        }
 
         $currentFileArray = Misc::scanDir($videoFileInfo['dirname']);
         if (!$currentFileArray) {
@@ -138,19 +170,7 @@ class CheckSub
                     $zipFile = new \ZipArchive();
                     if ($zipFile->open($currentDirPath . '/' . $currentFile) === true) {
                         Log::info('找到字幕压缩包' . $currentFile);
-                        $outFileArray = [];
-                        for ($i = 0; $i < $zipFile->count(); $i++) {
-                            $zipFileName = $zipFile->getNameIndex($i);
-                            $zipFileType = mb_substr($zipFileName,-3);
-                            switch (strtolower($zipFileType)) {
-                                case 'srt':
-                                case 'ass':
-                                case 'ssa':
-                                    $outFileArray[] = $zipFileName;
-                                    Log::info('找到压缩包中的字幕文件：' . $zipFileName);
-                                    break;
-                            }
-                        }
+                        $outFileArray = self::getSubFileNameByZip($zipFile);
                         if (count($outFileArray) > 0) {
                             //有字幕文件，先解压
                             $zipFile->extractTo($videoFileInfo['dirname'], $outFileArray);
@@ -196,6 +216,58 @@ class CheckSub
         $newSubFile = $videoFileInfo['dirname'] . '/' . $videoFileInfo['filename'] . '.zh.' . $subFileInfo['extension'];
         @rename($videoFileInfo['dirname'] . '/' . $subFileInfo['basename'], $newSubFile);
         Log::info($subFileInfo['basename'] . '文件已解压并改名为：[' . $newSubFile . ']');
+    }
+
+    /**
+     * 检查整季字幕包，命名格式s01.zip
+     * @param string $seasonDir
+     * @return bool
+     */
+    protected static function checkFullSeasonSubZip(string $seasonDir): bool
+    {
+        $seasonNumber = trim(substr($seasonDir, 6));
+        $fullSeasonSubFile = $seasonDir . '/s' . $seasonNumber . '.zip';
+        if (!file_exists($fullSeasonSubFile)) {
+            $fullSeasonSubFile = $seasonDir . '/S' . $seasonNumber . '.zip';
+            if (!file_exists($fullSeasonSubFile)) {
+                return false;
+            }
+        }
+        $fullSubZip = new \ZipArchive();
+        if ($fullSubZip->open($fullSeasonSubFile) === true) {
+            Log::info('找到第' . $seasonNumber . '季字幕压缩包');
+            $fullSubFileArray = self::getSubFileNameByZip($fullSubZip);
+            if (count($fullSubFileArray) > 0) {
+                //有字幕文件，先解压
+                $fullSubZip->extractTo($seasonDir, $fullSubFileArray);
+                //再将解压的字幕文件改名
+                foreach ($fullSubFileArray as $subFile) {
+                    $subSeasonName = self::getSeasonEpisode($subFile);
+
+                    $fileArray = Misc::scanDir($seasonDir);
+                    foreach ($fileArray as $file) {
+                        $fileSeasonName = self::getSeasonEpisode($file);
+                        if ($subSeasonName == $fileSeasonName) {
+                            //找到字幕相对应的视频集数
+                            $videoFileInfo = pathinfo($seasonDir . '/' . $file);
+                            $subFileInfo = pathinfo($seasonDir . '/' . $subFile);
+
+                            self::renameSubFilename($videoFileInfo, $subFileInfo);
+                            Log::info($subSeasonName . '字幕处理完成');
+                        }
+                    }
+                }
+                $fullSubZip->close();
+                return true;
+            } else {
+                Log::info($fullSeasonSubFile . '压缩文件中没有字幕文件');
+                $fullSubZip->close();
+                return false;
+            }
+        } else {
+            Log::info($fullSeasonSubFile . '压缩文件打开失败');
+        }
+        return false;
     }
 
     /**
