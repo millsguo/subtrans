@@ -213,8 +213,8 @@ class CheckSub
     protected static function renameSubFilename(array $videoFileInfo, array $subFileInfo)
     {
         $seasonStr = self::getSeasonEpisode($subFileInfo['basename']);
-        $seasonPos = mb_stripos($subFileInfo['basename'], $seasonStr);
-        $subRangeStr = trim(mb_substr($subFileInfo['basename'], ($seasonPos + mb_strlen($seasonStr))), '.');
+        $seasonPos = mb_stripos($subFileInfo['filename'], $seasonStr);
+        $subRangeStr = trim(mb_substr($subFileInfo['filename'], ($seasonPos + mb_strlen($seasonStr))), '.');
         $newSubFile = $videoFileInfo['dirname'] . '/' . $videoFileInfo['filename'] . '.zh.' . $subRangeStr . '.' . $subFileInfo['extension'];
         @rename($videoFileInfo['dirname'] . '/' . $subFileInfo['basename'], $newSubFile);
         Log::info($subFileInfo['basename'] . '文件已解压并改名为：[' . $newSubFile . ']');
