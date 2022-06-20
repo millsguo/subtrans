@@ -59,9 +59,8 @@ class CheckSub
                     if (substr($fileName, 0, 6) == 'Season') {
                         Log::info('Season目录');
                         self::checkFullSeasonSubZip($fullPath);
-                    } else {
-                        self::scanDir($fullPath);
                     }
+                    self::scanDir($fullPath);
                 } elseif (is_readable($fullPath)) {
                     //可读文件
                     $fileInfo = pathinfo($fullPath);
@@ -230,6 +229,7 @@ class CheckSub
         if (!file_exists($fullSeasonSubFile)) {
             $fullSeasonSubFile = $seasonDir . '/S' . $seasonNumber . '.zip';
             if (!file_exists($fullSeasonSubFile)) {
+                Log::info('没有第' . $seasonNumber . '季整季字幕包');
                 return false;
             }
         }
