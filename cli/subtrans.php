@@ -42,6 +42,7 @@ try {
                 $_ENV[strtoupper($key) . '_2'] = $value;
             }
         }
+
     }
 
     TransSub::initTranslation($apiName, $translationArray);
