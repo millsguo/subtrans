@@ -21,7 +21,7 @@ class TransSub
      *
      * @return void
      */
-    public static function initTranslation()
+    public static function initTranslation(): void
     {
         try {
             self::$translator = new Translation();

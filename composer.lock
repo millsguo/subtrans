@@ -966,7 +966,7 @@
             "version": "3.0.0",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/psr/cache/3.0.0/psr-cache-3.0.0.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/psr/cache/3.0.0/psr-cache-3.0.0.zip",
                 "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
                 "shasum": ""
             },
@@ -1006,7 +1006,7 @@
             "version": "2.0.2",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/psr/container/2.0.2/psr-container-2.0.2.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/psr/container/2.0.2/psr-container-2.0.2.zip",
                 "reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963",
                 "shasum": ""
             },
@@ -1138,7 +1138,7 @@
             "version": "1.0.1",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/psr/http-message/1.0.1/psr-http-message-1.0.1.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/psr/http-message/1.0.1/psr-http-message-1.0.1.zip",
                 "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
                 "shasum": ""
             },
@@ -1182,7 +1182,7 @@
             "version": "1.1.4",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/psr/log/1.1.4/psr-log-1.1.4.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/psr/log/1.1.4/psr-log-1.1.4.zip",
                 "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
                 "shasum": ""
             },
@@ -1575,7 +1575,7 @@
             "version": "v1.26.0",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/symfony/polyfill-mbstring/v1.26.0/symfony-polyfill-mbstring-v1.26.0.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/symfony/polyfill-mbstring/v1.26.0/symfony-polyfill-mbstring-v1.26.0.zip",
                 "reference": "9344f9cb97f3b19424af1a21a3b0e75b0a7d8d7e",
                 "shasum": ""
             },
@@ -1635,7 +1635,7 @@
             "version": "v1.26.0",
             "dist": {
                 "type": "zip",
-                "url": "https://mirrors.cloud.tencent.com/repository/composer/symfony/polyfill-php80/v1.26.0/symfony-polyfill-php80-v1.26.0.zip",
+                "url": "https://mirrors.tencent.com/repository/composer/symfony/polyfill-php80/v1.26.0/symfony-polyfill-php80-v1.26.0.zip",
                 "reference": "cfa0ae98841b9e461207c13ab093d76b0fa7bace",
                 "shasum": ""
             },

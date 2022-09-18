@@ -22,5 +22,5 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
 COPY . /app/subtrans
 WORKDIR /app/subtrans
 RUN rm /app/subtrans/database/subtrans \
-    && mv /app/subtrans/database/subtrans-init /app/subtrans/database/subtrans
+    && mv /app/subtrans/database/subtrans-init /app/subtrans/config/database_subtrans
 CMD ["php", "./cli/subtrans.php"]

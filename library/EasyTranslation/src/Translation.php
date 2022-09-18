@@ -2,6 +2,7 @@
 
 namespace EasyTranslation;
 
+use AlibabaCloud\Client\Exception\ClientException;
 use EasySub\Tools\Log;
 use EasySub\Translated\TransApi;
 use EasyTranslation\TransInterface\AbstractInterface;
@@ -50,11 +51,9 @@ class Translation
             case 'tencent':
                 //腾讯云翻译接口
                 throw new Exception('暂不支持腾讯云翻译接口');
-                break;
             case 'huawei':
                 //华为云翻译接口
                 throw new Exception('暂不支持华为云翻译接口');
-                break;
             default:
                 throw new Exception($translateApi . '翻译接口不支持');
         }
@@ -80,8 +79,8 @@ class Translation
      * @param string $sourceLanguage
      * @param string $targetLanguage
      * @param string $text
-     * @return string | bool
-     * @throws Exception
+     * @return string
+     * @throws ClientException
      */
     public function translate(string $sourceLanguage, string $targetLanguage, string $text): string
     {

@@ -14,13 +14,17 @@ use EasySub\CheckSub;
 require_once APPLICATION_PATH . '/cli/version.php';
 
 //获取配件
-Config::setConfig(APPLICATION_PATH . '/config/local-config.ini');
+$configPath = APPLICATION_PATH . '/config/config.ini';
+if (is_readable($configPath)) {
+    Config::setConfig($configPath);
+}
+
 
 Log::info('SubTrans Version ' . ST_VERSION);
 
 //初始化Sqlite
 Log::debug('Sqlite 初始化');
-$db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/database/subtrans'], 'sqlite');
+$db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/config/database_subtrans'], 'sqlite');
 
 $translationArray = [];
 $apiName = $_ENV['API_NAME'] ?? 'aliyun';
@@ -45,7 +49,7 @@ try {
 
     }
 
-    TransSub::initTranslation($apiName, $translationArray);
+    TransSub::initTranslation();
 
     for ($i = 1;$i <= 3; $i++) {
         if (isset($configArray['volume']['movies-' . $i])) {
