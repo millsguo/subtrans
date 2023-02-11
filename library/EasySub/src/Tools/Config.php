@@ -103,16 +103,15 @@ class Config
         }
         $versionConfig = self::getConfig($versionPath,'version',true);
         $outVersion = $versionConfig->full_version;
-        Log::info(print_r($versionConfig,true));
-        if ($versionConfig->major_version < 10) {
-            $versionConfig->major_version++;
-        } elseif ($versionConfig->sub_version < 10) {
+        if ((int)$versionConfig->major_version < 9) {
+            $versionConfig->major_version = (int)$versionConfig->major_version + 1;
+        } elseif ($versionConfig->sub_version < 9) {
             $versionConfig->major_version = 1;
-            $versionConfig->sub_version++;
+            $versionConfig->sub_version = (int)$versionConfig->sub_version + 1;
         } else {
-            $versionConfig->main_verion++;
+            $versionConfig->main_version = (int)$versionConfig->main_version + 1;
         }
-        $versionConfig->full_version = $versionConfig->main_verion . '.' . $versionConfig->sub_version . '.' . $versionConfig->major_version;
+        $versionConfig->full_version = $versionConfig->main_version . '.' . (string)$versionConfig->sub_version . '.' . (string)$versionConfig->major_version;
         self::writeConfig($versionPath,'version',$versionConfig);
         return $outVersion;
     }

@@ -20,25 +20,25 @@ class Srt
     public function readToArray(string $filePath): array
     {
         if (!is_file($filePath)) {
-            throw new Exception('文件不存在');
+            throw new \RuntimeException('文件不存在');
         }
 
         if (!is_readable($filePath)) {
-            throw new Exception('文件读取失败');
+            throw new \RuntimeException('文件读取失败');
         }
 
         $filePathInfo = pathinfo($filePath);
 
         if (!isset($filePathInfo['extension'])) {
-            throw new Exception('文件没有扩展名');
+            throw new \RuntimeException('文件没有扩展名');
         }
 
-        if ($filePathInfo['extension'] != 'srt') {
-            throw new Exception('仅支持打开srt字幕文件');
+        if (strtolower($filePathInfo['extension']) !== 'srt') {
+            throw new \RuntimeException('仅支持打开srt字幕文件');
         }
         if (filesize($filePath) <= 2) {
             unlink($filePath);
-            throw new Exception('字幕文件为空，删除字幕');
+            throw new \RuntimeException('字幕文件为空，删除字幕');
         }
         return @file($filePath);
     }
@@ -56,7 +56,9 @@ class Srt
         if (is_array($content) && count($content) <= 2) {
             Log::info("数组内容为空，保存失败");
             return ;
-        } elseif (is_string($content) && empty(trim($content))) {
+        }
+
+        if (is_string($content) && empty(trim($content))) {
             Log::info("内容为空，保存失败");
             return ;
         }
@@ -83,25 +85,26 @@ class Srt
 
         //检查是否有中文字幕
         $haveChineseSub = false;
+
+        //发现字幕语言
+        $subLanguageStr = '';
         foreach ($subTitleInfoArray as $subTitle) {
             if (!isset($subTitle['tags']['language'])) {
                 continue;
             }
             $subLanguage = $subTitle['tags']['language'];
-            Log::info('发现' . $subLanguage . '内置字幕');
-            if ($subLanguage == 'chi') {
+            $subLanguageStr .= '[' . $subLanguage . '-' . $subTitle['tags']['title'] . ']';
+            if (str_contains(strtolower($subLanguage),'chi')) {
                 $haveChineseSub = true;
             }
         }
+        Log::info('发现' . $subLanguageStr . '内置字幕');
 
         //有中文字幕时，停止处理
         if ($haveChineseSub) {
             Log::info('发现内置中文字幕，不需要导出英文字幕');
             return true;
         }
-
-        //导出字幕结果
-//        $subTitleFilePath = false;
 
         //字幕数量
         $subTitleCount = count($subTitleInfoArray);
@@ -117,7 +120,7 @@ class Srt
                     $subTitleLanguage = $subTitleInfoArray[0]['tags']['language'];
                 }
                 Log::info('发现一个内置字幕，字幕编码为：' . $subTitleInfoArray[0]['codec_name']);
-                if ($subTitleInfoArray[0]['codec_name'] == 'dvb_subtitle') {
+                if (strtolower($subTitleInfoArray[0]['codec_name']) === 'dvb_subtitle') {
                     Log::info('不支持此格式字幕导出，跳过');
                     return false;
                 }
@@ -140,7 +143,7 @@ class Srt
                         continue;
                     }
                     //只处理 subrip 字幕, 跳过dvb_subtitle等字幕
-                    if ($subTitleInfo['codec_name'] != 'subrip') {
+                    if (strtolower($subTitleInfo['codec_name']) !== 'subrip') {
                         $subIndex++;
                         Log::info('发现 ' . $subTitleInfo['codec_name'] . ' 编码字幕，跳过');
                         continue;
@@ -148,7 +151,7 @@ class Srt
 //                    if ($subTitleInfo['tags']['language'] == 'eng' && $engDefaultIndex == -1) {
 //                        $engDefaultIndex = $subIndex;
 //                    }
-                    if ($subTitleInfo['tags']['language'] == $exportLanguage) {
+                    if (strtolower($subTitleInfo['tags']['language']) === strtolower($exportLanguage)) {
                         $numberOfBytes = $subTitleInfo['tags']['NUMBER_OF_BYTES'] ?? 0;
                         Log::debug('索引序号：' . $subIndex . ' 字幕长度：' . $numberOfBytes / 1024 . "KB");
                         if ($numberOfBytes > $maxLineSubCount) {
@@ -180,23 +183,21 @@ class Srt
     protected function getVideoInsideSubTitleInfo(string $videoFilePath): array
     {
         if (!is_readable($videoFilePath)) {
-            throw new Exception('视频文件不存在');
+            throw new \RuntimeException('视频文件不存在');
         }
 
         exec('ffprobe -loglevel quiet -select_streams s -show_entries stream=index:stream_tags=language:stream_tags=title:stream=codec_name:stream_tags=NUMBER_OF_BYTES -print_format json "' . $videoFilePath . '"', $videoInfoArray, $runReturn);
 
         if ($runReturn === 1) {
-            throw new Exception('获取字幕列表命令不存在或执行失败');
+            throw new \RuntimeException('获取字幕列表命令不存在或执行失败');
         }
         $videoInfoJson = implode("\r\n", $videoInfoArray);
 
-        $jsonArray = json_decode($videoInfoJson, 320);
+        $jsonArray = json_decode($videoInfoJson, 320, 512, JSON_THROW_ON_ERROR);
 
         if (!isset($jsonArray['streams'])) {
-            throw new Exception('视频文件中没有内嵌字幕');
+            throw new \RuntimeException('视频文件中没有内嵌字幕');
         }
-        Log::debug('字幕详细信息');
-        Log::debug(print_r($jsonArray, true));
         return $jsonArray['streams'];
     }
 

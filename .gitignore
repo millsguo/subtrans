@@ -1,4 +1,4 @@
 /.idea/
-/config/
-/logs/
-/vendor/
+/logs/*
+/vendor/*
+/config/config.ini

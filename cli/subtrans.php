@@ -8,7 +8,6 @@ require_once APPLICATION_PATH . '/cli/bootstrap.php';
 use EasySub\CheckSub;
 use EasySub\Tools\Config;
 use EasySub\Tools\Log;
-use EasySub\Translated\TransApi;
 use EasySub\TransSub;
 
 //获取版本号
@@ -16,7 +15,7 @@ $currentVersion = Config::getVersion();
 
 Log::info('SubTrans Version ' . $currentVersion);
 
-//获取配件
+//配置文件路径
 $configPath = APPLICATION_PATH . '/config/config.ini';
 
 
@@ -24,13 +23,11 @@ $configPath = APPLICATION_PATH . '/config/config.ini';
 Log::debug('Sqlite 初始化');
 $db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/config/database_subtrans'], 'sqlite');
 
-$translationArray = [];
-$apiName = $_ENV['API_NAME'] ?? 'aliyun';
-$transApi = new TransApi();
-
-
 try {
-    $configArray = Config::getConfig($configPath);
+    $configArray = Config::getConfig($configPath,'translation');
+    if (isset($configArray->api_name)) {
+        $_ENV['API_NAME'] = $configArray->api_name;
+    }
     if ($configArray) {
         Log::info('使用配置文件');
         if (isset($configArray['translation']['aliyun1'])) {

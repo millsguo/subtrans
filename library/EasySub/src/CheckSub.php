@@ -116,7 +116,7 @@ class CheckSub
                             }
                             $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
 
-                            if (strtolower($enableTrans) == 'true') {
+                            if (strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件');
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
                             } else {
@@ -163,7 +163,7 @@ class CheckSub
             $currentFileInfo = pathinfo($currentFile);
             $currentFileName = strtolower($currentFileInfo['filename']);
 
-            if ($currentFileName != strtolower($seasonEpisode)) {
+            if (strtolower($currentFileName) !== strtolower($seasonEpisode)) {
                 //如果不是S01E01.zip这种文件，则直接跳过
                 continue;
             }
@@ -185,14 +185,14 @@ class CheckSub
                             }
                             $zipFile->close();
                             return true;
-                        } else {
-                            Log::info($currentFile . '压缩文件中没有字幕文件');
-                            $zipFile->close();
-                            return false;
                         }
-                    } else {
-                        Log::info($currentFile . '压缩文件打开失败');
+
+                        Log::info($currentFile . '压缩文件中没有字幕文件');
+                        $zipFile->close();
+                        return false;
                     }
+
+                    Log::info($currentFile . '压缩文件打开失败');
                     continue 2;
                 case 'rar':
                     return false;
@@ -259,11 +259,11 @@ class CheckSub
                             //如果是目录，没有扩展名，则直接跳过
                             continue;
                         }
-                        if ($filePathInfo['extension'] != 'mp4' && $filePathInfo['extension'] != 'mkv') {
+                        if (strtolower($filePathInfo['extension']) !== 'mp4' && strtolower($filePathInfo['extension']) !== 'mkv') {
                             continue;
                         }
                         $fileSeasonName = self::getSeasonEpisode($file);
-                        if ($subSeasonName == $fileSeasonName) {
+                        if ((!empty($subSeasonName) && !empty($fileSeasonName)) && strtolower($subSeasonName) === strtolower($fileSeasonName)) {
                             //找到字幕相对应的视频集数
                             $subFileInfo = pathinfo($seasonDir . '/' . $subFile);
 
@@ -296,9 +296,9 @@ class CheckSub
 
         if (preg_match($matchRegex, $videoFile, $matchResult)) {
             return $matchResult[0];
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -362,16 +362,15 @@ class CheckSub
     {
         $fileSize = filesize($subFileName);
         if ($fileSize <= 2) {
-            if (is_writeable($subFileName)) {
+            if (is_writable($subFileName)) {
                 unlink($subFileName);
             } else {
                 Log::info('没有写权限，文件删除失败:' . $subFileName);
             }
 
             return false;
-        } else {
-
-            return true;
         }
+
+        return true;
     }
 }

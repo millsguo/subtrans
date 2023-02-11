@@ -8,8 +8,6 @@ require_once APPLICATION_PATH . '/cli/bootstrap.php';
 use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 
-require_once APPLICATION_PATH . '/cli/version.php';
-
 $currentVersion = Config::updateVersion();
 
 //获取配置文件
@@ -18,7 +16,7 @@ if (is_readable($configPath)) {
     Config::setConfig($configPath);
 }
 
-Log::info('SubTrans Version ' . $ST_VERSION);
+Log::info('SubTrans Version ' . $currentVersion);
 
 
 try {
