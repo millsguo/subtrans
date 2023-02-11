@@ -11,16 +11,14 @@ use EasySub\Tools\Log;
 use EasySub\Translated\TransApi;
 use EasySub\TransSub;
 
-require_once APPLICATION_PATH . '/cli/version.php';
+//获取版本号
+$currentVersion = Config::getVersion();
+
+Log::info('SubTrans Version ' . $currentVersion);
 
 //获取配件
 $configPath = APPLICATION_PATH . '/config/config.ini';
-if (is_readable($configPath)) {
-    Config::setConfig($configPath);
-}
 
-
-Log::info('SubTrans Version ' . ST_VERSION);
 
 //初始化Sqlite
 Log::debug('Sqlite 初始化');
@@ -32,7 +30,7 @@ $transApi = new TransApi();
 
 
 try {
-    $configArray = Config::getConfig();
+    $configArray = Config::getConfig($configPath);
     if ($configArray) {
         Log::info('使用配置文件');
         if (isset($configArray['translation']['aliyun1'])) {
