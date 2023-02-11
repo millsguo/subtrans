@@ -118,7 +118,7 @@ class CheckSub
                             }
                             $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
 
-                            if (strtolower($enableTrans) === 'true') {
+                            if (strtolower($enableTrans) === 'true' || $enableTrans === true) {
                                 Log::info('开始翻译英文字幕文件:' . $fullPath . '/' . $engSubFile);
                                 TransSub::transSubFile($fullPath . '/' . $engSubFile, $chineseSubFileName, 'eng', 'zh');
                             } else {

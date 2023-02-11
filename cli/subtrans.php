@@ -31,8 +31,8 @@ try {
         $_ENV['API_NAME'] = $translationArray->api_name;
         Log::info('找到翻译API配置:' . $_ENV['API_NAME']);
     }
-    if (isset($translationArray->enable_trans)) {
-        $_ENV['ENABLE_TRANS'] = $translationArray->enable_trans;
+    if (isset($translationArray->enable_trans) && ($translationArray->enable_trans === 1 || $translationArray->enable_trans === "1")) {
+        $_ENV['ENABLE_TRANS'] = true;
         Log::info('找到翻译开关配置:' . $_ENV['ENABLE_TRANS']);
     }
     if ($translationArray) {
