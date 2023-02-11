@@ -118,12 +118,17 @@ class CheckSub
                             }
                             $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
 
-                            if (strtolower($enableTrans) === 'true' || $enableTrans === true) {
+                            if ($enableTrans === true || strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
                             } else {
                                 Log::info('翻译功能已关闭');
                             }
+                            break;
+                        case 'srt':
+                        case 'ass':
+                            //字幕文件
+
                             break;
                     }
                 } else {
