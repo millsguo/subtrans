@@ -20,7 +20,11 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
        /var/lib/apt/lists/* \
        /var/tmp/*
 COPY . /app/subtrans
+COPY ./nginx.conf /etc/nginx/nginx.conf
+#COPY ./config/version.ini /app/subtrans/config/version.ini
+
 WORKDIR /app/subtrans
 RUN rm /app/subtrans/database/subtrans \
-    && mv /app/subtrans/database/subtrans-init /app/subtrans/config/database_subtrans
+    && mv /app/subtrans/database/subtrans-init /app/subtrans/config/database_subtrans \
+CMD ["nginx","-g","daemon off;"]
 CMD ["php", "./cli/subtrans.php"]
