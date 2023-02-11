@@ -52,7 +52,9 @@ class CheckSub
         $dirPath = '/' . trim($dirPath, '/') . '/';
         try {
             $dirArray = Misc::scanDir($dirPath);
-
+            if (!$dirArray) {
+                return;
+            }
             foreach ($dirArray as $fileName) {
                 $fullPath = $dirPath . $fileName;
                 if (is_dir($fullPath)) {
@@ -69,7 +71,7 @@ class CheckSub
                     //可读文件
                     $fileInfo = pathinfo($fullPath);
                     if (!isset($fileInfo['extension'])) {
-                        Log::debug($fullPath . '获取扩展名失败');
+                        //Log::debug($fullPath . '获取扩展名失败');
                         continue;
                     }
                     $fileExt = $fileInfo['extension'];

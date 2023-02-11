@@ -14,15 +14,16 @@ class Misc
      * @return array|false
      * @throws MiscException
      */
-    public static function scanDir(string $basePath)
+    public static function scanDir(string $basePath): bool|array
     {
         if (!is_dir($basePath)) {
             throw new MiscException($basePath . ' is not directory');
         }
         $dirArray = scandir($basePath);
-
-        unset($dirArray[0]);
-        unset($dirArray[1]);
+        if (!$dirArray) {
+            return false;
+        }
+        unset($dirArray[0], $dirArray[1]);
 
         return $dirArray;
     }

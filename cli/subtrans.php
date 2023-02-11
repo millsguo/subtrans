@@ -47,7 +47,7 @@ try {
     }
 
     TransSub::initTranslation();
-
+    $isUseConfig = false;
     for ($i = 1;$i <= 3; $i++) {
         $moviesName = 'movies-' . $i;
         $tvName = 'tv-' . $i;
@@ -55,32 +55,36 @@ try {
             $dirPath = $configArray->volume->{$moviesName};
             Log::info('扫描配置电影目录：' . $dirPath);
             CheckSub::scanDir($dirPath);
+            $isUseConfig = true;
         }
         if (isset($configArray->volume->{$tvName})) {
             $dirPath = $configArray->volume->{$tvName};
             if (!empty($dirPath)) {
                 Log::info('扫描配置剧集目录：' . $dirPath);
                 CheckSub::scanDir($dirPath,true);
+                $isUseConfig = true;
             }
         } else {
             Log::info('配置剧集目录不存在');
         }
 
-        Log::info('开始处理挂载目录');
-        $moviesPath = '/data/movies-' . $i;
-        $tvPath = '/data/tv-' . $i;
-        if (is_dir($moviesPath)) {
-            Log::info('扫描挂载电影目录：' . $moviesPath);
-            CheckSub::scanDir($moviesPath);
-        } else {
-            Log::info('目录不存在或未挂载 [' . $moviesPath . ']');
-        }
+        if (!$isUseConfig) {
+            Log::info('开始处理挂载目录');
+            $moviesPath = '/data/movies-' . $i;
+            $tvPath = '/data/tv-' . $i;
+            if (is_dir($moviesPath)) {
+                Log::info('扫描挂载电影目录：' . $moviesPath);
+                CheckSub::scanDir($moviesPath);
+            } else {
+                Log::info('目录不存在或未挂载 [' . $moviesPath . ']');
+            }
 
-        if (is_dir($tvPath)) {
-            Log::info('扫描挂载剧集目录：' . $tvPath);
-            CheckSub::scanDir($tvPath, true);
-        } else {
-            Log::info('目录不存在或未挂载 [' . $tvPath . ']');
+            if (is_dir($tvPath)) {
+                Log::info('扫描挂载剧集目录：' . $tvPath);
+                CheckSub::scanDir($tvPath, true);
+            } else {
+                Log::info('目录不存在或未挂载 [' . $tvPath . ']');
+            }
         }
     }
 } catch (Exception $e) {

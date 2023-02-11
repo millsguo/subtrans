@@ -177,7 +177,7 @@ class TransApi
      * @param string $accessKey
      * @return false|Zend_Db_Table_Row_Abstract
      */
-    public function getApiByAccessKey(string $accessKey)
+    public function getApiByAccessKey(string $accessKey): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'api_access_key = ?'    => $accessKey
@@ -193,9 +193,9 @@ class TransApi
     /**
      * 获取可用接口信息
      *
-     * @return false|Zend_Db_Table_Row_Abstract|null
+     * @return false|Zend_Db_Table_Row_Abstract
      */
-    public function getSmartApi()
+    public function getSmartApi(): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'id > ?'    => 0
@@ -203,10 +203,10 @@ class TransApi
         $apiRows = $this->apiTable->fetchAll($where, 'id ASC');
         if (is_countable($apiRows)) {
             foreach ($apiRows as $apiRow) {
-                if ($apiRow->current_month_limit == 0) {
+                if ((int)$apiRow->current_month_limit === 0) {
                     return $apiRow;
                 }
-                if ($apiRow->enable_pay == 1) {
+                if ((int)$apiRow->enable_pay === 1) {
                     return $apiRow;
                 }
             }
@@ -238,21 +238,21 @@ class TransApi
             ];
             $updateResult = $this->apiTable->update($data, ['id = ?' => $apiId]);
             if (!$updateResult) {
-                throw new Exception('更新月数据失败');
+                throw new \RuntimeException('更新月数据失败');
             }
             $apiRow = $this->getApi($apiId);
         }
         $data = [
-            'current_month_translated_count'    => intval($apiRow->current_month_translated_count) + $translatedCount,
-            'translated_count'                  => intval($apiRow->translated_count) + $translatedCount,
+            'current_month_translated_count'    => (int)$apiRow->current_month_translated_count + $translatedCount,
+            'translated_count'                  => (int)$apiRow->translated_count + $translatedCount,
         ];
         if ($apiRow->current_month_free_count > $apiRow->free_count_limit) {
             //付费翻译
-            $data['translated_fee_count'] = intval($apiRow->translated_fee_count) + $translatedCount;
+            $data['translated_fee_count'] = (int)$apiRow->translated_fee_count + $translatedCount;
         } else {
             //免费翻译
-            $monthFreeCount = intval($apiRow->current_month_free_count) + $translatedCount;
-            $data['translated_free_count'] = intval($apiRow->translated_free_count) + $translatedCount;
+            $monthFreeCount = (int)$apiRow->current_month_free_count + $translatedCount;
+            $data['translated_free_count'] = (int)$apiRow->translated_free_count + $translatedCount;
             $data['current_month_free_count'] = $monthFreeCount;
             if ($monthFreeCount > $apiRow->free_count_limit) {
                 //超过免费额度
@@ -261,7 +261,7 @@ class TransApi
         }
         $updateResult = $this->apiTable->update($data, ['id = ?' => $apiId]);
         if (!$updateResult) {
-            throw new Exception('更新免费翻译字数失败');
+            throw new \RuntimeException('更新免费翻译字数失败');
         }
         return true;
     }
@@ -278,7 +278,7 @@ class TransApi
     {
         $apiRow = $this->getApiByAccessKey($accessKey);
         if (!$apiRow) {
-            throw new Exception('接口不存在');
+            throw new \RuntimeException('接口不存在');
         }
         return $this->updateApiCount($apiRow->id, $translatedCount);
     }

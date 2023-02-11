@@ -20,25 +20,25 @@ class Srt
     public function readToArray(string $filePath): array
     {
         if (!is_file($filePath)) {
-            throw new \RuntimeException('文件不存在');
+            throw new \RuntimeException('文件不存在:' . $filePath);
         }
 
         if (!is_readable($filePath)) {
-            throw new \RuntimeException('文件读取失败');
+            throw new \RuntimeException('文件读取失败:' . $filePath);
         }
 
         $filePathInfo = pathinfo($filePath);
 
         if (!isset($filePathInfo['extension'])) {
-            throw new \RuntimeException('文件没有扩展名');
+            throw new \RuntimeException('文件没有扩展名:' . $filePath);
         }
 
         if (strtolower($filePathInfo['extension']) !== 'srt') {
-            throw new \RuntimeException('仅支持打开srt字幕文件');
+            throw new \RuntimeException('仅支持打开srt字幕文件:' . $filePath);
         }
         if (filesize($filePath) <= 2) {
             unlink($filePath);
-            throw new \RuntimeException('字幕文件为空，删除字幕');
+            throw new \RuntimeException('字幕文件为空，删除字幕:' . $filePath);
         }
         return @file($filePath);
     }
@@ -93,7 +93,8 @@ class Srt
                 continue;
             }
             $subLanguage = $subTitle['tags']['language'];
-            $subLanguageStr .= '[' . $subLanguage . '-' . $subTitle['tags']['title'] . ']';
+            $subTitleName = $subTitle['tags']['title'] ?? '';
+            $subLanguageStr .= '[' . $subLanguage . '-' . $subTitleName . ']';
             if (str_contains(strtolower($subLanguage),'chi')) {
                 $haveChineseSub = true;
             }
@@ -111,14 +112,11 @@ class Srt
         switch ($subTitleCount) {
             case 0:
                 //没有字幕
+                Log::info('没有找到字幕');
                 return false;
             case 1:
                 //只有默认字幕，导出默认字幕
-                if (!isset($subTitleInfoArray[0]['tags']['language'])) {
-                    $subTitleLanguage = 'eng';
-                } else {
-                    $subTitleLanguage = $subTitleInfoArray[0]['tags']['language'];
-                }
+                $subTitleLanguage = $subTitleInfoArray[0]['tags']['language'] ?? 'eng';
                 Log::info('发现一个内置字幕，字幕编码为：' . $subTitleInfoArray[0]['codec_name']);
                 if (strtolower($subTitleInfoArray[0]['codec_name']) === 'dvb_subtitle') {
                     Log::info('不支持此格式字幕导出，跳过');
@@ -246,6 +244,8 @@ class Srt
                     unlink($subtitleFilename);
                 }
             }
+            Log::debug('导出字幕命令执行失败');
+            Log::debug(print_r($return,true));
             return false;
         }
         return $subtitleFilename;
