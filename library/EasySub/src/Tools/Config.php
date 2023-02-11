@@ -95,7 +95,7 @@ class Config
     public static function updateVersion(): string
     {
         //版本文件路径
-        $versionPath = APPLICATION_PATH . '/config/version.ini';
+        $versionPath = APPLICATION_PATH . '/insideConfig/version.ini';
         if (!is_file($versionPath)) {
             Log::info('版本文件不存在,' . $versionPath);
             $versionData = [
@@ -128,11 +128,8 @@ class Config
     public static function getVersion(): mixed
     {
         //版本文件路径
-        $versionPath = APPLICATION_PATH . '/config/version.ini';
+        $versionPath = APPLICATION_PATH . '/insideConfig/version.ini';
         $versionConfig = self::getConfig($versionPath,'version',false);
-        if (!$versionConfig) {
-            return '0.0.0';
-        }
-        return $versionConfig->full_version;
+        return $versionConfig->full_version ?? '0.0.0';
     }
 }
