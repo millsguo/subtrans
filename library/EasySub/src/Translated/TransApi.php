@@ -31,7 +31,11 @@ class TransApi
             if (!$apiRow) {
                 //不存在此接口
                 $accessSecret = $_ENV['ACCESS_SECRET'] ?? '';
-                $usePro = intval($_ENV['USE_PRO']) ?? 0;
+                if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
+                    $usePro = 1;
+                } else {
+                    $usePro = 0;
+                }
                 $regionId = $_ENV['REGION_ID'] ?? 'cn-hangzhou';
                 try {
                     $apiId = $this->addApi(
@@ -57,7 +61,11 @@ class TransApi
                 if (!$apiRow) {
                     //不存在此接口
                     $accessSecret = $_ENV['ACCESS_SECRET_' . $i] ?? '';
-                    $usePro = intval($_ENV['USE_PRO_' . $i]) ?? 0;
+                    if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
+                        $usePro = 1;
+                    } else {
+                        $usePro = 0;
+                    }
                     $regionId = $_ENV['REGION_ID_' . $i] ?? 'cn-hangzhou';
                     try {
                         $apiId = $this->addApi(
@@ -78,7 +86,7 @@ class TransApi
         }
         $usedApiRow = $this->getSmartApi();
         if (!$usedApiRow) {
-            throw new Exception('没有满足条件的可用接口');
+            throw new \RuntimeException('没有满足条件的可用接口');
         }
         return [
             'translate_api' => $usedApiRow->api_type,
@@ -102,7 +110,7 @@ class TransApi
      * @param int $freeCountLimit
      * @param int $feeCount
      * @param bool $enablePay
-     * @return false|mixed
+     * @return bool|int
      * @throws Exception
      */
     public function addApi(
@@ -114,11 +122,11 @@ class TransApi
         string $regionId,
         int $freeCountLimit,
         int $feeCount,
-        bool $enablePay = false)
+        bool $enablePay = false): bool|int
     {
         $apiRow = $this->getApiByAccessKey($accessKey);
         if ($apiRow) {
-            throw new Exception('AccessKey已存在');
+            throw new \RuntimeException('AccessKey已存在');
         }
         if ($enablePay) {
             $enablePay = 1;
@@ -138,19 +146,19 @@ class TransApi
         ];
         $apiId = $this->apiTable->insert($data);
         if ($apiId) {
-            return $apiId;
-        } else {
-            return false;
+            return (int)$apiId;
         }
+
+        return false;
     }
 
     /**
      * 通过接口ID获取接口信息
      *
      * @param int $id
-     * @return false|Zend_Db_Table_Row_Abstract
+     * @return bool|Zend_Db_Table_Row_Abstract
      */
-    public function getApi(int $id)
+    public function getApi(int $id): Zend_Db_Table_Row_Abstract|bool
     {
         $where = [
             'id = ?'=> $id
@@ -158,9 +166,9 @@ class TransApi
         $row = $this->apiTable->fetchRow($where);
         if (isset($row->id)) {
             return $row;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -177,9 +185,9 @@ class TransApi
         $row = $this->apiTable->fetchRow($where);
         if (isset($row->id)) {
             return $row;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

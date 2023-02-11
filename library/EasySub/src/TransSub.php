@@ -3,11 +3,11 @@
 namespace EasySub;
 
 use EasySub\SubTitle\Srt;
-use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 use EasySub\Translated\TransApi;
 use EasyTranslation\Translation;
 use Exception;
+use JsonException;
 use Zend_Validate_Digits;
 
 class TransSub
@@ -38,11 +38,7 @@ class TransSub
      */
     public static function checkTranslation(): bool
     {
-        if (self::$translator instanceof Translation) {
-            return true;
-        } else {
-            return false;
-        }
+        return self::$translator instanceof Translation;
     }
 
     /**
@@ -128,7 +124,7 @@ class TransSub
                     $isNewSubItem = false;
                     continue;
                 }
-                if (!$isNewSubItem && strpos($line, '-->') !== false) {
+                if (!$isNewSubItem && str_contains($line, '-->')) {
                     //时间行
                     $subItemData['lineDate'] = $line;
                     $isNewSubItem = false;
@@ -188,21 +184,19 @@ class TransSub
      * @return void
      * @throws Exception
      */
-    protected static function convertTranslated($sourceLanguage, $targetLanguage, $sourceJsonText, &$outFileArray)
+    protected static function convertTranslated($sourceLanguage, $targetLanguage, $sourceJsonText, &$outFileArray): void
     {
         $transJsonText = self::$translator->batchTranslate($sourceLanguage, $targetLanguage, $sourceJsonText);
         if ($transJsonText !== false) {
             if (is_array($transJsonText)) {
                 $transArray = $transJsonText;
             } else {
-                $transArray = json_decode($transJsonText, 320);
+                $transArray = json_decode($transJsonText, 320, 512, JSON_THROW_ON_ERROR);
             }
             if (is_countable($transArray) && count($transArray) > 0) {
                 foreach ($transArray as $transItem) {
-                    if (isset($transItem['code']) && $transItem['code'] == '200') {
-                        if (isset($outFileArray[$transItem['index']])) {
-                            $outFileArray[$transItem['index']]['translatedLine'] = $transItem['translated'];
-                        }
+                    if (isset($transItem['code'], $outFileArray[$transItem['index']]) && $transItem['code'] === '200') {
+                        $outFileArray[$transItem['index']]['translatedLine'] = $transItem['translated'];
                     }
                 }
             } else {
@@ -217,17 +211,22 @@ class TransSub
      * @param array $subItemData
      * @return false|string
      */
-    protected static function convertSubData(array $subItemData)
+    protected static function convertSubData(array $subItemData): bool|string
     {
         $jsonArray = [];
         foreach ($subItemData as $lineNumber => $itemData) {
-            $jsonArray[strval($lineNumber)] = $itemData['sourceLine'];
+            $jsonArray[(string)$lineNumber] = $itemData['sourceLine'];
         }
         if (count($jsonArray) > 0) {
-            return json_encode($jsonArray, 320);
-        } else {
-            return false;
+            try {
+                return json_encode($jsonArray, JSON_THROW_ON_ERROR | 320);
+            } catch (JsonException $e) {
+                Log::err($e->getMessage());
+                return false;
+            }
         }
+
+        return false;
     }
 
     /**
@@ -254,11 +253,11 @@ class TransSub
 
             foreach ($subFileContentArray as $line) {
                 $line = trim($line);
-                if (!empty($line) && !$numberLineValidator->isValid($line) && strpos($line, '-->') === false) {
+                if (!empty($line) && !$numberLineValidator->isValid($line) && !str_contains($line, '-->')) {
                     //不是空行，不是数字行，不是时间行
                     $line = str_replace(['.', ','], ' ', $line);    //替换掉部分符号
                     $transLine = self::$translator->translate($sourceLanguage, $targetLanguage, $line);
-                    if ($transLine !== false) {
+                    if ($transLine) {
                         $outFileArray[] = $transLine . "\r\n";
                     }
                 }

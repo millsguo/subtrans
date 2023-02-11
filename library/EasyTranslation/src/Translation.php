@@ -2,17 +2,15 @@
 
 namespace EasyTranslation;
 
-use AlibabaCloud\Client\Exception\ClientException;
 use EasySub\Tools\Log;
 use EasySub\Translated\TransApi;
-use EasyTranslation\TransInterface\AbstractInterface;
 use EasyTranslation\TransInterface\AliYun;
 use Exception;
 
 class Translation
 {
     private AliYun $translateObj;
-    private $config;
+    private array $config = [];
 
     /**
      * 参数配置
@@ -21,10 +19,10 @@ class Translation
      * @return void
      * @throws Exception
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         if (!isset($config['translate_api'])) {
-            throw new Exception('请先指定翻译接口');
+            throw new \RuntimeException('请先指定翻译接口');
         }
         $this->config = $config;
 
@@ -32,10 +30,10 @@ class Translation
         switch ($translateApi) {
             case 'aliyun':
                 if (!isset($config['access_key'])) {
-                    throw new Exception('请指定阿里云AccessKey');
+                    throw new \RuntimeException('请指定阿里云AccessKey');
                 }
                 if (!isset($config['access_secret'])) {
-                    throw new Exception('请指定阿里云AccessSecret');
+                    throw new \RuntimeException('请指定阿里云AccessSecret');
                 }
                 $regionId = $config['region_id'] ?? '';
                 $usePro = $config['use_pro'] ?? false;
@@ -50,12 +48,12 @@ class Translation
                 break;
             case 'tencent':
                 //腾讯云翻译接口
-                throw new Exception('暂不支持腾讯云翻译接口');
+                throw new \RuntimeException('暂不支持腾讯云翻译接口');
             case 'huawei':
                 //华为云翻译接口
-                throw new Exception('暂不支持华为云翻译接口');
+                throw new \RuntimeException('暂不支持华为云翻译接口');
             default:
-                throw new Exception($translateApi . '翻译接口不支持');
+                throw new \RuntimeException($translateApi . '翻译接口不支持');
         }
     }
 
@@ -67,10 +65,7 @@ class Translation
      */
     public function getConfig(string $key)
     {
-        if (isset($this->config[$key])) {
-            return $this->config[$key];
-        }
-        return false;
+        return $this->config[$key] ?? false;
     }
 
     /**
@@ -79,18 +74,22 @@ class Translation
      * @param string $sourceLanguage
      * @param string $targetLanguage
      * @param string $text
-     * @return string
-     * @throws ClientException
+     * @return string|bool
      */
-    public function translate(string $sourceLanguage, string $targetLanguage, string $text): string
+    public function translate(string $sourceLanguage, string $targetLanguage, string $text): string|bool
     {
-        $transApi = new TransApi();
-        $apiConfig = $transApi->initApiByEnv();
-        $this->setConfig($apiConfig);
-        if (!is_object($this->translateObj)) {
-            throw new Exception('未配置接口，请先配置接口');
+        try {
+            $transApi = new TransApi();
+            $apiConfig = $transApi->initApiByEnv();
+            $this->setConfig($apiConfig);
+            if (!is_object($this->translateObj)) {
+                throw new \RuntimeException('未配置接口，请先配置接口');
+            }
+            return $this->translateObj->translate($sourceLanguage, $targetLanguage, $text);
+        } catch (Exception $e) {
+            Log::err($e->getMessage());
+            return false;
         }
-        return $this->translateObj->translate($sourceLanguage, $targetLanguage, $text);
     }
 
     /**
@@ -102,7 +101,7 @@ class Translation
      * @return array|false
      * @throws Exception
      */
-    public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $multiLineJson)
+    public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $multiLineJson): bool|array
     {
         $transApi = new TransApi();
         $apiConfig = $transApi->initApiByEnv();
@@ -110,7 +109,7 @@ class Translation
         $this->setConfig($apiConfig);
 
         if (!is_object($this->translateObj)) {
-            throw new Exception('未配置接口，请先配置接口');
+            throw new \RuntimeException('未配置接口，请先配置接口');
         }
         return $this->translateObj->batchTranslate($sourceLanguage, $targetLanguage, $multiLineJson);
     }
