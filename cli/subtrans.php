@@ -5,11 +5,11 @@ defined('APPLICATION_PATH')
 
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
+use EasySub\CheckSub;
 use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 use EasySub\Translated\TransApi;
 use EasySub\TransSub;
-use EasySub\CheckSub;
 
 require_once APPLICATION_PATH . '/cli/version.php';
 
@@ -28,7 +28,6 @@ $db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/config/database_sub
 
 $translationArray = [];
 $apiName = $_ENV['API_NAME'] ?? 'aliyun';
-$enableTrans = $_ENV['ENABLE_TRANS'] ?? false;
 $transApi = new TransApi();
 
 

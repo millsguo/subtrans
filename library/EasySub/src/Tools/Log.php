@@ -16,7 +16,7 @@ class Log
      * @return void
      * @throws Zend_Log_Exception
      */
-    protected static function checkLog()
+    protected static function checkLog(): void
     {
         if (!isset(self::$logObj)) {
             self::$logObj = new Zend_Log();
@@ -44,50 +44,47 @@ class Log
         }
     }
 
-    public static function info(string $message)
+    public static function info(string $message): void
     {
         self::log($message, 6);
     }
 
-    public static function warn(string $message)
+    public static function warn(string $message): void
     {
         self::log($message, 4);
     }
 
-    public static function err(string $message)
+    public static function err(string $message): void
     {
         self::log($message, 3);
     }
 
-    public static function debug($message)
+    public static function debug($message): void
     {
         if (is_string($message) || is_int($message) || is_float($message)) {
             $message = trim($message);
         } else {
             $message = print_r($message, true);
         }
-        $logDebug = $_ENV['LOG_DEBUG'] ?? 'false';
-        if (strtolower($logDebug) == 'true') {
-            self::log($message, 7);
-        }
+        self::log($message, 7);
     }
 
-    public static function critical(string $message)
+    public static function critical(string $message): void
     {
         self::log($message, 2);
     }
 
-    public static function alert(string $message)
+    public static function alert(string $message): void
     {
         self::log($message, 1);
     }
 
-    public static function emerge(string $message)
+    public static function emerge(string $message): void
     {
         self::log($message, 0);
     }
 
-    public static function notice(string $message)
+    public static function notice(string $message): void
     {
         self::log($message, 5);
     }
@@ -97,7 +94,7 @@ class Log
      * @param int $priority
      * @return void
      */
-    protected static function log(string $message, int $priority)
+    protected static function log(string $message, int $priority): void
     {
         try {
             self::checkLog();
