@@ -344,7 +344,7 @@ class CheckSub
                         if (stripos($subRangeStr, $subLanguage) !== false) {
                             $checkResult = self::checkSubTitleFileSize($currentFullFilePath);
                             if ($checkResult) {
-                                return $currentFileName;
+                                return $currentFullFilePath;
                             }
                         }
                         break;
