@@ -41,7 +41,12 @@ class Config
                 Log::info('配置文件不存在：' . $configFile);
                 return false;
             }
-            return new Zend_Config_Ini($configFile,$section,['allowModifications' => $allowModifications]);
+            if (empty($section)) {
+                $sectionValue = null;
+            } else {
+                $sectionValue = trim($section);
+            }
+            return new Zend_Config_Ini($configFile,$sectionValue,['allowModifications' => $allowModifications]);
         } catch (Zend_Config_Exception $e) {
             Log::debug($e->getMessage());
             return false;

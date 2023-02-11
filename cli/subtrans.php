@@ -24,35 +24,40 @@ Log::debug('Sqlite 初始化');
 $db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/config/database_subtrans'], 'sqlite');
 
 try {
-    $configArray = Config::getConfig($configPath,'translation');
-    if (isset($configArray->api_name)) {
-        $_ENV['API_NAME'] = $configArray->api_name;
+    $configArray = Config::getConfig($configPath);
+
+    $translationArray = $configArray->translation;
+    if (isset($translationArray->api_name)) {
+        $_ENV['API_NAME'] = $translationArray->api_name;
     }
-    if ($configArray) {
+    if ($translationArray) {
         Log::info('使用配置文件');
-        if (isset($configArray['translation']['aliyun1'])) {
-            foreach ($configArray['translation']['aliyun1'] as $key => $value) {
+        if (isset($translationArray->aliyun1)) {
+            $aliyunArray = $translationArray->aliyun1->toArray();
+            foreach ($aliyunArray as $key => $value) {
                 $_ENV[strtoupper($key) . '_1'] = $value;
             }
         }
-        if (isset($configArray['translation']['aliyun2'])) {
-            foreach ($configArray['translation']['aliyun2'] as $key => $value) {
+        if (isset($translationArray->aliyun2)) {
+            $aliyunArray = $translationArray->aliyun2->toArray();
+            foreach ($aliyunArray as $key => $value) {
                 $_ENV[strtoupper($key) . '_2'] = $value;
             }
         }
-
     }
 
     TransSub::initTranslation();
 
     for ($i = 1;$i <= 3; $i++) {
-        if (isset($configArray['volume']['movies-' . $i])) {
-            $dirPath = $configArray['volume']['movies-' . $i];
+        $moviesName = 'movies-' . $i;
+        $tvName = 'tv-' . $i;
+        if (isset($configArray->volume->{$moviesName})) {
+            $dirPath = $configArray->volume->{$moviesName};
             Log::info('扫描配置电影目录：' . $dirPath);
             CheckSub::scanDir($dirPath);
         }
-        if (isset($configArray['volume']['tv-' . $i])) {
-            $dirPath = $configArray['volume']['tv-' . $i];
+        if (isset($configArray->volume->{$tvName})) {
+            $dirPath = $configArray->volume->{$tvName};
             if (!empty($dirPath)) {
                 Log::info('扫描配置剧集目录：' . $dirPath);
                 CheckSub::scanDir($dirPath,true);
