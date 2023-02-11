@@ -30,6 +30,9 @@ try {
     if (isset($translationArray->api_name)) {
         $_ENV['API_NAME'] = $translationArray->api_name;
     }
+    if (isset($translationArray->enable_trans)) {
+        $_ENV['ENABLE_TRANS'] = $translationArray->enable_trans;
+    }
     if ($translationArray) {
         Log::info('使用配置文件');
         if (isset($translationArray->aliyun1)) {
