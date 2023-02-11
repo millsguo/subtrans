@@ -170,6 +170,7 @@ class TransSub
             $transApi = new TransApi();
             $transApi->updateApiCountByAccessKey(self::$translator->getConfig('access_key'), $translatedCount);
             self::$srtObj->writeSrt($targetSubFile, $writeSrtArray);
+            Log::info('字幕翻译成功，保存为：' . $targetSubFile);
             return true;
         } catch (Exception $e) {
             Log::debug($e->getMessage());

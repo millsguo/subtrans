@@ -59,7 +59,10 @@ class CheckSub
                     //目录
                     if (str_starts_with($fileName, 'Season')) {
                         Log::info('Season目录');
-                        self::checkFullSeasonSubZip($fullPath);
+                        $checkSeason = self::checkFullSeasonSubZip($fullPath);
+                        if ($checkSeason) {
+                            continue;
+                        }
                     }
                     self::scanDir($fullPath);
                 } elseif (is_readable($fullPath)) {
@@ -271,14 +274,14 @@ class CheckSub
                 }
                 $fullSubZip->close();
                 return true;
-            } else {
-                Log::info($fullSeasonSubFile . '压缩文件中没有字幕文件');
-                $fullSubZip->close();
-                return false;
             }
-        } else {
-            Log::info($fullSeasonSubFile . '压缩文件打开失败');
+
+            Log::info($fullSeasonSubFile . '压缩文件中没有字幕文件');
+            $fullSubZip->close();
+            return false;
         }
+
+        Log::info($fullSeasonSubFile . '压缩文件打开失败');
         return false;
     }
 

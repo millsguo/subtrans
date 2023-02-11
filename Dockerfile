@@ -1,4 +1,4 @@
-FROM php:8.1-cli
+FROM php:8.2-fpm
 
 ENV TZ=Asia/Shanghai PERMS=true \
     PUID=1026 PGID=100
@@ -7,7 +7,7 @@ ENV TZ=Asia/Shanghai PERMS=true \
 
 RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install --no-install-recommends -y yasm ffmpeg\
+    && apt-get install --no-install-recommends -y yasm ffmpeg nginx\
     # 通用
     ca-certificates \
     wget \

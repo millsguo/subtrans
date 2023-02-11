@@ -1,7 +1,7 @@
 <?php
 // Define path to application directory
 defined('APPLICATION_PATH')
-|| define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../'));
+|| define('APPLICATION_PATH', realpath(__DIR__ . '/../'));
 
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
