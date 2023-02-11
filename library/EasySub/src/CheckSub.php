@@ -120,7 +120,7 @@ class CheckSub
 
                             if (strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件');
-                                TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
+                                TransSub::transSubFile($fullPath . '/' . $engSubFile, $chineseSubFileName, 'eng', 'zh');
                             } else {
                                 Log::info('翻译功能已关闭');
                             }
