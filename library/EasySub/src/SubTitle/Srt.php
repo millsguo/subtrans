@@ -20,7 +20,7 @@ class Srt
     public function readToArray(string $filePath): array
     {
         if (!is_file($filePath)) {
-            throw new \RuntimeException('文件不存在:' . $filePath);
+            throw new \RuntimeException('字幕文件不存在:' . $filePath);
         }
 
         if (!is_readable($filePath)) {
