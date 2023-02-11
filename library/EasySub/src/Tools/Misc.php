@@ -27,4 +27,20 @@ class Misc
 
         return $dirArray;
     }
+
+    /**
+     * 检查文件是否存在，存在返回true，不存在返回false
+     * @param string $filePath
+     * @return bool
+     */
+    public static function checkFileExists(string $filePath): bool
+    {
+        if (!file_exists($filePath)) {
+            clearstatcache(true,$filePath);
+            if (!is_readable($filePath)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

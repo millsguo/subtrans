@@ -3,6 +3,7 @@
 namespace EasySub\SubTitle;
 
 use EasySub\Tools\Log;
+use EasySub\Tools\Misc;
 use Exception;
 
 /**
@@ -19,12 +20,8 @@ class Srt
      */
     public function readToArray(string $filePath): array
     {
-        if (!is_file($filePath)) {
+        if (!Misc::checkFileExists($filePath)) {
             throw new \RuntimeException('字幕文件不存在:' . $filePath);
-        }
-
-        if (!is_readable($filePath)) {
-            throw new \RuntimeException('文件读取失败:' . $filePath);
         }
 
         $filePathInfo = pathinfo($filePath);
