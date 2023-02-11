@@ -9,7 +9,7 @@ require_once APPLICATION_PATH . '/cli/bootstrap.php';
 defined('CLI_PATH')
 || define('CLI_PATH', realpath(__DIR__));
 
-$currentVersion = \EasySub\Tools\Config::updateVersion();
+$currentVersion = \EasySub\Tools\Config::getVersion();
 echo "开始打包，版本号：" . $currentVersion . "\r\n";
 
 echo '进入打包工作目录' . CLI_PATH . '/../' . "\r\n";
@@ -29,3 +29,5 @@ exec('docker tag millsguo/subtrans millsguo/subtrans:' . $currentVersion, $outpu
 echo "开始上传 " . $currentVersion . " 打包版本\r\n";
 exec('docker push millsguo/subtrans:' . $currentVersion, $output, $returnVar);
 echo "上传完成 " . $currentVersion . " 打包版本\r\n";
+
+\EasySub\Tools\Config::updateVersion();
