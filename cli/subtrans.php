@@ -3,8 +3,6 @@
 defined('APPLICATION_PATH')
 || define('APPLICATION_PATH', realpath(__DIR__ . '/../'));
 
-ini_set('cgi.fix_pathinfo',1);
-
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
 use EasySub\CheckSub;
@@ -20,6 +18,8 @@ Log::info('SubTrans Version ' . $currentVersion);
 //配置文件路径
 $configPath = APPLICATION_PATH . '/config/config.ini';
 
+//设置默认字符编码
+mb_internal_encoding('UTF-8');
 
 //初始化Sqlite
 Log::debug('Sqlite 初始化');

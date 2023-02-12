@@ -7,7 +7,7 @@ ENV TZ=Asia/Shanghai PERMS=true \
 
 RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install --no-install-recommends -y yasm ffmpeg nginx\
+    && apt-get install --no-install-recommends -y yasm ffmpeg nginx php-fpm\
     # 通用
     ca-certificates \
     wget \
@@ -27,7 +27,4 @@ WORKDIR /app/subtrans
 RUN rm /app/subtrans/database/subtrans \
     && mv /app/subtrans/database/subtrans-init /app/subtrans/database/subtrans
 
-CMD ["nginx","-g","daemon off;"]
-CMD ["service","nginx","start &"]
-CMD ["php", "./cli/subtrans.php"]
-CMD ["/bin/bash"]
+CMD ["/app/run.sh"]

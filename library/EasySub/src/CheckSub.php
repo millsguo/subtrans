@@ -86,7 +86,7 @@ class CheckSub
                                 continue 2;
                             }
                             //中文字幕文件名
-                            $chineseSubFileName = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.zh.srt';
+                            $chineseSubFileName = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.default.zh.srt';
                             //检查是否有已下载的字幕文件
                             $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, $isSeason);
                             if ($checkChineseSubZip) {
@@ -313,7 +313,8 @@ class CheckSub
         $languageTag = mb_substr($subFilename,($firstDotPos + 1),($endDotPos - $firstDotPos - 1));
         $tagDotCount = mb_substr_count($languageTag,'.');
         if ($tagDotCount > 0) {
-            $languageTag = mb_substr($languageTag,(mb_strrpos($languageTag,'.') + 1));
+            $startTagPos = mb_strrpos($languageTag,'.') + 1;
+            $languageTag = mb_substr($languageTag,$startTagPos);
         }
         return $languageTag;
     }

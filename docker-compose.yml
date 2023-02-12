@@ -1,0 +1,9 @@
+services:
+  web:
+    image: php:8.2-fpm
+    command:
+      - /usr/sbin/nginx
+      - -g
+      - daemon off;
+      - /usr/sbin/php-fpm7.2
+      - -F
