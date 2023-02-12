@@ -3,17 +3,17 @@
 namespace EasySub\Translated;
 
 use EasySub\Tools\Log;
+use EasySub\Tools\Table;
 use Exception;
-use Zend_Db_Table;
 use Zend_Db_Table_Row_Abstract;
 
 class TransApi
 {
-    protected Zend_Db_Table $apiTable;
+    protected Table $apiTable;
 
     public function __construct()
     {
-        $this->apiTable = new Zend_Db_Table('translation_api');
+        $this->apiTable = new Table('translation_api','id');
     }
 
     /**
@@ -30,6 +30,7 @@ class TransApi
             $apiRow = $this->getApiByAccessKey($accessKey);
             if (!$apiRow) {
                 //不存在此接口
+                Log::info('[' . $accessKey . ']接口数据不在数据库中');
                 $accessSecret = $_ENV['ACCESS_SECRET'] ?? '';
                 if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
                     $usePro = 1;
@@ -55,11 +56,13 @@ class TransApi
         }
 
         for ($i = 1; $i <= 5; $i++) {
-            if (isset($_ENV['ACCESS_KEY_' . $i])) {
-                $accessKey = trim($_ENV['ACCESS_KEY_' . $i]);
+            $accessKeyName = 'ACCESS_KEY_' . $i;
+            if (isset($_ENV[$accessKeyName])) {
+                $accessKey = trim($_ENV[$accessKeyName]);
                 $apiRow = $this->getApiByAccessKey($accessKey);
                 if (!$apiRow) {
                     //不存在此接口
+                    Log::info('[' . $accessKey . ']接口数据不在数据库中');
                     $accessSecret = $_ENV['ACCESS_SECRET_' . $i] ?? '';
                     if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
                         $usePro = 1;
@@ -79,7 +82,13 @@ class TransApi
                             60,
                             false
                         );
+                        if ($apiId) {
+                            Log::info('[' . $accessKey . ']保存至数据库成功');
+                        } else {
+                            Log::info('[' . $accessKey . ']保存至数据库失败');
+                        }
                     } catch (Exception $e) {
+                        Log::info($e->getMessage());
                     }
                 }
             }
@@ -222,13 +231,13 @@ class TransApi
      * @return bool
      * @throws Exception
      */
-    public function updateApiCount(int $apiId, int $translatedCount)
+    public function updateApiCount(int $apiId, int $translatedCount): bool
     {
         $apiRow = $this->getApi($apiId);
         if (!$apiRow) {
             return false;
         }
-        if ($apiRow->current_month_str != date('Ym')) {
+        if ($apiRow->current_month_str !== date('Ym')) {
             //不是本月数据，清零
             $data = [
                 'current_month_translated_count'    => 0,
@@ -274,7 +283,7 @@ class TransApi
      * @return bool
      * @throws Exception
      */
-    public function updateApiCountByAccessKey(string $accessKey, int $translatedCount)
+    public function updateApiCountByAccessKey(string $accessKey, int $translatedCount): bool
     {
         $apiRow = $this->getApiByAccessKey($accessKey);
         if (!$apiRow) {

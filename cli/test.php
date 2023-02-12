@@ -5,22 +5,10 @@ defined('APPLICATION_PATH')
 
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
-use EasySub\Tools\Config;
-use EasySub\Tools\Log;
-
-$currentVersion = Config::updateVersion();
-
-//获取配置文件
-$configPath = APPLICATION_PATH . '/config/config.ini';
-if (is_readable($configPath)) {
-    Config::setConfig($configPath);
-}
-
-Log::info('SubTrans Version ' . $currentVersion);
-
 
 try {
-
+    echo \EasySub\CheckSub::getLanguageTagFromSubFilename('Tulsa.King.S01E05.Token.Joe.2160p.AMZN.WEB-DL.DDP5.1.H.265-NTb.ass') . "\r\n";
+    echo \EasySub\CheckSub::getLanguageTagFromSubFilename('Tulsa King - S01E04 - Visitation Place WEBDL-2160p.eng.srt') . "\r\n";
 } catch (Exception $e) {
     echo $e->getMessage();
     echo $e->getTraceAsString();

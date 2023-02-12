@@ -44,47 +44,42 @@ class Log
         }
     }
 
-    public static function info(string $message): void
+    public static function info(mixed $message): void
     {
         self::log($message, 6);
     }
 
-    public static function warn(string $message): void
+    public static function warn(mixed $message): void
     {
         self::log($message, 4);
     }
 
-    public static function err(string $message): void
+    public static function err(mixed $message): void
     {
         self::log($message, 3);
     }
 
-    public static function debug($message): void
+    public static function debug(mixed $message): void
     {
-        if (is_string($message) || is_int($message) || is_float($message)) {
-            $message = trim($message);
-        } else {
-            $message = print_r($message, true);
-        }
         self::log($message, 7);
     }
 
-    public static function critical(string $message): void
+    public static function critical(mixed $message): void
     {
         self::log($message, 2);
     }
 
-    public static function alert(string $message): void
+    public static function alert(mixed $message): void
     {
         self::log($message, 1);
     }
 
-    public static function emerge(string $message): void
+    public static function emerge(mixed $message): void
     {
         self::log($message, 0);
     }
 
-    public static function notice(string $message): void
+    public static function notice(mixed $message): void
     {
         self::log($message, 5);
     }
@@ -94,10 +89,15 @@ class Log
      * @param int $priority
      * @return void
      */
-    protected static function log(string $message, int $priority): void
+    public static function log(mixed $message, int $priority = 6): void
     {
         try {
             self::checkLog();
+            if (is_string($message) || is_int($message) || is_float($message)) {
+                $message = trim($message);
+            } else {
+                $message = print_r($message, true);
+            }
             self::$logObj->log($message, $priority);
         } catch (Zend_Log_Exception $e) {
             self::$logObj->err($e->getMessage());

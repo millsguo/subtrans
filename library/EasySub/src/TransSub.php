@@ -163,6 +163,7 @@ class TransSub
                 $writeSrtArray[] = $itemData['sourceLine'] . "\r\n";
                 $writeSrtArray[] = "\r\n";
             }
+            Log::info('翻译完成，准备写入文件');
             $transApi = new TransApi();
             $transApi->updateApiCountByAccessKey(self::$translator->getConfig('access_key'), $translatedCount);
             self::$srtObj->writeSrt($targetSubFile, $writeSrtArray);
@@ -170,6 +171,7 @@ class TransSub
             return true;
         } catch (Exception $e) {
             Log::debug($e->getMessage());
+            Log::debug($e->getTraceAsString());
             return false;
         }
     }

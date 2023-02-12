@@ -25,8 +25,9 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /app/subtrans
 RUN rm /app/subtrans/database/subtrans \
-    && mv /app/subtrans/database/subtrans-init /app/subtrans/config/database_subtrans
+    && mv /app/subtrans/database/subtrans-init /app/subtrans/database/subtrans
 
 CMD ["nginx","-g","daemon off;"]
 CMD ["service","nginx","start &"]
 CMD ["php", "./cli/subtrans.php"]
+CMD ["/bin/bash"]

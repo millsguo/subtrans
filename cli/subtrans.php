@@ -3,6 +3,8 @@
 defined('APPLICATION_PATH')
 || define('APPLICATION_PATH', realpath(__DIR__ . '/../'));
 
+ini_set('cgi.fix_pathinfo',1);
+
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
 use EasySub\CheckSub;
@@ -21,7 +23,7 @@ $configPath = APPLICATION_PATH . '/config/config.ini';
 
 //初始化Sqlite
 Log::debug('Sqlite 初始化');
-$db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/config/database_subtrans'], 'sqlite');
+$db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/database/subtrans'], 'sqlite');
 
 try {
     $configArray = Config::getConfig($configPath);

@@ -128,7 +128,18 @@ class CheckSub
                         case 'srt':
                         case 'ass':
                             //字幕文件
-
+                            Log::info('找到字幕文件：' . $fileName);
+                            $fileEpisode = self::getSeasonEpisode($fileName);
+                            if (!$fileEpisode) {
+                                Log::info('字幕文件不是剧集字幕，跳过');
+                                continue 2;
+                            }
+                            $videoFileName = self::getSeasonEpisodeVideoFileByDir($fileInfo['dirname'],$dirArray,$fileEpisode);
+                            Log::info('匹配剧集：' . $videoFileName);
+                            $videoFileInfo = pathinfo($fileInfo['dirname'] . '/' . $videoFileName);
+                            if (!str_contains($fileName,$videoFileInfo['filename'])) {
+                                self::renameSubFilename($videoFileInfo,$fileInfo);
+                            }
                             break;
                     }
                 } else {
@@ -139,6 +150,39 @@ class CheckSub
             Log::debug($e->getMessage());
             Log::debug($e->getTraceAsString());
         }
+    }
+
+    /**
+     * 找到当前目录下的指定剧集的视频文件名
+     * @param string $dirPath
+     * @param array $dirArray
+     * @param string $episode
+     * @return bool|string
+     */
+    protected static function getSeasonEpisodeVideoFileByDir(string $dirPath, array $dirArray, string $episode): bool|string
+    {
+        foreach ($dirArray as $fileName) {
+            $fileInfo = pathinfo($dirPath . $fileName);
+            if (!isset($fileInfo['extension'])) {
+                //Log::debug($fullPath . '获取扩展名失败');
+                continue;
+            }
+            $fileExt = $fileInfo['extension'];
+            switch ($fileExt) {
+                case 'mkv':
+                case 'mp4':
+                    $fileEpisode = self::getSeasonEpisode($fileName);
+                    if (!$fileEpisode) {
+                        continue 2;
+                    }
+                    if ($fileEpisode === $episode) {
+                        return $fileName;
+                    }
+                    break;
+            }
+
+        }
+        return false;
     }
 
     /**
@@ -182,11 +226,11 @@ class CheckSub
                         Log::info('找到字幕压缩包' . $currentFile);
                         $outFileArray = self::getSubFileNameByZip($zipFile);
                         if (count($outFileArray) > 0) {
-                            //有字幕文件，先解压
-                            $zipFile->extractTo($videoFileInfo['dirname'], $outFileArray);
+                            //有字幕文件，先解压至subs_s01e01目录
+                            $zipFile->extractTo($videoFileInfo['dirname'] . '/subs_' . $seasonEpisode, $outFileArray);
                             //再将解压的字幕文件改名
                             foreach ($outFileArray as $subFile) {
-                                $subFileInfo = pathinfo($videoFileInfo['dirname'] . '/' . $subFile);
+                                $subFileInfo = pathinfo($videoFileInfo['dirname'] . '/subs_' . $seasonEpisode . '/' . $subFile);
 
                                 self::renameSubFilename($videoFileInfo, $subFileInfo);
                             }
@@ -223,12 +267,55 @@ class CheckSub
      */
     protected static function renameSubFilename(array $videoFileInfo, array $subFileInfo): void
     {
-        $seasonStr = self::getSeasonEpisode($subFileInfo['basename']);
-        $seasonPos = mb_stripos($subFileInfo['filename'], $seasonStr);
-        $subRangeStr = trim(mb_substr($subFileInfo['filename'], ($seasonPos + mb_strlen($seasonStr))), '.');
-        $newSubFile = $videoFileInfo['dirname'] . '/' . $videoFileInfo['filename'] . '.zh.' . $subRangeStr . '.' . $subFileInfo['extension'];
-        @rename($videoFileInfo['dirname'] . '/' . $subFileInfo['basename'], $newSubFile);
-        Log::info($subFileInfo['basename'] . '文件已解压并改名为：[' . $newSubFile . ']');
+        $subRangeStr = self::getLanguageTagFromSubFilename($subFileInfo['filename']);
+        if (empty($subRangeStr)) {
+            $subRangeStr = 'zh';
+        }
+        Log::info('语言标签：' . $subRangeStr);
+        switch ($subRangeStr) {
+            case 'zh':
+            case 'chs':
+            case 'eng':
+                break;
+            default:
+                //$subRangeStr = 'zh.' . $subRangeStr;
+                break;
+        }
+        $newSubFile = $videoFileInfo['filename'] . '.' . $subRangeStr . '.' . $subFileInfo['extension'];
+        if (!Misc::checkFileExists($videoFileInfo['dirname'] . '/' . $videoFileInfo['basename'])) {
+            Log::info('视频文件不存在');
+        }
+        if (!Misc::checkFileExists($subFileInfo['dirname'] . '/' . $subFileInfo['basename'])) {
+            Log::info('字幕文件不存在');
+        }
+        $renameResult = @rename($videoFileInfo['dirname'] . '/' . $subFileInfo['basename'], $videoFileInfo['dirname'] . '/' . $newSubFile);
+        if ($renameResult) {
+            Log::info('更名成功');
+            Log::info('文件改名为：[' . $videoFileInfo['basename'] . ']新文件名[' . $newSubFile . ']');
+        } else {
+            Log::info('更名失败');
+        }
+    }
+
+    /**
+     * 获取字幕文件中的语言标签
+     * @param string $subFilename
+     * @return string
+     */
+    public static function getLanguageTagFromSubFilename(string $subFilename): string
+    {
+        $dotCount = mb_substr_count($subFilename, '.');
+        if ($dotCount <= 1) {
+            return '';
+        }
+        $firstDotPos = mb_stripos($subFilename, '.');
+        $endDotPos = mb_strrpos($subFilename,'.');
+        $languageTag = mb_substr($subFilename,($firstDotPos + 1),($endDotPos - $firstDotPos - 1));
+        $tagDotCount = mb_substr_count($languageTag,'.');
+        if ($tagDotCount > 0) {
+            $languageTag = mb_substr($languageTag,(mb_strrpos($languageTag,'.') + 1));
+        }
+        return $languageTag;
     }
 
     /**
@@ -239,7 +326,7 @@ class CheckSub
     protected static function checkFullSeasonSubZip(string $seasonDir): bool
     {
         $dirPathInfo = pathinfo($seasonDir);
-        $seasonNumber = str_pad(trim(substr($dirPathInfo['basename'], 6)),2,"0",STR_PAD_LEFT);
+        $seasonNumber = str_pad(trim(substr($dirPathInfo['basename'], 6)), 2, "0", STR_PAD_LEFT);
         $fullSeasonSubFile = $seasonDir . '/s' . $seasonNumber . '.zip';
         if (!file_exists($fullSeasonSubFile)) {
             $fullSeasonSubFile = $seasonDir . '/S' . $seasonNumber . '.zip';
@@ -347,6 +434,13 @@ class CheckSub
                     case 'ssa':
                         Log::info('找到' . $currentFileName . '字幕文件');
                         if (stripos($subRangeStr, $subLanguage) !== false) {
+                            $checkResult = self::checkSubTitleFileSize($currentFullFilePath);
+                            if ($checkResult) {
+                                return $currentFullFilePath;
+                            }
+                        }
+                        //如果是检查中文字幕，则考虑chi字串，如chinese
+                        if ($subLanguage === 'zh' && stripos($subRangeStr, 'chi')) {
                             $checkResult = self::checkSubTitleFileSize($currentFullFilePath);
                             if ($checkResult) {
                                 return $currentFullFilePath;

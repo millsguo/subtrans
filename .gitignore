@@ -2,3 +2,6 @@
 /logs/*
 /vendor/*
 /config/config.ini
+/config/subtrans
+/config/database_subtrans
+/database/subtrans

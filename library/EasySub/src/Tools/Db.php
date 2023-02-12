@@ -63,7 +63,7 @@ class Db
     public function getDb(): Zend_Db_Adapter_Abstract
     {
         if (!isset($this->db)) {
-            throw new Exception('数据库连接未初始化');
+            throw new \RuntimeException('数据库连接未初始化');
         }
         return $this->db;
     }

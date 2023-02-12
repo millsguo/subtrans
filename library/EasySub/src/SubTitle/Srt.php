@@ -186,8 +186,13 @@ class Srt
         if ($runReturn === 1) {
             throw new \RuntimeException('获取字幕列表命令不存在或执行失败');
         }
+        if (empty($videoInfoArray)) {
+            throw new \RuntimeException('获取视频信息失败');
+        }
         $videoInfoJson = implode("\r\n", $videoInfoArray);
-
+        if (empty($videoInfoJson)) {
+            throw new \RuntimeException('获取视频信息失败');
+        }
         $jsonArray = json_decode($videoInfoJson, 320, 512, JSON_THROW_ON_ERROR);
 
         if (!isset($jsonArray['streams'])) {
