@@ -28,4 +28,9 @@ RUN rm /app/database/subtrans \
     && mv /app/database/subtrans-init /app/database/subtrans \
     && chmod +x /app/run.sh
 
+EXPOSE 6550
+STOPSIGNAL SIGQUIT
+
 ENTRYPOINT ["/app/run.sh"]
+
+CMD ["nginx","-g","daemon off;"]
