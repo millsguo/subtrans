@@ -5,3 +5,5 @@
 /config/subtrans
 /config/database_subtrans
 /database/subtrans
+/config/subtrans-bak.db
+/database/subtrans.bak.db
