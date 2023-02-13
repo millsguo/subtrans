@@ -10,7 +10,7 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
     && apt-get install --no-install-recommends -y yasm ffmpeg nginx\
     # 通用
     ca-certificates \
-    wget \
+    wget vim procps\
     libzip-dev zlib1g-dev\
     && /usr/local/bin/docker-php-ext-install zip\
     # cleanup
@@ -32,5 +32,3 @@ EXPOSE 6550
 STOPSIGNAL SIGQUIT
 
 ENTRYPOINT ["/app/run.sh"]
-
-CMD ["nginx","-g","daemon off;"]
