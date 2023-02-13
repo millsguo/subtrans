@@ -1,0 +1,51 @@
+<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+    <li class="nav-item">
+        <a href="/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'index') {
+    echo 'active';
+}?>">
+            <i class="nav-icon fas fa-th"></i>
+            <p>
+                管理面板
+            </p>
+        </a>
+    </li>
+    <li class="nav-item has-treeview <?php if (isset($this->controller) && $this->controller === 'movies') {
+    echo 'menu-open';
+}?>">
+        <a href="/movies/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'movies') {
+    echo 'active';
+}?>">
+            <i class="nav-icon fas fa-file-movie-o"></i>
+            <p>
+                电影库
+                <i class="right fas fa-angle-left"></i>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item has-treeview <?php if (isset($this->controller) && $this->controller === 'tv') {
+        echo 'menu-open';
+    }?>">
+        <a href="/tv/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'tv') {
+            echo 'active';
+        }?>">
+            <i class="nav-icon fas fa-tv"></i>
+            <p>
+                剧集库
+                <i class="right fas fa-angle-left"></i>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item has-treeview <?php if (isset($this->controller) && $this->controller === 'system') {
+    echo 'menu-open';
+}?>">
+        <a href="/system/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'system') {
+    echo 'active';
+}?>">
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+                系统设置
+                <i class="right fas fa-angle-left"></i>
+            </p>
+        </a>
+    </li>
+</ul>

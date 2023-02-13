@@ -1,0 +1,8 @@
+User-Agent: *
+Allow: /motul/
+Allow: /
+Disallow: /smsapi/
+Disallow: /sms/
+Disallow: /csems/
+Disallow: /v/
+Disallow: /oa/
