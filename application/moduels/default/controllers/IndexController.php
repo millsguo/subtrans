@@ -21,7 +21,7 @@ class IndexController extends Default_Model_ControllerHelper
     /**
      * 首页概况
      */
-    public function indexAction()
+    public function indexAction(): void
     {
     }
 }

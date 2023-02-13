@@ -108,7 +108,7 @@ class Config
         }
         $versionConfig = self::getConfig($versionPath,'version',true);
         $outVersion = $versionConfig->full_version;
-        if ((int)$versionConfig->major_version < 9) {
+        if ((int)$versionConfig->major_version < 99) {
             $versionConfig->major_version = (int)$versionConfig->major_version + 1;
         } elseif ($versionConfig->sub_version < 9) {
             $versionConfig->major_version = 1;
