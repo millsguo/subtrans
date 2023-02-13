@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e4be95edac0369edcab24859461f878b",
+    "content-hash": "86be3154ded504459952b416486042e0",
     "packages": [
         {
             "name": "adbario/php-dot-notation",
@@ -211,16 +211,16 @@
         },
         {
             "name": "alibabacloud/sdk",
-            "version": "1.8.1681",
+            "version": "1.8.1683",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aliyun/openapi-sdk-php.git",
-                "reference": "3763368fc2e0f8dcf0c9d3ff863bc766c95cf6d6"
+                "reference": "d7463a39c9a96a942e15bc465f8a540147f9018d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aliyun/openapi-sdk-php/zipball/3763368fc2e0f8dcf0c9d3ff863bc766c95cf6d6",
-                "reference": "3763368fc2e0f8dcf0c9d3ff863bc766c95cf6d6",
+                "url": "https://api.github.com/repos/aliyun/openapi-sdk-php/zipball/d7463a39c9a96a942e15bc465f8a540147f9018d",
+                "reference": "d7463a39c9a96a942e15bc465f8a540147f9018d",
                 "shasum": ""
             },
             "require": {
@@ -445,7 +445,7 @@
                 "issues": "https://github.com/aliyun/openapi-sdk-php/issues",
                 "source": "https://github.com/aliyun/openapi-sdk-php"
             },
-            "time": "2023-02-10T10:57:45+00:00"
+            "time": "2023-02-13T08:20:11+00:00"
         },
         {
             "name": "clagiordano/weblibs-configmanager",
@@ -2402,7 +2402,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "~8.2",
+        "php": "~8.1",
         "ext-json": "*",
         "ext-zip": "*"
     },
