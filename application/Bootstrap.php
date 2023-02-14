@@ -38,6 +38,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     public function _initLog(): void
     {
         Log::init(BASE_APP_PATH . '/logs/web.log');
+        try {
+            $this->bootstrap('log');
+        } catch (Zend_Application_Bootstrap_Exception $e) {
+            Log::err($e->getMessage());
+            Log::err($e->getTraceAsString());
+        }
     }
 
     /**
@@ -60,7 +66,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $nameSpace = ucfirst($moduleName);
         $autoLoader = new Zend_Application_Module_Autoloader([
             'namespace' => $nameSpace,
-            'basePath' => dirname(__FILE__ . '/modules/' . $moduleName)
+            'basePath' => APPLICATION_PATH . '/modules/' . $moduleName
         ]);
     }
 
@@ -115,18 +121,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             Log::info($e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * 文档头初始化
-     *
-     * @throws Zend_Application_Bootstrap_Exception
-     */
-    protected function _initDoctype(): void
-    {
-        $this->bootstrap('view');
-        $view = $this->getResource('view');
-        $view->doctype('HTML5');
     }
 
     /**
@@ -204,17 +198,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     public function _initModule(): void
     {
-//        $frontController = Zend_Controller_Front::getInstance();
-//        if ($frontController === null) {
-//            return;
-//        }
-//        $frontController->registerPlugin(new \EasySub\Tools\Module());
+        $frontController = Zend_Controller_Front::getInstance();
+        if ($frontController === null) {
+            return;
+        }
+        $frontController->registerPlugin(new \EasySub\Tools\Module());
     }
 
     /**
      * 邮件初始化
      */
-    public function _initMail(): void
+    public function initMail(): void
     {
         $this->_initLog();
         try {

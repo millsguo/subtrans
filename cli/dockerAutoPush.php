@@ -23,11 +23,11 @@ echo "latest开始上传\r\n";
 exec('docker push millsguo/subtrans', $output, $returnVar);
 echo "latest上传完成\r\n";
 
-echo "生成" . $currentVersion . " 版本标签\r\n";
-exec('docker tag millsguo/subtrans millsguo/subtrans:' . $currentVersion, $output, $returnVar);
-
-echo "开始上传 " . $currentVersion . " 打包版本\r\n";
-exec('docker push millsguo/subtrans:' . $currentVersion, $output, $returnVar);
-echo "上传完成 " . $currentVersion . " 打包版本\r\n";
+//echo "生成" . $currentVersion . " 版本标签\r\n";
+//exec('docker tag millsguo/subtrans millsguo/subtrans:' . $currentVersion, $output, $returnVar);
+//
+//echo "开始上传 " . $currentVersion . " 打包版本\r\n";
+//exec('docker push millsguo/subtrans:' . $currentVersion, $output, $returnVar);
+//echo "上传完成 " . $currentVersion . " 打包版本\r\n";
 
 \EasySub\Tools\Config::updateVersion();
