@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.1.15-fpm
 
 ENV TZ=Asia/Shanghai PERMS=true \
     PUID=1026 PGID=100
@@ -26,7 +26,8 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 WORKDIR /app
 RUN rm /app/database/subtrans \
     && mv /app/database/subtrans-init /app/database/subtrans \
-    && chmod +x /app/run.sh
+    && chmod +x /app/run.sh \
+    && chown -R www-data:www-data /app
 
 EXPOSE 6550
 STOPSIGNAL SIGQUIT

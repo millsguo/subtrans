@@ -41,7 +41,7 @@ class SystemController extends Default_Model_ControllerHelper
                 $this->quickRedirect(BASE_APP_PATH . '/config/config.ini配置文件不可写','/error/error/','danger');
             }
         }
-        $configIni = \EasySub\Tools\Config::getConfig(BASE_APP_PATH . '/config/config.ini','',true);
+        $configIni = \EasySub\Tools\Config::getConfig($configFilePath,'',true);
         if ($this->isPost()) {
             if (isset($this->params['enable_trans']) && $this->params['enable_trans'] === 'true') {
                 $enableTrans = true;

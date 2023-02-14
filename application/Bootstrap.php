@@ -194,8 +194,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     public function _initModule(): void
     {
-        $frontController = Zend_Controller_Front::getInstance();
-        $frontController?->registerPlugin(new \EasySub\Tools\Module());
+//        $frontController = Zend_Controller_Front::getInstance();
+//        if ($frontController === null) {
+//            return;
+//        }
+//        $frontController->registerPlugin(new \EasySub\Tools\Module());
     }
 
     /**

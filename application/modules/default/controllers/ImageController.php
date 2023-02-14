@@ -45,7 +45,9 @@ class ImageController extends Default_Model_ControllerHelper
             $this->quickRedirect('图片不存在','/error/error/','warning');
         }
         header("Content-type: image/jpg");
-        $imageObj = imagecreatefromjpeg($filePath);
-        echo imagejpeg($imageObj);
+        echo file_get_contents($filePath);
+
+//        $imageObj = imagecreatefromjpeg($filePath);
+//        echo imagejpeg($imageObj);
     }
 }
