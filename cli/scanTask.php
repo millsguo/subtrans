@@ -1,7 +1,7 @@
 <?php
 // Define path to application directory
 defined('APPLICATION_PATH')
-|| define('APPLICATION_PATH', realpath(__DIR__ . '/../'));
+|| define('APPLICATION_PATH', dirname(__DIR__));
 
 require_once APPLICATION_PATH . '/cli/bootstrap.php';
 
@@ -35,10 +35,10 @@ try {
     }
     if (isset($translationArray->enable_trans) && ($translationArray->enable_trans === 1 || $translationArray->enable_trans === "1")) {
         $_ENV['ENABLE_TRANS'] = true;
-        Log::info('找到翻译开关配置:' . $_ENV['ENABLE_TRANS']);
+        Log::info('启用机器翻译');
     }
     if ($translationArray) {
-        Log::info('使用配置文件');
+        Log::info('载入配置文件');
         if (isset($translationArray->aliyun1)) {
             $aliyunArray = $translationArray->aliyun1->toArray();
             foreach ($aliyunArray as $key => $value) {
@@ -54,47 +54,25 @@ try {
     }
 
     TransSub::initTranslation();
-    $isUseConfig = false;
-    for ($i = 1;$i <= 3; $i++) {
-        $moviesName = 'movie-' . $i;
-        $tvName = 'tv-' . $i;
-        if (isset($configArray->volume->{$moviesName})) {
-            $dirPath = $configArray->volume->{$moviesName};
-            Log::info('扫描配置电影目录：' . $dirPath);
-            CheckSub::scanDir($dirPath);
-            $isUseConfig = true;
-        }
-        if (isset($configArray->volume->{$tvName})) {
-            $dirPath = $configArray->volume->{$tvName};
-            if (!empty($dirPath)) {
-                Log::info('扫描配置剧集目录：' . $dirPath);
-                CheckSub::scanDir($dirPath,true);
-                $isUseConfig = true;
-            }
-        } else {
-            Log::info('配置剧集目录不存在');
-        }
 
-        if (!$isUseConfig) {
-            Log::info('开始处理挂载目录');
-            $moviesPath = '/data/movie-' . $i;
-            $tvPath = '/data/tv-' . $i;
-            if (is_dir($moviesPath)) {
-                Log::info('扫描挂载电影目录：' . $moviesPath);
-                CheckSub::scanDir($moviesPath);
+    $queueObj = new \EasySub\Task\Queue();
+    $count = 10;
+    $page = 1;
+    while ($rows = $queueObj->fetchTask($count,$page)) {
+        foreach ($rows as $row) {
+            if (strtolower($row->task_type) === 'tv') {
+                $isSeason = true;
             } else {
-                Log::info('目录不存在或未挂载 [' . $moviesPath . ']');
+                $isSeason = false;
             }
-
-            if (is_dir($tvPath)) {
-                Log::info('扫描挂载剧集目录：' . $tvPath);
-                CheckSub::scanDir($tvPath, true);
-            } else {
-                Log::info('目录不存在或未挂载 [' . $tvPath . ']');
-            }
+            checkSub::scanDir($row->target_path,$isSeason);
+            $queueObj->deleteTask($row->id);
         }
     }
+    Log::log('扫描任务完成');
 } catch (Exception $e) {
     echo $e->getMessage();
     echo $e->getTraceAsString();
 }
+\EasySub\Task\Command::stopScan();
+exit;

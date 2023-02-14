@@ -1,0 +1,96 @@
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">系统设置</h3>
+    </div>
+    <!-- /.card-header -->
+    <!-- form start -->
+    <form action="/system/config/" method="post" id="saveConfig" name="saveConfig">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="enable_trans">机器翻译</label>
+                <?php
+                $selectArray = ['true' => '启用','false' => '关闭'];
+                if (isset($this->config->translation->enable_trans) && ($this->config->translation->enable_trans === '1' || $this->config->translation->enable_trans === 1)) {
+                    $enableTrans = 'true';
+                } else {
+                    $enableTrans = 'false';
+                }
+                echo $this->formSelect('enable_trans',$enableTrans,['class' => 'form-control'],$selectArray);
+                ?>
+            </div>
+            <h5>阿里云第一个接口参数</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_1_access_key">Access Key</label>
+                        <?Php
+                        $accessKey_1 = $this->config->translation->aliyun1->access_key ?? '';
+                        echo $this->formText('aliyun_1_access_key',$accessKey_1,['class' => 'form-control','placeholder' => '输入阿里云接口的ACCESS_KEY']);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_1_access_secret">Access Secret</label>
+                        <?Php
+                        $accessSecret_1 = $this->config->translation->aliyun1->access_secret ?? '';
+                        echo $this->formText('aliyun_1_access_secret',$accessSecret_1,['class' => 'form-control','placeholder' => '输入阿里云接口的ACCESS_SECRET']);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_1_use_pro">是否调用专业翻译接口</label>
+                        <?Php
+                        if (isset($this->config->translation->aliyun1->use_pro) && ($this->config->translation->aliyun1->use_pro === 1 || $this->config->translation->aliyun1->use_pro === '1')) {
+                            $usePro_1 = 'true';
+                        } else {
+                            $usePro_1 = 'false';
+                        }
+                        echo $this->formSelect('aliyun_1_use_pro',$usePro_1,['class' => 'form-control'],$selectArray);
+                        ?>
+                    </div>
+                </div>
+            </div>
+            <h5>阿里云第二个接口参数</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_2_access_key">Access Key</label>
+                        <?Php
+                        $accessKey_2 = $this->config->translation->aliyun2->access_key ?? '';
+                        echo $this->formText('aliyun_2_access_key',$accessKey_2,['class' => 'form-control','placeholder' => '输入阿里云接口的ACCESS_KEY']);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_2_access_secret">Access Secret</label>
+                        <?Php
+                        $accessSecret_2 = $this->config->translation->aliyun2->access_secret ?? '';
+                        echo $this->formText('aliyun_2_access_secret',$accessSecret_2,['class' => 'form-control','placeholder' => '输入阿里云接口的ACCESS_SECRET']);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="aliyun_2_use_pro">是否调用专业翻译接口</label>
+                        <?Php
+                        if (isset($this->config->translation->aliyun2->use_pro) && ($this->config->translation->aliyun2->use_pro === 1 || $this->config->translation->aliyun2->use_pro === '1')) {
+                            $usePro_2 = 'true';
+                        } else {
+                            $usePro_2 = 'false';
+                        }
+                        echo $this->formSelect('aliyun_2_use_pro',$usePro_2,['class' => 'form-control'],$selectArray);
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+    </form>
+</div>

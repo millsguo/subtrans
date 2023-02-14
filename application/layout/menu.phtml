@@ -1,5 +1,5 @@
 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-    <li class="nav-item">
+    <li class="nav-item menu-open">
         <a href="/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'index') {
     echo 'active';
 }?>">
@@ -9,13 +9,13 @@
             </p>
         </a>
     </li>
-    <li class="nav-item has-treeview <?php if (isset($this->controller) && $this->controller === 'movies') {
+    <li class="nav-item has-treeview <?php if (isset($this->controller) && $this->controller === 'movie') {
     echo 'menu-open';
 }?>">
-        <a href="/movies/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'movies') {
+        <a href="/movie/" class="nav-link <?php if (isset($this->controller) && $this->controller === 'movie') {
     echo 'active';
 }?>">
-            <i class="nav-icon fas fa-file-movie-o"></i>
+            <i class="nav-icon fas fa-video"></i>
             <p>
                 电影库
                 <i class="right fas fa-angle-left"></i>

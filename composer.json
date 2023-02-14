@@ -15,7 +15,9 @@
     "php-ffmpeg/php-ffmpeg": "^0.19.0",
     "ext-json": "*",
     "shardj/zf1-future": "^1.20",
-    "ext-zip": "*"
+    "ext-zip": "*",
+    "ext-pcntl": "*",
+    "ext-gd": "*"
   },
   "autoload": {
     "psr-4": {

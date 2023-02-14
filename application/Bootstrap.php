@@ -32,6 +32,15 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     }
 
     /**
+     * 日志初始化
+     * @return void
+     */
+    public function _initLog(): void
+    {
+        Log::init(BASE_APP_PATH . '/logs/web.log');
+    }
+
+    /**
      * 设置自动加载
      */
     public function _initAutoload(): void
@@ -133,7 +142,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 Log::log($currentDomain);
                 return $currentDomain;
             }
-            $currentDomain = $_SERVER['HTTP_HOST'];
+            $currentDomain = $_SERVER['SERVER_NAME'];
             //保存当前注册使用的域名 xxx.com 格式
             Zend_Registry::set('domain', $currentDomain);
             return $currentDomain;
@@ -194,6 +203,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     public function _initMail(): void
     {
+        $this->_initLog();
         try {
             $config = \EasySub\Tools\Config::getConfig(BASE_APP_PATH . '/config/config.ini');
 
@@ -207,8 +217,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 ];
                 $transport = new Zend_Mail_Transport_Smtp($config->mail->smtp->server, $configParam);
                 Zend_Mail::setDefaultTransport($transport);
-            } else {
-                Log::info('未找到邮件配置');
             }
         } catch (Zend_Config_Exception|Zend_Exception $e) {
             Log::info($e->getMessage());

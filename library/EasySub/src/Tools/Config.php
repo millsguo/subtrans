@@ -2,6 +2,7 @@
 
 namespace EasySub\Tools;
 
+use Zend_Config;
 use Zend_Config_Exception;
 use Zend_Config_Ini;
 
@@ -66,7 +67,7 @@ class Config
             if ($data instanceof Zend_Config_Ini) {
                 $configObj = $data;
             } elseif (is_array($data)) {
-                $configObj = new \Zend_Config([],true);
+                $configObj = new Zend_Config([],true);
                 $configObj->{$section} = [];
                 $configObj->setExtend($section);
                 foreach ($data as $key => $value) {
@@ -131,5 +132,46 @@ class Config
         $versionPath = APPLICATION_PATH . '/insideConfig/version.ini';
         $versionConfig = self::getConfig($versionPath,'version',false);
         return $versionConfig->full_version ?? '0.0.0';
+    }
+
+    public static function initConfigFile()
+    {
+        $createConfigIni = new Zend_Config([],true);
+        $createConfigIni->translation = [];
+        $createConfigIni->volume = [];
+        $createConfigIni->setExtend('translation','volume');
+        $createConfigIni->translation->api_name = 'aliyun';
+        $createConfigIni->translation->enable_trans = false;
+        $createConfigIni->translation->aliyun1 = [
+            'access_key'    => '',
+            'access_secret' => '',
+            'use_pro'       => true
+        ];
+        $createConfigIni->translation->aliyun2 = [
+            'access_key'    => '',
+            'access_secret' => '',
+            'use_pro'       => true
+        ];
+        $createConfigIni->translation->aliyun3 = [
+            'access_key'    => '',
+            'access_secret' => '',
+            'use_pro'       => true
+        ];
+        for ($i = 1; $i <= 3;$i++) {
+            $moviesName = 'movie-' . $i;
+            $tvName = 'tv-' . $i;
+            $createConfigIni->volume->{$moviesName} = '/data/' . $moviesName;
+            $createConfigIni->volume->{$tvName} = '/data/' . $tvName;
+        }
+        $writeObj = new \Zend_Config_Writer_Ini();
+        $writeObj->setConfig($createConfigIni);
+        $writeObj->setFilename(BASE_APP_PATH . '/config/config.ini');
+        try {
+            $writeObj->write();
+            return true;
+        } catch (Zend_Config_Exception $e) {
+            Log::info($e->getMessage());
+            return false;
+        }
     }
 }

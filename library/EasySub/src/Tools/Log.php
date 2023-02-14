@@ -20,7 +20,11 @@ class Log
     {
         if (!isset(self::$logObj)) {
             self::$logObj = new Zend_Log();
-            self::$logObj->addWriter(new Zend_Log_Writer_Stream('php://output'));
+            if (PHP_SAPI === 'cli') {
+                self::$logObj->addWriter(new Zend_Log_Writer_Stream('php://output'));
+            } else {
+                self::$logObj->addWriter(new Zend_Log_Writer_Stream(BASE_APP_PATH . '/logs/web.log','a'));
+            }
         }
     }
 
