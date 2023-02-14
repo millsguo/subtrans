@@ -20,8 +20,7 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
        /var/lib/apt/lists/* \
        /var/tmp/*
 COPY . /app
-COPY ./nginx.conf /etc/nginx/nginx.conf
-#COPY ./config/version.ini /app/subtrans/config/version.ini
+COPY ./insideConfig/nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /app
 RUN rm /app/database/subtrans \
