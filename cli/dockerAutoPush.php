@@ -17,10 +17,18 @@ exec('cd ' . CLI_PATH . '/../', $output, $returnVar);
 
 echo '开始打包' . "\r\n";
 exec('docker build -t millsguo/subtrans .', $output, $returnVar);
+if ($returnVar !== 0) {
+    echo "打包出错\r\n";
+    exit();
+}
 echo "打包完成\r\n";
 
 echo "latest开始上传\r\n";
 exec('docker push millsguo/subtrans', $output, $returnVar);
+if ($returnVar !== 0) {
+    echo "上传出错\r\n";
+    exit();
+}
 echo "latest上传完成\r\n";
 
 //echo "生成" . $currentVersion . " 版本标签\r\n";

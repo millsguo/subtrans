@@ -21,11 +21,10 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
        /var/tmp/*
 COPY . /app
 COPY ./insideConfig/nginx.conf /etc/nginx/nginx.conf
+COPY ./insideConfig/subtrans-init /app/database/subtrans
 
 WORKDIR /app
-RUN rm /app/database/subtrans \
-    && mv /app/database/subtrans-init /app/database/subtrans \
-    && chmod +x /app/run.sh \
+RUN chmod +x /app/run.sh \
     && chown -R www-data:www-data /app
 
 EXPOSE 6550
