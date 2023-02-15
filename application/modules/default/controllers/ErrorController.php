@@ -17,6 +17,9 @@ class ErrorController extends Zend_Controller_Action
     public function errorAction()
     {
         $errors = $this->getParam('error_handler');
+        if (empty($errors)) {
+            $this->redirect('/error/show/code/404');
+        }
         switch ($errors->type) {
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ROUTE:
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_CONTROLLER:
@@ -36,21 +39,28 @@ class ErrorController extends Zend_Controller_Action
                 break;
         }
         // conditionally display exceptions
-        if ($this->getInvokeArg('displayExceptions')) {
-            $this->view->showExceptions = true;
+        //if ($this->getInvokeArg('displayExceptions')) {
+            //$this->view->showExceptions = true;
             $this->view->exception = $errors->exception;
             $this->view->request   = $errors->request;
-        }
+        //}
         $this->view->messageType = 'error';
-        $params = $errors->request->getParams();
+//        $params = $errors->request->getParams();
 
-        $this->render($errorPage);
-        $this->_helper->layout->setLayout('subtrans');
         if ($errorPage === '500') {
-            $traceStr = $errors->exception->getTraceAsString();
-            $traceStr .= print_r($params, true);
-            \EasySub\Tools\Log::log($errors->exception->getMessage());
+//            $traceStr = $errors->exception->getTraceAsString();
+            $traceStr = print_r($errors, true);
+            //\EasySub\Tools\Log::log($errors->exception->getMessage());
             \EasySub\Tools\Log::log($traceStr);
         }
+        $this->render($errorPage);
+        $this->_helper->layout->setLayout('subtrans');
+    }
+
+    public function showAction()
+    {
+        $this->view->messageType = $this->session->messageType ?? '默认消息';
+        $this->view->messageTitle = $this->session->messageTitle ?? '消息标题';
+        $this->view->message = $this->session->messageStr ?? '消息内容';
     }
 }

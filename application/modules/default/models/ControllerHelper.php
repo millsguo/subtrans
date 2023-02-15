@@ -6,6 +6,8 @@
  * 作者：millsguo
  */
 
+use EasySub\Tools\Log;
+
 /**
  *
  * @author MillsGuo
@@ -21,7 +23,7 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
      * @var int
      */
     protected int $page;
-    protected Zend_Controller_Action_Helper_Abstract $flashMessage;
+    private mixed $session;
 
     public function init(): void
     {
@@ -62,12 +64,9 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
         $this->view->page = $this->page;
         try {
             $this->initView();
-
-            $this->flashMessage = $this->_helper->getHelper('FlashMessenger');
-            $this->view->message = $this->flashMessage->getMessages();
         } catch (Zend_Controller_Exception $e) {
-            \EasySub\Tools\Log::err($e->getMessage());
-            \EasySub\Tools\Log::err($e->getTraceAsString());
+            Log::err($e->getMessage());
+            Log::err($e->getTraceAsString());
         }
 
         $this->params = $this->getAllParams();
@@ -81,18 +80,19 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
         if (Zend_Registry::isRegistered('session')) {
             try {
                 $this->session = Zend_Registry::get('session');
+                $this->view->session = $this->session;
+                if (isset($this->session->messageType)) {
+                    $this->view->messageType = $this->session->messageType;
+                }
+                if (isset($this->session->messageTitle)) {
+                    $this->view->messageTitle = $this->session->messageTitle;
+                }
+                if (isset($this->session->messageStr)) {
+                    $this->session->setExpirationHops(1,'messageStr',true);
+                    $this->view->message = $this->session->messageStr;
+                }
             } catch (Zend_Exception $e) {
-                $this->quickRedirect($e->getMessage(), '/error/', 'warning');
-            }
-            $this->view->session = $this->session;
-            if (isset($this->session->messageType)) {
-                $this->view->messageType = $this->session->messageType;
-            }
-            if (isset($this->session->messageTitle)) {
-                $this->view->messageTitle = $this->session->messageTitle;
-            }
-            if (isset($this->session->messageStr)) {
-                $this->view->messageStr = $this->session->messageStr;
+                $this->quickRedirect($e->getMessage(), '/error/show/', 'warning');
             }
         } else {
             $this->quickRedirect('SESSION未启用', '/error/', 'warning');
@@ -175,17 +175,10 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
         if (isset($this->session)) {
             $this->session->messageType = $type;
             if (is_array($message)) {
-                if (isset($message['title'])) {
-                    $this->session->messageTitle = $message['title'];
-                } else {
-                    $this->session->messageTitle = '';
-                }
-                if (isset($message['message'])) {
-                    $this->flashMessage->addMessage($message['message']);
-                    $this->session->messageStr = $message['message'];
-                }
+                $this->session->messageTitle = $message['title'] ?? '';
+                $this->session->messageStr = $message['message'] ?? '';
             } else {
-                $this->flashMessage->addMessage($message);
+                $this->session->messageTitle = '默认消息';
                 $this->session->messageStr = $message;
             }
         }

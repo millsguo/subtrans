@@ -3,12 +3,12 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>500 内部故障</h1>
+                <h1>错误信息</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="/">首页</a></li>
-                    <li class="breadcrumb-item active">500 内部故障</li>
+                    <li class="breadcrumb-item active">错误信息</li>
                 </ol>
             </div>
         </div>
@@ -18,24 +18,12 @@
 <!-- Main content -->
 <section class="content">
     <div class="error-page">
-        <h2 class="headline text-danger">500</h2>
+        <h2 class="headline text-danger"><?php echo $this->messageType ?? '错误';?></h2>
 
         <div class="error-content">
-            <h3><i class="fas fa-exclamation-triangle text-danger"></i> 估计是哪里代码出错了</h3>
-
+            <h3><i class="fas fa-exclamation-triangle text-danger"></i> <?php echo $this->messageTitle ?? '错误信息';?></h3>
+            <p><?php echo $this->message;?></p>
             <p>欢迎你到 <a href="https://github.com/millsguo/subtrans/issues/" target="_blank">GITHUB</a> 反馈</p>
-            <div class="card-widget card-blue">
-                <div class="card-header"><?php if (isset($this->exception)) {
-                    echo $this->exception->getMessage();
-                    }?></div>
-                <div class="card-body">
-                    <?php
-                    if (isset($this->exception)) {
-                        echo $this->exception->getTraceAsString();
-                    }
-                    ?>
-                </div>
-            </div>
         </div>
     </div>
     <!-- /.error-page -->

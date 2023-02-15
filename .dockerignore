@@ -1,6 +1,6 @@
 /.idea/
+.git
 /logs/*
-/vendor/*
 /config/*
-/database/subtrans
 /run/*
+/database/*

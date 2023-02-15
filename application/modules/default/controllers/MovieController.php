@@ -33,4 +33,16 @@ class MovieController extends Default_Model_ControllerHelper
     public function listAction(): void
     {
     }
+
+    public function scanAction()
+    {
+        if (!isset($this->params['target'])) {
+            $this->quickRedirect('未指定扫描目标','/movie/list/','warning');
+        }
+        if (strtolower($this->params['target']) === 'all') {
+            $taskObj = new \EasySub\Task\Queue();
+
+            $taskObj->addTask('movie','/data/movies-1');
+        }
+    }
 }

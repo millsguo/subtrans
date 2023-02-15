@@ -37,13 +37,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     public function _initLog(): void
     {
-        Log::init(BASE_APP_PATH . '/logs/web.log');
-        try {
-            $this->bootstrap('log');
-        } catch (Zend_Application_Bootstrap_Exception $e) {
-            Log::err($e->getMessage());
-            Log::err($e->getTraceAsString());
-        }
+        Log::init(BASE_APP_PATH . '/logs/web-' . date('Ymd') . '.log');
     }
 
     /**
@@ -98,6 +92,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     public function _initSession(): false|Zend_Session_Namespace
     {
+        $this->_initLog();
+
         $currentDomain = $this->_getCurrentDomain();
 
         $options = $this->getOptions();
@@ -107,15 +103,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             $options['cookie_domain'] = $currentDomain;
         }
         try {
+            if (!isset($options['save_path'])) {
+                $options['save_path'] = BASE_APP_PATH . '/run/session';
+            }
             Zend_Session::setOptions($options);
             Zend_Session::start();
             $session = new Zend_Session_Namespace('subtrans');
 
             if (!isset($session->initialized)) {
                 Zend_Session::regenerateId();
+                $session->initialized = true;
             }
             Zend_Registry::set('session', $session);
-
             return $session;
         } catch (Zend_Session_Exception $e) {
             Log::info($e->getMessage());
@@ -132,11 +131,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         try {
             if (Zend_Registry::isRegistered('domain')) {
-                $currentDomain = Zend_Registry::get('domain');
-                Log::log($currentDomain);
-                return $currentDomain;
+                return Zend_Registry::get('domain');
             }
-            $currentDomain = $_SERVER['SERVER_NAME'];
+            if ($_SERVER['SERVER_NAME'] === '0.0.0.0') {
+                $currentDomain = $_SERVER['HTTP_HOST'];
+                if (str_contains($currentDomain,':')) {
+                    $currentDomain = substr($currentDomain,0,strpos($currentDomain,':'));
+                }
+            } else {
+                $currentDomain = $_SERVER['SERVER_NAME'];
+            }
             //保存当前注册使用的域名 xxx.com 格式
             Zend_Registry::set('domain', $currentDomain);
             return $currentDomain;

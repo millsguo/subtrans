@@ -11,6 +11,12 @@ class Log
     protected static Zend_Log $logObj;
 
     /**
+     * 是否初始化
+     * @var bool
+     */
+    private static bool $isInit = false;
+
+    /**
      * 检查日志对象是否初始化
      *
      * @return void
@@ -36,10 +42,14 @@ class Log
      */
     public static function init(string $configFile): bool
     {
+        if (self::$isInit) {
+            return true;
+        }
         try {
             self::checkLog();
             $writer = new Zend_Log_Writer_Stream($configFile);
             self::$logObj->addWriter($writer);
+            self::$isInit = true;
             return true;
         } catch (Zend_Log_Exception $e) {
             echo $e->getMessage();
