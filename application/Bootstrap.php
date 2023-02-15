@@ -155,7 +155,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             $front = $this->getContainer()->frontcontroller;
             $front->setRequest(new Zend_Controller_Request_Http());
             $route = $front->getRouter();
-            $this->addModuleSupport($route,$this->_getCurrentDomain(),'default');
+            //$this->addModuleSupport($route,$this->_getCurrentDomain(),'default');
         } catch (Zend_Application_Bootstrap_Exception $e) {
             echo $e->getMessage();
             echo $e->getTraceAsString();
