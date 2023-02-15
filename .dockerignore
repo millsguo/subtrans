@@ -2,5 +2,5 @@
 .git
 /logs/*
 /config/*
-/run/*
+/run/session/*
 /database/*

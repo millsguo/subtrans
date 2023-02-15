@@ -27,6 +27,25 @@
         </div>
         <!-- /.error-content -->
     </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="card-widget card-blue">
+            <div class="card-header">环境参数</div>
+            <div class="card-body">
+                <?php
+                echo nl2br(print_r($_SERVER,true));
+                ?>
+            </div>
+        </div>
+        <div class="card-widget card-danger">
+            <div class="card-header">错误信息</div>
+            <div class="card-body">
+                <?php
+                echo nl2br(print_r($this->errors,true));
+                ?>
+            </div>
+        </div>
+    </div>
     <!-- /.error-page -->
 </section>
 <!-- /.content -->

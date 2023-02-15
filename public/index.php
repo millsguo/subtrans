@@ -21,15 +21,8 @@ require_once BASE_APP_PATH . '/vendor/autoload.php';
 
 /** Zend_Application */
 // Create application, bootstrap, and run
-try {
-    $application = new \Zend_Application(
-        APPLICATION_ENV,
-        APPLICATION_PATH . '/configs/application.ini'
-    );
-    $application->bootstrap()->run();
-} catch (\Zend_Application_Exception $e) {
-    \EasySub\Tools\Log::info($e->getMessage());
-    \EasySub\Tools\Log::info($e->getTraceAsString());
-    echo $e->getMessage() . "\r\n";
-    echo $e->getTraceAsString() . "\r\n";
-}
+$application = new \Zend_Application(
+    APPLICATION_ENV,
+    APPLICATION_PATH . '/configs/application.ini'
+);
+$application->bootstrap()->run();

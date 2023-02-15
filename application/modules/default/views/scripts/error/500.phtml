@@ -22,23 +22,43 @@
 
         <div class="error-content">
             <h3><i class="fas fa-exclamation-triangle text-danger"></i> 估计是哪里代码出错了</h3>
-
-            <p>欢迎你到 <a href="https://github.com/millsguo/subtrans/issues/" target="_blank">GITHUB</a> 反馈</p>
-            <div class="card-widget card-blue">
-                <div class="card-header"><?php if (isset($this->exception)) {
-                    echo $this->exception->getMessage();
-                    }?></div>
-                <div class="card-body">
-                    <?php
-                    if (isset($this->exception)) {
-                        echo $this->exception->getTraceAsString();
-                    }
-                    ?>
+            <?php
+            if (isset($this->showExceptions) && $this->showExceptions)
+            {
+                ?>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="card-widget card-blue">
+                            <div class="card-header"><?php if (isset($this->exception)) {
+                                    echo $this->exception->getMessage();
+                                }?></div>
+                            <div class="card-body">
+                                <?php
+                                if (isset($this->exception)) {
+                                    echo $this->exception->getTraceAsString();
+                                }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <?php
+            }
+            ?>
+            <p>欢迎你到 <a href="https://github.com/millsguo/subtrans/issues/" target="_blank">GITHUB</a> 反馈</p>
         </div>
     </div>
     <!-- /.error-page -->
-
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="card-widget card-blue">
+            <div class="card-header">环境参数</div>
+            <div class="card-body">
+                <?php
+                var_dump($_SERVER);
+                ?>
+            </div>
+        </div>
+    </div>
 </section>
 <!-- /.content -->

@@ -77,25 +77,24 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
      */
     protected function initSession(): void
     {
+        if (!is_dir(BASE_APP_PATH . '/run/session') && !mkdir($concurrentDirectory = BASE_APP_PATH . '/run/session') && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
         if (Zend_Registry::isRegistered('session')) {
-            try {
-                $this->session = Zend_Registry::get('session');
-                $this->view->session = $this->session;
-                if (isset($this->session->messageType)) {
-                    $this->view->messageType = $this->session->messageType;
-                }
-                if (isset($this->session->messageTitle)) {
-                    $this->view->messageTitle = $this->session->messageTitle;
-                }
-                if (isset($this->session->messageStr)) {
-                    $this->session->setExpirationHops(1,'messageStr',true);
-                    $this->view->message = $this->session->messageStr;
-                }
-            } catch (Zend_Exception $e) {
-                $this->quickRedirect($e->getMessage(), '/error/show/', 'warning');
+            $this->session = Zend_Registry::get('session');
+            $this->view->session = $this->session;
+            if (isset($this->session->messageType)) {
+                $this->view->messageType = $this->session->messageType;
+            }
+            if (isset($this->session->messageTitle)) {
+                $this->view->messageTitle = $this->session->messageTitle;
+            }
+            if (isset($this->session->messageStr)) {
+                $this->session->setExpirationHops(1,'messageStr',true);
+                $this->view->message = $this->session->messageStr;
             }
         } else {
-            $this->quickRedirect('SESSION未启用', '/error/', 'warning');
+            $this->quickRedirect('SESSION未启用', '/', 'warning');
         }
     }
 
