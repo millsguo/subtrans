@@ -29,7 +29,7 @@ class Log
             if (PHP_SAPI === 'cli') {
                 self::$logObj->addWriter(new Zend_Log_Writer_Stream('php://output'));
             } else {
-                self::$logObj->addWriter(new Zend_Log_Writer_Stream(BASE_APP_PATH . '/config/logs/web.log'));
+                self::$logObj->addWriter(new Zend_Log_Writer_Stream(BASE_APP_PATH . '/config/logs/web-' . date('Ymd') . '.log'));
             }
         }
     }

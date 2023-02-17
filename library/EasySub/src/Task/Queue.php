@@ -30,13 +30,14 @@ class Queue
     public function addTask(string $taskType,string $targetPath): bool
     {
         $taskHash = md5(strtoupper($taskType) . trim($targetPath,'/'));
-        if ($taskHash) {
+        $hashRow = $this->getTaskByHash($taskHash);
+        if ($hashRow) {
             $this->message = '任务已存在，请不要重复添加';
             return false;
         }
         $data = [
             'target_path'   => $targetPath,
-            'target_type'   => strtoupper($taskType),
+            'task_type'   => strtoupper($taskType),
             'task_hash'     => $taskHash,
             'task_time'     => time()
         ];
@@ -44,6 +45,7 @@ class Queue
         if ($result) {
             return true;
         }
+        $this->message = '保存任务至数据库失败';
         return false;
     }
 

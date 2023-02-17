@@ -41,8 +41,21 @@ class MovieController extends Default_Model_ControllerHelper
         }
         if (strtolower($this->params['target']) === 'all') {
             $taskObj = new \EasySub\Task\Queue();
-
-            $taskObj->addTask('movie','/data/movies-1');
+            $libraryArray = \EasySub\Video\Store::getMovieLibrary();
+            if (empty($libraryArray)) {
+                $this->quickRedirect('没有添加电影库','/movie/list/','warning');
+            }
+            $message = '';
+            foreach ($libraryArray as $moviePath) {
+                $result = $taskObj->addTask('movie',$moviePath);
+                if ($result) {
+                    $message .= '电影库[' . $moviePath . ']添加成功';
+                } else {
+                    $message .= '电影库[' . $moviePath . ']添加失败：' . $taskObj->getMessage();
+                }
+            }
+            $this->quickRedirect($message, '/movie/list/');
         }
+        $this->quickRedirect('暂不支持单独扫描', '/movie/list/','warning');
     }
 }

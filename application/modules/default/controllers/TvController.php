@@ -33,4 +33,29 @@ class TvController extends Default_Model_ControllerHelper
     public function listAction(): void
     {
     }
+
+    public function scanAction()
+    {
+        if (!isset($this->params['target'])) {
+            $this->quickRedirect('未指定扫描目标','/tv/list/','warning');
+        }
+        if (strtolower($this->params['target']) === 'all') {
+            $taskObj = new \EasySub\Task\Queue();
+            $tvLibraryArray = \EasySub\Video\Store::getTvLibrary();
+            if (!$tvLibraryArray) {
+                $this->quickRedirect('没有添加剧集库','/tv/list/','warning');
+            }
+            $message = '';
+            foreach ($tvLibraryArray as $tvPath) {
+                $result = $taskObj->addTask('tv',$tvPath);
+                if ($result) {
+                    $message .= '剧集库[' . $tvPath . ']添加成功';
+                } else {
+                    $message .= '剧集库[' . $tvPath . ']添加失败：' . $taskObj->getMessage();
+                }
+            }
+            $this->quickRedirect($message,'/tv/list/','warning');
+        }
+        $this->quickRedirect('暂不支持单独扫描', '/tv/list/','warning');
+    }
 }

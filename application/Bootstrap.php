@@ -80,7 +80,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             }
         }
         //初始化Sqlite
-        $db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/database/subtrans'], 'sqlite');
+        $db = new EasySub\Tools\Db(['dbname' => BASE_APP_PATH . '/database/subtrans'], 'sqlite');
 
         Zend_Registry::set('db', $db);
 

@@ -1,9 +1,11 @@
 <?php
+defined('BASE_APP_PATH')
+|| define('BASE_APP_PATH', dirname(__DIR__));
 // Define path to application directory
 defined('APPLICATION_PATH')
-|| define('APPLICATION_PATH', dirname(__DIR__));
+|| define('APPLICATION_PATH', BASE_APP_PATH . '/application');
 
-require_once APPLICATION_PATH . '/cli/bootstrap.php';
+require_once BASE_APP_PATH . '/cli/bootstrap.php';
 
 use EasySub\CheckSub;
 use EasySub\Tools\Config;
@@ -16,14 +18,14 @@ $currentVersion = Config::getVersion();
 Log::info('SubTrans Version ' . $currentVersion);
 
 //配置文件路径
-$configPath = APPLICATION_PATH . '/config/config.ini';
+$configPath = BASE_APP_PATH . '/config/config.ini';
 
 //设置默认字符编码
 mb_internal_encoding('UTF-8');
 
 //初始化Sqlite
 Log::debug('Sqlite 初始化');
-$db = new EasySub\Tools\Db(['dbname' => APPLICATION_PATH . '/database/subtrans'], 'sqlite');
+$db = new EasySub\Tools\Db(['dbname' => BASE_APP_PATH . '/database/subtrans'], 'sqlite');
 
 try {
     $configArray = Config::getConfig($configPath);
@@ -62,8 +64,10 @@ try {
         foreach ($rows as $row) {
             if (strtolower($row->task_type) === 'tv') {
                 $isSeason = true;
+                Log::info('扫描剧集：' . $row->target_path);
             } else {
                 $isSeason = false;
+                Log::info('扫描电影：' . $row->target_path);
             }
             checkSub::scanDir($row->target_path,$isSeason);
             $queueObj->deleteTask($row->id);
