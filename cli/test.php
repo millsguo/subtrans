@@ -1,13 +1,11 @@
 <?php
-// Define path to application directory
-defined('APPLICATION_PATH')
-|| define('APPLICATION_PATH', realpath(__DIR__ . '/../'));
-
-require_once APPLICATION_PATH . '/cli/bootstrap.php';
+require_once __DIR__ . '/bootstrap.php';
 
 
 try {
-    \EasySub\Task\Command::run('ps -ef');
+    $fileInfo = simplexml_load_string(file_get_contents(BASE_APP_PATH . '/run/movie.nfo'));
+
+    echo print_r($fileInfo,true);
 } catch (Exception $e) {
     echo $e->getMessage();
     echo $e->getTraceAsString();

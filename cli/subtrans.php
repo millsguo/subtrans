@@ -24,5 +24,6 @@ mb_internal_encoding('UTF-8');
 Log::debug('Sqlite 初始化');
 $db = new EasySub\Tools\Db(['dbname' => BASE_APP_PATH . '/database/subtrans'], 'sqlite');
 
-CheckSub::init();
+CheckSub::initCli();
+CheckSub::initLibrary();
 CheckSub::scanAll();

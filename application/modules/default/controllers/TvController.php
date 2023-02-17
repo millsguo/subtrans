@@ -16,6 +16,7 @@ class TvController extends Default_Model_ControllerHelper
 {
     public function action_init(): void
     {
+        \EasySub\CheckSub::initLibrary();
     }
     
     /**

@@ -7,7 +7,9 @@ use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 use EasySub\Tools\Misc;
 use EasySub\Translated\TransApi;
+use EasySub\Video\Movie;
 use EasySub\Video\Store;
+use EasySub\Video\Tv;
 use Exception;
 use ZipArchive;
 
@@ -27,10 +29,10 @@ class CheckSub
      * 初始化
      * @return void
      */
-    public static function init(): void
+    public static function initCli(): void
     {
         try {
-            $configArray = Config::getConfig(APPLICATION_PATH . '/config/config.ini');
+            $configArray = Config::getConfig(BASE_APP_PATH . '/config/config.ini');
 
             $translationArray = $configArray->translation;
             if (isset($translationArray->api_name)) {
@@ -64,21 +66,30 @@ class CheckSub
             }
 
             TransSub::initTranslation();
-            for ($i = 1;$i <= 3; $i++) {
-                $moviesName = 'movie-' . $i;
-                $tvName = 'tv-' . $i;
-                if (isset($configArray->volume->{$moviesName})) {
-                    Log::info('增加电影库：' . $configArray->volume->{$moviesName});
-                    Store::addMovieLibrary($configArray->volume->{$moviesName});
-                }
-                if (isset($configArray->volume->{$tvName})) {
-                    Log::info('增加剧集库：' . $configArray->volume->{$tvName});
-                    Store::addTvLibrary($configArray->volume->{$tvName});
-                }
-            }
         } catch (Exception $e) {
             echo $e->getMessage();
             echo $e->getTraceAsString();
+        }
+    }
+
+    /**
+     * 初始化库
+     * @return void
+     */
+    public static function initLibrary(): void
+    {
+        $configArray = Config::getConfig(BASE_APP_PATH . '/config/config.ini');
+        for ($i = 1;$i <= 3; $i++) {
+            $moviesName = 'movies-' . $i;
+            $tvName = 'tv-' . $i;
+            if (isset($configArray->volume->{$moviesName})) {
+                Log::info('增加电影库：' . $configArray->volume->{$moviesName});
+                Store::addMovieLibrary($configArray->volume->{$moviesName});
+            }
+            if (isset($configArray->volume->{$tvName})) {
+                Log::info('增加剧集库：' . $configArray->volume->{$tvName});
+                Store::addTvLibrary($configArray->volume->{$tvName});
+            }
         }
     }
 
@@ -142,6 +153,11 @@ class CheckSub
             Log::info('不是正确的目录' . $dirPath);
             return;
         }
+        if ($isSeason) {
+            $videoObj = new Movie();
+        } else {
+            $videoObj = new Tv();
+        }
         $dirPath = '/' . trim($dirPath, '/') . '/';
         try {
             $dirArray = Misc::scanDir($dirPath);
@@ -176,6 +192,12 @@ class CheckSub
                             $subFileName = self::checkSubTitleFile($fullPath, 'zh');
                             if ($subFileName) {
                                 Log::info('已有中文字幕文件，跳过');
+                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($addResult) {
+                                    Log::info('更新电影库成功');
+                                } else {
+                                    Log::info('更新电影库失败');
+                                }
                                 continue 2;
                             }
                             //中文字幕文件名
@@ -184,6 +206,12 @@ class CheckSub
                             $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, $isSeason);
                             if ($checkChineseSubZip) {
                                 Log::info('找到中文字幕包，并处理完成');
+                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($addResult) {
+                                    Log::info('更新电影库成功');
+                                } else {
+                                    Log::info('更新电影库失败');
+                                }
                                 continue 2;
                             }
                             //没有中文字幕
@@ -196,6 +224,12 @@ class CheckSub
                                 if ($exportSubResult === true) {
                                     //有内置中文字幕
                                     Log::info('内置中文字幕处理完成');
+                                    $addResult = $videoObj->addMovie($fullPath,true);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
+                                    } else {
+                                        Log::info('更新电影库失败');
+                                    }
                                     continue 2;
                                 }
                                 if ($exportSubResult === false) {
@@ -214,8 +248,20 @@ class CheckSub
                             if ($enableTrans === true || strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
+                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($addResult) {
+                                    Log::info('更新电影库成功');
+                                } else {
+                                    Log::info('更新电影库失败');
+                                }
                             } else {
                                 Log::info('翻译功能已关闭');
+                            }
+                            $addResult = $videoObj->addMovie($fullPath,false);
+                            if ($addResult) {
+                                Log::info('更新电影库成功');
+                            } else {
+                                Log::info('更新电影库失败');
                             }
                             break;
                         case 'srt':

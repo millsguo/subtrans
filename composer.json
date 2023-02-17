@@ -17,7 +17,8 @@
     "shardj/zf1-future": "^1.20",
     "ext-zip": "*",
     "ext-pcntl": "*",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "ext-simplexml": "*"
   },
   "autoload": {
     "psr-4": {

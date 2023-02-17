@@ -138,8 +138,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 $currentDomain = substr($currentDomain,0,strpos($currentDomain,':'));
             }
             $this->_initLog();
-            Log::info('Session Domain:' . $currentDomain);
-            Log::info($_SERVER);
             //保存当前注册使用的域名 xxx.com 格式
             Zend_Registry::set('domain', $currentDomain);
             return $currentDomain;

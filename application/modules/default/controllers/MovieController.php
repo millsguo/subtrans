@@ -16,6 +16,7 @@ class MovieController extends Default_Model_ControllerHelper
 {
     public function action_init(): void
     {
+        \EasySub\CheckSub::initLibrary();
     }
     
     /**
@@ -32,6 +33,11 @@ class MovieController extends Default_Model_ControllerHelper
      */
     public function listAction(): void
     {
+        $movie = new \EasySub\Video\Movie();
+        $where = [
+            'id > ?'    => 0
+        ];
+        $this->view->rows = $movie->autoFetch($where,'date_added DESC',30,$this->page,true);
     }
 
     public function scanAction()
