@@ -3,13 +3,106 @@
 namespace EasySub;
 
 use EasySub\SubTitle\Srt;
+use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 use EasySub\Tools\Misc;
+use EasySub\Translated\TransApi;
+use EasySub\Video\Store;
 use Exception;
 use ZipArchive;
 
 class CheckSub
 {
+    /**
+     * @var string 翻译接口提供商
+     */
+    public static string $apiName = 'aliyun';
+
+    /**
+     * @var bool 机器翻译开关
+     */
+    public static bool $enableTrans = false;
+
+    /**
+     * 初始化
+     * @return void
+     */
+    public static function init(): void
+    {
+        try {
+            $configArray = Config::getConfig(APPLICATION_PATH . '/config/config.ini');
+
+            $translationArray = $configArray->translation;
+            if (isset($translationArray->api_name)) {
+                self::$apiName = $translationArray->api_name;
+                Log::info('找到翻译API配置:' . self::$apiName);
+            }
+            if (isset($translationArray->enable_trans) && ($translationArray->enable_trans === 1 || $translationArray->enable_trans === "1")) {
+                self::$enableTrans = true;
+                Log::info('找到翻译开关:打开');
+            }
+            if ($translationArray) {
+                Log::info('使用配置文件');
+                if (isset($translationArray->aliyun1)) {
+                    $aliyunArray = $translationArray->aliyun1->toArray();
+                    if ($aliyunArray['use_pro'] === 1) {
+                        $usePro = true;
+                    } else {
+                        $usePro = false;
+                    }
+                    TransApi::addApiConfig($aliyunArray['access_key'],$aliyunArray['access_secret'],$usePro);
+                }
+                if (isset($translationArray->aliyun2)) {
+                    $aliyunArray = $translationArray->aliyun2->toArray();
+                    if ($aliyunArray['use_pro'] === 1) {
+                        $usePro = true;
+                    } else {
+                        $usePro = false;
+                    }
+                    TransApi::addApiConfig($aliyunArray['access_key'],$aliyunArray['access_secret'],$usePro);
+                }
+            }
+
+            TransSub::initTranslation();
+            for ($i = 1;$i <= 3; $i++) {
+                $moviesName = 'movie-' . $i;
+                $tvName = 'tv-' . $i;
+                if (isset($configArray->volume->{$moviesName})) {
+                    Log::info('增加电影库：' . $configArray->volume->{$moviesName});
+                    Store::addMovieLibrary($configArray->volume->{$moviesName});
+                }
+                if (isset($configArray->volume->{$tvName})) {
+                    Log::info('增加剧集库：' . $configArray->volume->{$tvName});
+                    Store::addTvLibrary($configArray->volume->{$tvName});
+                }
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            echo $e->getTraceAsString();
+        }
+    }
+
+    /**
+     * 扫描所有库
+     * @return void
+     */
+    public static function scanAll(): void
+    {
+        //扫描目录
+        Log::info('扫描电影库');
+        $movieLibrary = Store::getMovieLibrary();
+        foreach ($movieLibrary as $dirPath) {
+            Log::info('扫描电影目录：' . $dirPath);
+            self::scanDir($dirPath);
+        }
+        Log::info('扫描剧集库');
+        $tvLibrary = Store::getTvLibrary();
+        foreach ($tvLibrary as $dirPath) {
+            Log::info('扫描剧集目录：' . $dirPath);
+            self::scanDir($dirPath,true);
+        }
+    }
+
     /**
      * @param ZipArchive $fullSubZip
      * @return array

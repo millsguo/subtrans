@@ -6,13 +6,13 @@ date_default_timezone_set('Asia/Shanghai');
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
-    realpath(APPLICATION_PATH . '/library'),
-    realpath(APPLICATION_PATH . '/vendor'),
+    realpath(BASE_APP_PATH . '/library'),
+    realpath(BASE_APP_PATH . '/vendor'),
     get_include_path(),
 )));
 
-require_once APPLICATION_PATH . '/vendor/autoload.php';
+require_once BASE_APP_PATH . '/vendor/autoload.php';
 
-$logFile = APPLICATION_PATH . '/logs/' . date('Ymd') . '.log';
+$logFile = BASE_APP_PATH . '/logs/' . date('Ymd') . '.log';
 
 \EasySub\Tools\Log::init($logFile);

@@ -133,14 +133,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             if (Zend_Registry::isRegistered('domain')) {
                 return Zend_Registry::get('domain');
             }
-            if ($_SERVER['SERVER_NAME'] === '0.0.0.0') {
-                $currentDomain = $_SERVER['HTTP_HOST'];
-                if (str_contains($currentDomain,':')) {
-                    $currentDomain = substr($currentDomain,0,strpos($currentDomain,':'));
-                }
-            } else {
-                $currentDomain = $_SERVER['SERVER_NAME'];
+            $currentDomain = $_SERVER['HTTP_HOST'];
+            if (str_contains($currentDomain,':')) {
+                $currentDomain = substr($currentDomain,0,strpos($currentDomain,':'));
             }
+            $this->_initLog();
+            Log::info('Session Domain:' . $currentDomain);
+            Log::info($_SERVER);
             //保存当前注册使用的域名 xxx.com 格式
             Zend_Registry::set('domain', $currentDomain);
             return $currentDomain;

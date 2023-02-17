@@ -130,6 +130,11 @@
                 echo $this->partial('menu.phtml', ['controller' => $this->controller]);
                 ?>
             </nav>
+            <div class="text-center" style="width:150px;height:40px;position: fixed;bottom:10px;left:50px;">Version
+                <?php
+                echo EasySub\Tools\Config::getVersion();
+                ?>
+            </div>
             <!-- /.sidebar-menu -->
         </div>
         <!-- /.sidebar -->

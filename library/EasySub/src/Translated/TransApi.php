@@ -9,11 +9,76 @@ use Zend_Db_Table_Row_Abstract;
 
 class TransApi
 {
+    /**
+     * @var array API配置
+     */
+    private static array $apiConfigArray = [];
+
     protected Table $apiTable;
 
     public function __construct()
     {
         $this->apiTable = new Table('translation_api','id');
+    }
+
+    /**
+     * @param string $accessKey
+     * @param string $accessSecret
+     * @param bool $usePro
+     * @return bool
+     */
+    public static function addApiConfig(string $accessKey,string $accessSecret,bool $usePro): bool
+    {
+        if (!isset(self::$apiConfigArray[$accessKey])) {
+            self::$apiConfigArray[$accessKey] = [
+                'access_key' => $accessKey,
+                'access_secret' => $accessSecret,
+                'use_pro'   => $usePro
+            ];
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 初始化翻译接口
+     * @return array
+     * @throws Exception
+     */
+    public function initApi(): array
+    {
+        if (count(self::$apiConfigArray) > 0) {
+            foreach (self::$apiConfigArray as $key => $config) {
+                $apiRow = $this->getApiByAccessKey($key);
+                if (!$apiRow) {
+                    $regionId = $config['region_id'] ?? 'cn-hangzhou';
+                    $this->addApi(
+                        'ALIYUN API',
+                        'aliyun',
+                        $config['access_key'],
+                        $config['access_secret'],
+                        $config['use_pro'],
+                        $regionId,
+                        1000000,
+                        60,
+                        false
+                    );
+                }
+            }
+        }
+
+        $usedApiRow = $this->getSmartApi();
+        if (!$usedApiRow) {
+            throw new \RuntimeException('没有满足条件的可用接口');
+        }
+        return [
+            'translate_api' => $usedApiRow->api_type,
+            'access_key'    => $usedApiRow->api_access_key,
+            'access_secret' => $usedApiRow->api_access_secret,
+            'region_id'     => $usedApiRow->api_region_id,
+            'use_pro'       => $usedApiRow->api_use_pro,
+            'id'            => $usedApiRow->id
+        ];
     }
 
     /**

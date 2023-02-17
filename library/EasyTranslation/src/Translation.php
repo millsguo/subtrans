@@ -80,7 +80,7 @@ class Translation
     {
         try {
             $transApi = new TransApi();
-            $apiConfig = $transApi->initApiByEnv();
+            $apiConfig = $transApi->initApi();
             $this->setConfig($apiConfig);
             if (!is_object($this->translateObj)) {
                 throw new \RuntimeException('未配置接口，请先配置接口');
@@ -104,7 +104,7 @@ class Translation
     public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $multiLineJson): bool|array
     {
         $transApi = new TransApi();
-        $apiConfig = $transApi->initApiByEnv();
+        $apiConfig = $transApi->initApi();
         Log::info('使用' . $apiConfig['id'] . '号接口');
         $this->setConfig($apiConfig);
 
