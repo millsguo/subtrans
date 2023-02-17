@@ -60,6 +60,7 @@ class MovieController extends Default_Model_ControllerHelper
                     $message .= '电影库[' . $moviePath . ']添加失败：' . $taskObj->getMessage();
                 }
             }
+            \EasySub\Task\Command::runScan();
             $this->quickRedirect($message, '/movie/list/');
         }
         $this->quickRedirect('暂不支持单独扫描', '/movie/list/','warning');

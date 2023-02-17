@@ -55,6 +55,7 @@ class TvController extends Default_Model_ControllerHelper
                     $message .= '剧集库[' . $tvPath . ']添加失败：' . $taskObj->getMessage();
                 }
             }
+            \EasySub\Task\Command::runScan();
             $this->quickRedirect($message,'/tv/list/','warning');
         }
         $this->quickRedirect('暂不支持单独扫描', '/tv/list/','warning');
