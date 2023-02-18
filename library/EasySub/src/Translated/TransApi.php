@@ -14,11 +14,11 @@ class TransApi
      */
     private static array $apiConfigArray = [];
 
-    protected Table $apiTable;
+    protected static Table $apiTable;
 
     public function __construct()
     {
-        $this->apiTable = new Table('translation_api','id');
+        self::$apiTable = new Table('translation_api','id');
     }
 
     /**
@@ -45,14 +45,14 @@ class TransApi
      * @return array
      * @throws Exception
      */
-    public function initApi(): array
+    public static function initApi(): array
     {
         if (count(self::$apiConfigArray) > 0) {
             foreach (self::$apiConfigArray as $key => $config) {
-                $apiRow = $this->getApiByAccessKey($key);
+                $apiRow = self::getApiByAccessKey($key);
                 if (!$apiRow) {
                     $regionId = $config['region_id'] ?? 'cn-hangzhou';
-                    $this->addApi(
+                    self::addApi(
                         'ALIYUN API',
                         'aliyun',
                         $config['access_key'],
@@ -67,7 +67,7 @@ class TransApi
             }
         }
 
-        $usedApiRow = $this->getSmartApi();
+        $usedApiRow = self::getSmartApi();
         if (!$usedApiRow) {
             throw new \RuntimeException('没有满足条件的可用接口');
         }
@@ -86,12 +86,12 @@ class TransApi
      *
      * @return array
      */
-    public function initApiByEnv(): array
+    public static function initApiByEnv(): array
     {
         if (isset($_ENV['ACCESS_KEY'])) {
             Log::info('使用环境变量');
             $accessKey = trim($_ENV['ACCESS_KEY']);
-            $apiRow = $this->getApiByAccessKey($accessKey);
+            $apiRow = self::getApiByAccessKey($accessKey);
             if (!$apiRow) {
                 //不存在此接口
                 Log::info('[' . $accessKey . ']接口数据不在数据库中');
@@ -103,7 +103,7 @@ class TransApi
                 }
                 $regionId = $_ENV['REGION_ID'] ?? 'cn-hangzhou';
                 try {
-                    $apiId = $this->addApi(
+                    $apiId = self::addApi(
                         'ALIYUN API',
                         'aliyun',
                         $accessKey,
@@ -123,7 +123,7 @@ class TransApi
             $accessKeyName = 'ACCESS_KEY_' . $i;
             if (isset($_ENV[$accessKeyName])) {
                 $accessKey = trim($_ENV[$accessKeyName]);
-                $apiRow = $this->getApiByAccessKey($accessKey);
+                $apiRow = self::getApiByAccessKey($accessKey);
                 if (!$apiRow) {
                     //不存在此接口
                     Log::info('[' . $accessKey . ']接口数据不在数据库中');
@@ -135,7 +135,7 @@ class TransApi
                     }
                     $regionId = $_ENV['REGION_ID_' . $i] ?? 'cn-hangzhou';
                     try {
-                        $apiId = $this->addApi(
+                        $apiId = self::addApi(
                             'ALIYUN API',
                             'aliyun',
                             $accessKey,
@@ -157,7 +157,7 @@ class TransApi
                 }
             }
         }
-        $usedApiRow = $this->getSmartApi();
+        $usedApiRow = self::getSmartApi();
         if (!$usedApiRow) {
             throw new \RuntimeException('没有满足条件的可用接口');
         }
@@ -186,7 +186,7 @@ class TransApi
      * @return bool|int
      * @throws Exception
      */
-    public function addApi(
+    public static function addApi(
         string $apiName,
         string $apiType,
         string $accessKey,
@@ -197,7 +197,7 @@ class TransApi
         int $feeCount,
         bool $enablePay = false): bool|int
     {
-        $apiRow = $this->getApiByAccessKey($accessKey);
+        $apiRow = self::getApiByAccessKey($accessKey);
         if ($apiRow) {
             throw new \RuntimeException('AccessKey已存在');
         }
@@ -217,7 +217,7 @@ class TransApi
             'fee_count' => $feeCount,
             'enable_pay'    => $enablePay
         ];
-        $apiId = $this->apiTable->insert($data);
+        $apiId = self::$apiTable->insert($data);
         if ($apiId) {
             return (int)$apiId;
         }
@@ -231,12 +231,12 @@ class TransApi
      * @param int $id
      * @return bool|Zend_Db_Table_Row_Abstract
      */
-    public function getApi(int $id): Zend_Db_Table_Row_Abstract|bool
+    public static function getApi(int $id): Zend_Db_Table_Row_Abstract|bool
     {
         $where = [
             'id = ?'=> $id
         ];
-        $row = $this->apiTable->fetchRow($where);
+        $row = self::$apiTable->fetchRow($where);
         if (isset($row->id)) {
             return $row;
         }
@@ -250,12 +250,12 @@ class TransApi
      * @param string $accessKey
      * @return false|Zend_Db_Table_Row_Abstract
      */
-    public function getApiByAccessKey(string $accessKey): bool|Zend_Db_Table_Row_Abstract
+    public static function getApiByAccessKey(string $accessKey): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'api_access_key = ?'    => $accessKey
         ];
-        $row = $this->apiTable->fetchRow($where);
+        $row = self::$apiTable->fetchRow($where);
         if (isset($row->id)) {
             return $row;
         }
@@ -268,12 +268,12 @@ class TransApi
      *
      * @return false|Zend_Db_Table_Row_Abstract
      */
-    public function getSmartApi(): bool|Zend_Db_Table_Row_Abstract
+    public static function getSmartApi(): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'id > ?'    => 0
         ];
-        $apiRows = $this->apiTable->fetchAll($where, 'id ASC');
+        $apiRows = self::$apiTable->fetchAll($where, 'id ASC');
         if (is_countable($apiRows)) {
             foreach ($apiRows as $apiRow) {
                 if ((int)$apiRow->current_month_limit === 0) {
@@ -295,9 +295,9 @@ class TransApi
      * @return bool
      * @throws Exception
      */
-    public function updateApiCount(int $apiId, int $translatedCount): bool
+    public static function updateApiCount(int $apiId, int $translatedCount): bool
     {
-        $apiRow = $this->getApi($apiId);
+        $apiRow = self::getApi($apiId);
         if (!$apiRow) {
             return false;
         }
@@ -309,11 +309,11 @@ class TransApi
                 'current_month_limit'               => 0,
                 'current_month_str'                 => date('Ym')
             ];
-            $updateResult = $this->apiTable->update($data, ['id = ?' => $apiId]);
+            $updateResult = self::$apiTable->update($data, ['id = ?' => $apiId]);
             if (!$updateResult) {
                 throw new \RuntimeException('更新月数据失败');
             }
-            $apiRow = $this->getApi($apiId);
+            $apiRow = self::getApi($apiId);
         }
         $data = [
             'current_month_translated_count'    => (int)$apiRow->current_month_translated_count + $translatedCount,
@@ -332,7 +332,7 @@ class TransApi
                 $data['current_month_limit'] = 1;
             }
         }
-        $updateResult = $this->apiTable->update($data, ['id = ?' => $apiId]);
+        $updateResult = self::$apiTable->update($data, ['id = ?' => $apiId]);
         if (!$updateResult) {
             throw new \RuntimeException('更新免费翻译字数失败');
         }
@@ -347,12 +347,12 @@ class TransApi
      * @return bool
      * @throws Exception
      */
-    public function updateApiCountByAccessKey(string $accessKey, int $translatedCount): bool
+    public static function updateApiCountByAccessKey(string $accessKey, int $translatedCount): bool
     {
-        $apiRow = $this->getApiByAccessKey($accessKey);
+        $apiRow = self::getApiByAccessKey($accessKey);
         if (!$apiRow) {
             throw new \RuntimeException('接口不存在');
         }
-        return $this->updateApiCount($apiRow->id, $translatedCount);
+        return self::updateApiCount($apiRow->id, $translatedCount);
     }
 }

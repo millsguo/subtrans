@@ -164,8 +164,7 @@ class TransSub
                 $writeSrtArray[] = "\r\n";
             }
             Log::info('翻译完成，准备写入文件');
-            $transApi = new TransApi();
-            $transApi->updateApiCountByAccessKey(self::$translator->getConfig('access_key'), $translatedCount);
+            TransApi::updateApiCountByAccessKey(self::$translator->getConfig('access_key'), $translatedCount);
             self::$srtObj->writeSrt($targetSubFile, $writeSrtArray);
             Log::info('字幕翻译成功，保存为：' . $targetSubFile);
             return true;

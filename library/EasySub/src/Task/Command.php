@@ -4,6 +4,7 @@ namespace EasySub\Task;
 
 use EasySub\CheckSub;
 use EasySub\Tools\Log;
+use EasySub\Translated\TransApi;
 use EasySub\TransSub;
 
 class Command
@@ -24,6 +25,7 @@ class Command
             return false;
         }
 
+        TransApi::initApiByEnv();
         TransSub::initTranslation();
 
         $queueObj = new \EasySub\Task\Queue();

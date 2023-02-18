@@ -88,7 +88,8 @@ class Daemon
                     echo $e->getMessage();
                     echo $e->getTraceAsString();
                 }
-                exit('子进程退出');
+                Log::info('子进程退出');
+                exit();
             } else {
                 //父进程
                 Log::info('子进程ID：' . $pid);

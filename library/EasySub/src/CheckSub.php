@@ -154,9 +154,9 @@ class CheckSub
             return;
         }
         if ($isSeason) {
-            $videoObj = new Movie();
-        } else {
             $videoObj = new Tv();
+        } else {
+            $videoObj = new Movie();
         }
         $dirPath = '/' . trim($dirPath, '/') . '/';
         try {
