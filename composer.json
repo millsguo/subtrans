@@ -18,7 +18,8 @@
     "ext-zip": "*",
     "ext-pcntl": "*",
     "ext-gd": "*",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "ext-posix": "*"
   },
   "autoload": {
     "psr-4": {

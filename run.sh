@@ -8,6 +8,9 @@ if [ ! -d "/app/config/log/nginx" ]; then
 fi
 
 php-fpm -D
+
+php /app/cli/scanTask.php --start &
+
 nginx -g "daemon off;"
 
 

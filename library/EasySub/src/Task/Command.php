@@ -2,7 +2,9 @@
 
 namespace EasySub\Task;
 
+use EasySub\CheckSub;
 use EasySub\Tools\Log;
+use EasySub\TransSub;
 
 class Command
 {
@@ -13,34 +15,41 @@ class Command
 
     /**
      * 执行命令
-     * @return bool|array
+     * @return bool
      */
-    public static function runScan(): bool|array
+    public static function runScan(): bool
     {
         if (self::$scanTaskRunning) {
             Log::log('扫描子任务正在执行');
             return false;
         }
-        $command = 'php ' . BASE_APP_PATH . '/cli/scanTask.php';
-        Log::info('主任务进程启动');
-        $subPid = pcntl_fork();
-        if ($subPid === -1) {
-            Log::log('子进程失败');
-            return false;
-        }
 
-        if ($subPid) {
-            Log::info('子进程ID：' . $subPid);
-            pcntl_wait($status);
-            self::$scanTaskRunning = true;
-            return true;
-        }
+        TransSub::initTranslation();
 
-        Log::info('子进程启动');
-        exec($command, $outArray,$returnState);
-        Log::info('子进程信息');
-        Log::info($outArray);
-        exit();
+        $queueObj = new \EasySub\Task\Queue();
+        $count = 10;
+        $page = 1;
+        while ($rows = $queueObj->fetchTask($count,$page)) {
+            if (is_countable($rows) && count($rows) > 0) {
+                foreach ($rows as $row) {
+                    if (strtolower($row->task_type) === 'tv') {
+                        $isSeason = true;
+                        Log::info('扫描剧集：' . $row->target_path);
+                    } else {
+                        $isSeason = false;
+                        Log::info('扫描电影：' . $row->target_path);
+                    }
+                    checkSub::scanDir($row->target_path,$isSeason);
+                    $queueObj->deleteTask($row->id);
+                }
+            } else {
+                Log::log('任务队列为空');
+                break;
+            }
+        }
+        self::stopScan();
+        Log::log('扫描任务完成');
+        return true;
     }
 
     /**

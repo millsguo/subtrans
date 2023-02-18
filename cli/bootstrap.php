@@ -5,7 +5,10 @@ set_time_limit(0);
 date_default_timezone_set('Asia/Shanghai');
 
 defined('BASE_APP_PATH')
-|| define('BASE_APP_PATH', dirname(__DIR__) . '/');
+|| define('BASE_APP_PATH', dirname(__DIR__));
+
+defined('APPLICATION_PATH')
+|| define('APPLICATION_PATH', BASE_APP_PATH . '/application');
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(

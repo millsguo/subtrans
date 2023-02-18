@@ -85,7 +85,6 @@ class TransApi
      * 通过环境变更初始化接口
      *
      * @return array
-     * @throws Exception
      */
     public function initApiByEnv(): array
     {
