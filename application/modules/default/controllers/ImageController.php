@@ -34,21 +34,21 @@ class ImageController extends Default_Model_ControllerHelper
      */
     public function showAction(): void
     {
-        if (!isset($this->params['dir'],$this->params['filename'])) {
+        if (isset($this->params['code'])) {
+            $filePath = base64_decode($this->params['code']);
+        } elseif (isset($this->params['dir'],$this->params['filename'])) {
+            $filePath = urldecode($this->params['dir']) . urldecode($this->params['filename']);
+        } else {
             $this->quickRedirect('图片访问参数错误','/','warning');
         }
-
-        $filePath = urldecode($this->params['dir']) . urldecode($this->params['filename']);
         if (!str_starts_with($filePath,'/data/')){
-            //$this->quickRedirect('仅允许访问挂载目录','/','danger');
+            die('仅允许访问挂载目录');
         }
+        $filePath = "'" . $filePath . "'";
         if (!is_readable($filePath)) {
-            $this->quickRedirect('图片不存在','/','warning');
+            die('[' . $filePath . ']图片不存在');
         }
         header("Content-type: image/jpg");
         echo file_get_contents($filePath);
-
-//        $imageObj = imagecreatefromjpeg($filePath);
-//        echo imagejpeg($imageObj);
     }
 }

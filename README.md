@@ -17,36 +17,16 @@ docker pull millsguo/subtrans
 /第三个剧集目录   /data/tv-3
 ````
 
-### 第二步，在应用配置目录创建config.ini文件，增加以下内容，暂时仅支持aliyun的翻译接口
+### 第二步，配置docker环境参数，增加以下参数
 ````
-[translation]
-api_name = aliyun
-;是否启用机器翻译，不启用设为false
-enable_trans = true
+PGID=推荐使用EMBY账号的GID，用于读取电影或剧集目录
+PUID=推荐使用EMBY账号的UID，用于读取电影或剧集目录
 
-;阿里云的ACCESS_KEY#
-aliyun1.access_key = ####
-;阿里云的ACCESS_SECRET
-aliyun1.access_secret = ####
-;是否使用专业翻译接口，专业接口稍贵一点，但也有100W字符的免费额度
-aliyun1.use_pro = true 
-
-;第二个阿里云的ACCESS_KEY#
-aliyun2.access_key = ####
-;第二个阿里云的ACCESS_SECRET
-aliyun2.access_secret = ####
-;是否使用专业翻译接口，专业接口稍贵一点，但也有100W字符的免费额度
-aliyun2.use_pro = true
-
-;以下为需要扫描的挂载路径，请不要轻易更改
-[volume]
-movies-1 = /data/movies-1
-movies-2 = /data/movies-2
-movies-3 = /data/movies-3
-tv-1 = /data/tv-1
-tv-2 = /data/tv-2
-tv-3 = /data/tv-3
+端口配置：
+6550 web端口
 ````
+
+### 第三步，启动docker容器，用浏览器打开主机【IP:6550】,系统自动进入配置页，配置好翻译接口后，在电影库和剧集库点击扫描
 
 ### 处理逻辑如下
 

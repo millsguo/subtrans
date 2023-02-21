@@ -22,6 +22,17 @@ class TransApi
     }
 
     /**
+     * 初始化数据库表
+     * @return void
+     */
+    private static function initTable(): void
+    {
+        if (!isset(self::$apiTable)) {
+            self::$apiTable = new Table('translation_api','id');
+        }
+    }
+
+    /**
      * @param string $accessKey
      * @param string $accessSecret
      * @param bool $usePro
@@ -47,6 +58,7 @@ class TransApi
      */
     public static function initApi(): array
     {
+        self::initTable();
         if (count(self::$apiConfigArray) > 0) {
             foreach (self::$apiConfigArray as $key => $config) {
                 $apiRow = self::getApiByAccessKey($key);
@@ -88,6 +100,7 @@ class TransApi
      */
     public static function initApiByEnv(): array
     {
+        self::initTable();
         if (isset($_ENV['ACCESS_KEY'])) {
             Log::info('使用环境变量');
             $accessKey = trim($_ENV['ACCESS_KEY']);
@@ -197,6 +210,7 @@ class TransApi
         int $feeCount,
         bool $enablePay = false): bool|int
     {
+        self::initTable();
         $apiRow = self::getApiByAccessKey($accessKey);
         if ($apiRow) {
             throw new \RuntimeException('AccessKey已存在');
@@ -233,6 +247,7 @@ class TransApi
      */
     public static function getApi(int $id): Zend_Db_Table_Row_Abstract|bool
     {
+        self::initTable();
         $where = [
             'id = ?'=> $id
         ];
@@ -252,6 +267,7 @@ class TransApi
      */
     public static function getApiByAccessKey(string $accessKey): bool|Zend_Db_Table_Row_Abstract
     {
+        self::initTable();
         $where = [
             'api_access_key = ?'    => $accessKey
         ];
@@ -270,6 +286,7 @@ class TransApi
      */
     public static function getSmartApi(): bool|Zend_Db_Table_Row_Abstract
     {
+        self::initTable();
         $where = [
             'id > ?'    => 0
         ];
@@ -297,6 +314,7 @@ class TransApi
      */
     public static function updateApiCount(int $apiId, int $translatedCount): bool
     {
+        self::initTable();
         $apiRow = self::getApi($apiId);
         if (!$apiRow) {
             return false;

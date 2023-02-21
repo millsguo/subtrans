@@ -12,9 +12,9 @@
             if (is_countable($this->rows) && count($this->rows) > 0) {
                 foreach ($this->rows as $row) {
             ?>
-            <div class="col-sm-3" style="width: 200px;height: 300px;">
-                <div class="position-relative p-3 bg-gray" style="border-radius: .75rem!important;height: 180px">
-                    <img src="../../dist/img/photo1.png" alt="Photo 1" class="img-fluid">
+            <div class="col-sm-2" style="height: 180px;">
+                <div class="position-relative p-3 bg-gray" style="border-radius: .75rem!important;height: 180px;width:120px;">
+                    <img src="/image/show?code=<?php echo base64_encode($row->file_path . '/poster.jpg'); ?>" alt="" class="img-fluid">
                     <?php echo $row->title;?> <br>
                     <small><?php echo $row->year;?></small>
                 </div>

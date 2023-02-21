@@ -7,6 +7,10 @@ if [ ! -d "/app/config/log/nginx" ]; then
   mkdir /app/config/log/nginx
 fi
 
+if [ ! -f "/app/config/subtrans" ]; then
+  cp /app/insideConfig/subtrans-init /app/config/subtrans
+fi
+
 php-fpm -D
 
 php /app/cli/scanTask.php --start &

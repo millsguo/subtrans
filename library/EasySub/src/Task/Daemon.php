@@ -53,7 +53,7 @@ class Daemon
 
                 //初始化Sqlite
                 Log::debug('Sqlite 初始化');
-                $db = new Db(['dbname' => BASE_APP_PATH . '/database/subtrans'], 'sqlite');
+                $db = new Db(['dbname' => BASE_APP_PATH . '/config/subtrans'], 'sqlite');
 
                 try {
                     $configArray = Config::getConfig($configPath);
