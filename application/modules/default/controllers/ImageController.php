@@ -44,7 +44,7 @@ class ImageController extends Default_Model_ControllerHelper
         if (!str_starts_with($filePath,'/data/')){
             die('仅允许访问挂载目录');
         }
-        $filePath = "'" . $filePath . "'";
+        $filePath = str_replace(' ','\ ',$filePath);
         if (!is_readable($filePath)) {
             die('[' . $filePath . ']图片不存在');
         }
