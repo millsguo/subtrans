@@ -16,8 +16,3 @@ php-fpm -D
 php /app/cli/scanTask.php --start &
 
 nginx -g "daemon off;"
-
-
-#cd /app/public || exit
-
-#php -S 0.0.0.0:6550

@@ -9,9 +9,12 @@ class Tv
 
     private Table $infoTable;
     private string $message = '';
+    private Table $seasonTable;
 
     public function __construct()
     {
+
+        $this->seasonTable = new Table('tv_season');
         $this->infoTable = new Table('tv_info');
     }
 

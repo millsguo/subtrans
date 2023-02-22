@@ -1,4 +1,4 @@
-FROM php:8.1.15-fpm
+FROM php:8.1.16-fpm
 
 ENV TZ=Asia/Shanghai PERMS=true \
     PUID=1026 PGID=100

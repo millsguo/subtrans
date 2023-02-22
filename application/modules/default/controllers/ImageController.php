@@ -39,13 +39,19 @@ class ImageController extends Default_Model_ControllerHelper
         } elseif (isset($this->params['dir'],$this->params['filename'])) {
             $filePath = urldecode($this->params['dir']) . urldecode($this->params['filename']);
         } else {
-            $this->quickRedirect('图片访问参数错误','/','warning');
+            die('图片访问参数错误');
         }
         if (!str_starts_with($filePath,'/data/')){
             die('仅允许访问挂载目录');
         }
-        $filePath = str_replace(' ','\ ',$filePath);
+        if (isset($this->params['trans']) && $this->params['trans'] === 'open') {
+            $filePath = str_replace(array(' ', '(', ')'), array('\ ', '\(', '\)'), $filePath);
+        }
         if (!is_readable($filePath)) {
+            $dirArray = scandir('/data/movies-1');
+            echo print_r($dirArray,true);
+            $fileArray = scandir(dirname($filePath));
+            echo print_r($fileArray,true);
             die('[' . $filePath . ']图片不存在');
         }
         header("Content-type: image/jpg");
