@@ -2,13 +2,18 @@
 
 namespace EasySub\Video;
 
+use EasySub\Tools\NfoTrait;
 use EasySub\Tools\Table;
+use Zend_Db_Table_Row_Abstract;
 
+/**
+ * 电影类
+ */
 class Movie
 {
+    use NfoTrait;
 
     private Table $infoTable;
-    private string $message = '';
 
     public function __construct()
     {
@@ -47,7 +52,8 @@ class Movie
         } else {
             $baseData['have_zh_sub'] = 0;
         }
-        $embyData = $this->getNfo($dirPath,$fileName);
+        $embyData = $this->getNfo($dirPath,$fileName,'movieInfo');
+
         $data = array_merge($baseData,$embyData);
 
         $existsRow = $this->getMovieByHash($pathHash);
@@ -66,9 +72,9 @@ class Movie
     /**
      * 通过文件路径HASH查询信息
      * @param string $pathHash
-     * @return bool|\Zend_Db_Table_Row_Abstract
+     * @return bool|Zend_Db_Table_Row_Abstract
      */
-    public function getMovieByHash(string $pathHash): bool|\Zend_Db_Table_Row_Abstract
+    public function getMovieByHash(string $pathHash): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'file_path_hash = ?'    => $pathHash
@@ -83,9 +89,9 @@ class Movie
     /**
      * 获取信息
      * @param int $id
-     * @return bool|\Zend_Db_Table_Row_Abstract
+     * @return bool|Zend_Db_Table_Row_Abstract
      */
-    public function getMovie(int $id): bool|\Zend_Db_Table_Row_Abstract
+    public function getMovie(int $id): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
             'id = ?'    => $id
@@ -126,77 +132,5 @@ class Movie
     public function autoFetch($where,$order,$count,$page,bool $isPage = false): bool|\Zend_Paginator|\Zend_Db_Table_Rowset_Abstract
     {
         return $this->infoTable->autoFetch($where,$order,$count,$page,$isPage);
-    }
-
-    /**
-     * 获取NFO信息
-     * @param string $dirPath
-     * @param string $fileName
-     * @return array
-     */
-    private function getNfo(string $dirPath,string $fileName): array
-    {
-        if (is_readable($dirPath . '/' . $fileName . '.nfo')) {
-            //EMBY 刮削信息
-            $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $fileName . '.nfo'));
-            return $this->getDataFromEmbyNfo($fileInfo);
-        }
-
-        return [];
-    }
-
-    /**
-     * 获取NFO数据到数组
-     * @param \SimpleXMLElement $simpleXml
-     * @return array
-     */
-    private function getDataFromEmbyNfo(\SimpleXMLElement $simpleXml): array
-    {
-        $returnField = [
-            'title',
-            'originaltitle',
-            'dateadded',
-            'rating',
-            'year',
-            'imdbid',
-            'tmdbid',
-            'runtime'
-        ];
-        $data = [];
-        foreach ($returnField as $key) {
-            switch ($key) {
-                case 'originaltitle':
-                    if (isset($simpleXml->{$key})) {
-                        $data['original_title'] = $simpleXml->{$key};
-                    }
-                    break;
-                case 'dateadded':
-                    if (isset($simpleXml->{$key})) {
-                        $data['date_added'] = $simpleXml->{$key};
-                    }
-                    break;
-                case 'imdbid':
-                    if (isset($simpleXml->{$key})) {
-                        $data['imdb_id'] = $simpleXml->{$key};
-                    }
-                    break;
-                case 'tmdbid':
-                    if (isset($simpleXml->{$key})) {
-                        $data['tmdb_id'] = $simpleXml->{$key};
-                    }
-                    break;
-                default:
-                    if (isset($simpleXml->{$key})) {
-                        $data[$key] = $simpleXml->{$key};
-                    }
-                    break;
-            }
-        }
-        return $data;
-    }
-
-    public function getMessage(): string
-    {
-        return $this->message;
     }
 }
