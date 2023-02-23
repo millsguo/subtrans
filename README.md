@@ -1,5 +1,6 @@
 # subtrans
 使用机器翻译自动翻译电影和剧集的字幕，最新剧集不用苦等字幕
+推荐搭配sonarr,radarr,emby，程序支持sonarr、radarr的目录结构，读取emby的nfo元数据
 
 ```
 docker pull millsguo/subtrans
@@ -8,7 +9,7 @@ docker pull millsguo/subtrans
 ### 第一步，配置存储空间，设置挂载目录，目前暂时支持以下6个挂载目录
 ````
 #主机目录        docker装载路径
-/应用配置目录     /app/subtrans/config
+/应用配置目录     /app/config
 /第一个电影目录   /data/movies-1
 /第二个电影目录   /data/movies-2
 /第三个电影目录   /data/movies-3
