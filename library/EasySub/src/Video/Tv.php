@@ -434,6 +434,7 @@ class Tv
                     Log::err('剧集添加失败');
                     return false;
                 }
+                $tvRow = $this->getTv($tvId);
             } else {
                 $tvId = $tvRow->id;
             }
