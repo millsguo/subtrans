@@ -17,7 +17,15 @@ trait NfoTrait
      */
     protected function getNfo(string $dirPath,string $fileName,string $nfoType = 'movieInfo'): array
     {
-        if (is_readable($dirPath . '/' . $fileName . '.nfo')) {
+        if (!is_readable($dirPath . '/' . $fileName)) {
+            return [];
+        }
+        $fileInfo = pathinfo($dirPath . '/' . $fileName);
+        if (!isset($fileInfo['filename'])) {
+            return [];
+        }
+        $preFilename = $fileInfo['filename'];
+        if (is_readable($dirPath . '/' . $preFilename . '.nfo')) {
             //EMBY 刮削信息
             $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $fileName . '.nfo'));
             return $this->getDataFromEmbyNfo($fileInfo,$nfoType);

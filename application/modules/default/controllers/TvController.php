@@ -33,6 +33,11 @@ class TvController extends Default_Model_ControllerHelper
      */
     public function listAction(): void
     {
+        $tv = new \EasySub\Video\Tv();
+        $where = [
+            'id > ?'    => 0
+        ];
+        $this->view->rows = $tv->autoFetchTv($where,'date_added DESC',30,$this->page,true);
     }
 
     public function scanAction()

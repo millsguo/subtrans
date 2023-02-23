@@ -7,19 +7,24 @@
     </div>
     <!-- /.card-header -->
     <div class="card-body">
-        <ul class="cards-vertical">
-            <li>
-                <div class="w-full">
-                    <div class="position-relative image-box overflow-hidden rounded-xl bg-gray bg-cover outline-none shadow">
-                        <div class="absolute inset-0 h-full w-full overflow-hidden">
-                            <span class="border-box">
-                                <img alt src="" class="absolute inset-0 h-full w-full" />
-                            </span>
+        <div class="row">
+            <?php
+            if (is_countable($this->rows) && count($this->rows) > 0) {
+                foreach ($this->rows as $row) {
+                    ?>
+                    <div class="image-box">
+                        <div class="position-relative bg-gray rounded-xl overflow-hidden w-full h-full border-width-2">
+                            <img src="/image/show?code=<?php echo base64_encode($row->tv_path . '/poster.jpg'); ?>" alt="" class="img-fluid h-full w-full">
+                        </div>
+                        <div class="text-center"><?php echo $row->title . '(' . $row->rating . ')';?><br>
+                            <small><?php echo $row->year;?></small>
                         </div>
                     </div>
-                </div>
-            </li>
-        </ul>
+                    <?php
+                }
+            }
+            ?>
+        </div>
     </div>
     <!-- /.card-body -->
 </div>

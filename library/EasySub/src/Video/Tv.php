@@ -2,6 +2,7 @@
 
 namespace EasySub\Video;
 
+use EasySub\Tools\Log;
 use EasySub\Tools\NfoTrait;
 use EasySub\Tools\Table;
 use Zend_Db_Table_Row_Abstract;
@@ -261,9 +262,9 @@ class Tv
      * @param string $episodePath
      * @param string $episodeFilename
      * @param bool $haveChineseSub
-     * @return false|mixed|string
+     * @return int|bool
      */
-    public function addEpisode(int $seasonId,string $episodePath,string $episodeFilename,bool $haveChineseSub = false): mixed
+    public function addEpisode(int $seasonId,string $episodePath,string $episodeFilename,bool $haveChineseSub = false): int|bool
     {
         $seasonRow = $this->getSeason($seasonId);
         if (!$seasonRow) {
@@ -294,7 +295,7 @@ class Tv
         if (!$episodeRow) {
             $episodeId = $this->episodeTable->insert($data);
             if ($episodeId) {
-                return $episodeId;
+                return (int)$episodeId;
             }
         } else {
             $updateWhere = [
@@ -302,7 +303,7 @@ class Tv
             ];
             $result = $this->episodeTable->update($data, $updateWhere);
             if ($result) {
-                return $episodeRow->id;
+                return (int)$episodeRow->id;
             }
         }
         $this->message = $this->episodeTable->getMessage();
@@ -386,7 +387,7 @@ class Tv
      * @param string $filename
      * @return string
      */
-    private function getEpisodeHash(string $filePath,string $filename): string
+    public function getEpisodeHash(string $filePath,string $filename): string
     {
         return md5('episode_' . $filePath . $filename);
     }
@@ -396,7 +397,7 @@ class Tv
      * @param string $seasonPath
      * @return string
      */
-    private function getSeasonHash(string $seasonPath): string
+    public function getSeasonHash(string $seasonPath): string
     {
         return md5('season_' . $seasonPath);
     }
@@ -406,8 +407,62 @@ class Tv
      * @param string $tvPath
      * @return string
      */
-    private function getTvHash(string $tvPath): string
+    public function getTvHash(string $tvPath): string
     {
         return md5('tv_' . $tvPath);
+    }
+
+    /**
+     * 自动处理季
+     * @param string $seasonPath
+     * @return bool|int
+     */
+    public function autoParseSeason(string $seasonPath): bool|int
+    {
+        $seasonHash = $this->getSeasonHash($seasonPath);
+        $seasonRow = $this->getSeasonByPathHash($seasonHash);
+        if (!$seasonRow) {
+            //通过当前目录没有找到季信息，查看上一级目录
+            Log::info('没有找到季信息:' . $seasonPath);
+            $tvHash = $this->getTvHash(dirname($seasonPath));
+            $tvRow = $this->getTvByHash($tvHash);
+            if (!$tvRow) {
+                //剧集信息不存在，跳过
+                Log::err('剧集信息不存在，跳过：' . dirname($seasonPath));
+                return false;
+            }
+            //添加季
+            $seasonId = $this->addSeason($tvRow->id,$seasonPath);
+            if (!$seasonId) {
+                Log::err('增加剧集[' . $tvRow->title . ']季信息失败');
+                return false;
+            }
+
+            Log::info('增加[' . $tvRow->title . ']季，seasonId：' . $seasonId);
+            return (int)$seasonId;
+        }
+        return (int)$seasonRow->id;
+    }
+
+    /**
+     * 自动处理剧集单集数据
+     * @param string $episodePath
+     * @param string $filename
+     * @param bool $haveChineseSub
+     * @return bool|int
+     */
+    public function autoParseEpisode(string $episodePath,string $filename,bool $haveChineseSub = false): bool|int
+    {
+        $seasonId = $this->autoParseSeason($episodePath);
+        if (!$seasonId) {
+            return false;
+        }
+        $episodeId = $this->addEpisode($seasonId,$episodePath,$filename,$haveChineseSub);
+        if ($episodeId) {
+            Log::info('单集ID：' . $episodeId);
+        } else {
+            Log::err('单集增加失败');
+        }
+        return $episodeId;
     }
 }

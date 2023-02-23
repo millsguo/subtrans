@@ -154,8 +154,10 @@ class CheckSub
             return;
         }
         if ($isSeason) {
+            //剧集
             $videoObj = new Tv();
         } else {
+            //电影
             $videoObj = new Movie();
         }
         $dirPath = '/' . trim($dirPath, '/') . '/';
@@ -192,11 +194,15 @@ class CheckSub
                             $subFileName = self::checkSubTitleFile($fullPath, 'zh');
                             if ($subFileName) {
                                 Log::info('已有中文字幕文件，跳过');
-                                $addResult = $videoObj->addMovie($fullPath,true);
-                                if ($addResult) {
-                                    Log::info('更新电影库成功');
+                                if ($isSeason) {
+                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
                                 } else {
-                                    Log::info('更新电影库失败');
+                                    $addResult = $videoObj->addMovie($fullPath,true);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
+                                    } else {
+                                        Log::info('更新电影库失败');
+                                    }
                                 }
                                 continue 2;
                             }
@@ -206,11 +212,15 @@ class CheckSub
                             $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, $isSeason);
                             if ($checkChineseSubZip) {
                                 Log::info('找到中文字幕包，并处理完成');
-                                $addResult = $videoObj->addMovie($fullPath,true);
-                                if ($addResult) {
-                                    Log::info('更新电影库成功');
+                                if ($isSeason) {
+                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
                                 } else {
-                                    Log::info('更新电影库失败');
+                                    $addResult = $videoObj->addMovie($fullPath,true);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
+                                    } else {
+                                        Log::info('更新电影库失败');
+                                    }
                                 }
                                 continue 2;
                             }
@@ -224,17 +234,31 @@ class CheckSub
                                 if ($exportSubResult === true) {
                                     //有内置中文字幕
                                     Log::info('内置中文字幕处理完成');
-                                    $addResult = $videoObj->addMovie($fullPath,true);
-                                    if ($addResult) {
-                                        Log::info('更新电影库成功');
+                                    if ($isSeason) {
+                                        $videoObj->autoParseEpisode($dirPath,$fileName,true);
                                     } else {
-                                        Log::info('更新电影库失败');
+                                        $addResult = $videoObj->addMovie($fullPath,true);
+                                        if ($addResult) {
+                                            Log::info('更新电影库成功');
+                                        } else {
+                                            Log::info('更新电影库失败');
+                                        }
                                     }
                                     continue 2;
                                 }
                                 if ($exportSubResult === false) {
                                     //导出失败
                                     Log::info('导出内置英文字幕失败');
+                                    if ($isSeason) {
+                                        $videoObj->autoParseEpisode($dirPath,$fileName,false);
+                                    } else {
+                                        $addResult = $videoObj->addMovie($fullPath,false);
+                                        if ($addResult) {
+                                            Log::info('更新电影库成功');
+                                        } else {
+                                            Log::info('更新电影库失败');
+                                        }
+                                    }
                                     continue 2;
                                 }
                                 $engSubFile = $exportSubResult;
@@ -248,16 +272,29 @@ class CheckSub
                             if ($enableTrans === true || strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
-                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($isSeason) {
+                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                } else {
+                                    $addResult = $videoObj->addMovie($fullPath,true);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
+                                    } else {
+                                        Log::info('更新电影库失败');
+                                    }
+                                }
+                            } else {
+                                Log::info('翻译功能已关闭');
+                            }
+                            if ($isSeason) {
+                                $addResult = $videoObj->autoParseEpisode($dirPath,$fileName,false);
+                            } else {
+                                $addResult = $videoObj->addMovie($fullPath,false);
                                 if ($addResult) {
                                     Log::info('更新电影库成功');
                                 } else {
                                     Log::info('更新电影库失败');
                                 }
-                            } else {
-                                Log::info('翻译功能已关闭');
                             }
-                            $addResult = $videoObj->addMovie($fullPath,false);
                             if ($addResult) {
                                 Log::info('更新电影库成功');
                             } else {
@@ -278,6 +315,30 @@ class CheckSub
                             $videoFileInfo = pathinfo($fileInfo['dirname'] . '/' . $videoFileName);
                             if (!str_contains($fileName,$videoFileInfo['filename'])) {
                                 self::renameSubFilename($videoFileInfo,$fileInfo);
+                            }
+                            break;
+                        case 'nfo':
+                            Log::info('找到nfo文件:' . $fileName);
+                            if ($isSeason) {
+                                switch ($fileName) {
+                                    case 'tvshow.nfo':
+                                        //剧集信息
+                                        $tvId = $videoObj->addTv($dirPath);
+                                        if (!$tvId) {
+                                            Log::info($videoObj->getMessage());
+                                        } else {
+                                            Log::info('增加剧集，tvID:' . $tvId);
+                                        }
+                                        break;
+                                    case 'season.nfo':
+                                        //季信息
+                                        $videoObj->autoParseSeason($dirPath);
+                                        break;
+                                    default:
+                                        //集信息
+                                        continue 3;
+                                        break;
+                                }
                             }
                             break;
                     }
