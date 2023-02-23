@@ -35,13 +35,12 @@ class Command
             if (is_countable($rows) && count($rows) > 0) {
                 foreach ($rows as $row) {
                     if (strtolower($row->task_type) === 'tv') {
-                        $isSeason = true;
                         Log::info('扫描剧集：' . $row->target_path);
+                        checkSub::scanTvDir($row->target_path);
                     } else {
-                        $isSeason = false;
                         Log::info('扫描电影：' . $row->target_path);
+                        checkSub::scanDir($row->target_path);
                     }
-                    checkSub::scanDir($row->target_path,$isSeason);
                     $queueObj->deleteTask($row->id);
                 }
             } else {

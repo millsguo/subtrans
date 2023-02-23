@@ -137,13 +137,12 @@ class CheckSub
     }
 
     /**
-     *扫描目录
+     *扫描电影目录
      *
      * @param string $dirPath
-     * @param bool $isSeason
      * @return void
      */
-    public static function scanDir(string $dirPath, bool $isSeason = false): void
+    public static function scanDir(string $dirPath): void
     {
         if (empty($dirPath)) {
             Log::info('空目录');
@@ -153,13 +152,8 @@ class CheckSub
             Log::info('不是正确的目录' . $dirPath);
             return;
         }
-        if ($isSeason) {
-            //剧集
-            $videoObj = new Tv();
-        } else {
-            //电影
-            $videoObj = new Movie();
-        }
+        //电影
+        $videoObj = new Movie();
         $dirPath = '/' . trim($dirPath, '/') . '/';
         try {
             $dirArray = Misc::scanDir($dirPath);
@@ -194,33 +188,25 @@ class CheckSub
                             $subFileName = self::checkSubTitleFile($fullPath, 'zh');
                             if ($subFileName) {
                                 Log::info('已有中文字幕文件，跳过');
-                                if ($isSeason) {
-                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($addResult) {
+                                    Log::info('更新电影库成功');
                                 } else {
-                                    $addResult = $videoObj->addMovie($fullPath,true);
-                                    if ($addResult) {
-                                        Log::info('更新电影库成功');
-                                    } else {
-                                        Log::info('更新电影库失败');
-                                    }
+                                    Log::info('更新电影库失败');
                                 }
                                 continue 2;
                             }
                             //中文字幕文件名
                             $chineseSubFileName = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.default.zh.srt';
                             //检查是否有已下载的字幕文件
-                            $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, $isSeason);
+                            $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, false);
                             if ($checkChineseSubZip) {
                                 Log::info('找到中文字幕包，并处理完成');
-                                if ($isSeason) {
-                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                $addResult = $videoObj->addMovie($fullPath,true);
+                                if ($addResult) {
+                                    Log::info('更新电影库成功');
                                 } else {
-                                    $addResult = $videoObj->addMovie($fullPath,true);
-                                    if ($addResult) {
-                                        Log::info('更新电影库成功');
-                                    } else {
-                                        Log::info('更新电影库失败');
-                                    }
+                                    Log::info('更新电影库失败');
                                 }
                                 continue 2;
                             }
@@ -234,30 +220,22 @@ class CheckSub
                                 if ($exportSubResult === true) {
                                     //有内置中文字幕
                                     Log::info('内置中文字幕处理完成');
-                                    if ($isSeason) {
-                                        $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                    $addResult = $videoObj->addMovie($fullPath,true);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
                                     } else {
-                                        $addResult = $videoObj->addMovie($fullPath,true);
-                                        if ($addResult) {
-                                            Log::info('更新电影库成功');
-                                        } else {
-                                            Log::info('更新电影库失败');
-                                        }
+                                        Log::info('更新电影库失败');
                                     }
                                     continue 2;
                                 }
                                 if ($exportSubResult === false) {
                                     //导出失败
                                     Log::info('导出内置英文字幕失败');
-                                    if ($isSeason) {
-                                        $videoObj->autoParseEpisode($dirPath,$fileName,false);
+                                    $addResult = $videoObj->addMovie($fullPath,false);
+                                    if ($addResult) {
+                                        Log::info('更新电影库成功');
                                     } else {
-                                        $addResult = $videoObj->addMovie($fullPath,false);
-                                        if ($addResult) {
-                                            Log::info('更新电影库成功');
-                                        } else {
-                                            Log::info('更新电影库失败');
-                                        }
+                                        Log::info('更新电影库失败');
                                     }
                                     continue 2;
                                 }
@@ -272,33 +250,16 @@ class CheckSub
                             if ($enableTrans === true || strtolower($enableTrans) === 'true') {
                                 Log::info('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
-                                if ($isSeason) {
-                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
-                                } else {
-                                    $addResult = $videoObj->addMovie($fullPath,true);
-                                    if ($addResult) {
-                                        Log::info('更新电影库成功');
-                                    } else {
-                                        Log::info('更新电影库失败');
-                                    }
-                                }
+                                $addResult = $videoObj->addMovie($fullPath,true);
                             } else {
                                 Log::info('翻译功能已关闭');
-                            }
-                            if ($isSeason) {
-                                $addResult = $videoObj->autoParseEpisode($dirPath,$fileName,false);
-                            } else {
                                 $addResult = $videoObj->addMovie($fullPath,false);
-                                if ($addResult) {
-                                    Log::info('更新电影库成功');
-                                } else {
-                                    Log::info('更新电影库失败');
-                                }
                             }
+
                             if ($addResult) {
-                                Log::info('更新电影库成功');
+                                Log::info('更新电影数据库成功');
                             } else {
-                                Log::info('更新电影库失败');
+                                Log::info('更新电影数据库失败');
                             }
                             break;
                         case 'srt':
@@ -317,28 +278,142 @@ class CheckSub
                                 self::renameSubFilename($videoFileInfo,$fileInfo);
                             }
                             break;
-                        case 'nfo':
-                            Log::info('找到nfo文件:' . $fileName);
-                            if ($isSeason) {
-                                switch ($fileName) {
-                                    case 'tvshow.nfo':
-                                        //剧集信息
-                                        $tvId = $videoObj->addTv($dirPath);
-                                        if (!$tvId) {
-                                            Log::info($videoObj->getMessage());
-                                        } else {
-                                            Log::info('增加剧集，tvID:' . $tvId);
-                                        }
-                                        break;
-                                    case 'season.nfo':
-                                        //季信息
-                                        $videoObj->autoParseSeason($dirPath);
-                                        break;
-                                    default:
-                                        //集信息
-                                        continue 3;
-                                        break;
+                    }
+                } else {
+                    Log::info($fullPath . '权限错误');
+                }
+            }
+        } catch (Exception $e) {
+            Log::debug($e->getMessage());
+            Log::debug($e->getTraceAsString());
+        }
+    }
+
+    /**
+     * 扫描剧集目录
+     * @param string $dirPath
+     * @return void
+     */
+    public static function scanTvDir(string $dirPath): void
+    {
+        if (empty($dirPath)) {
+            Log::info('空目录');
+            return;
+        }
+        if (!is_dir($dirPath)) {
+            Log::info('不是正确的目录' . $dirPath);
+            return;
+        }
+        //剧集
+        $videoObj = new Tv();
+
+        $dirPath = '/' . trim($dirPath, '/') . '/';
+        try {
+            $dirArray = Misc::scanDir($dirPath);
+            if (!$dirArray) {
+                return;
+            }
+            foreach ($dirArray as $fileName) {
+                $fullPath = $dirPath . $fileName;
+                if (is_dir($fullPath)) {
+                    //目录
+                    if (str_starts_with($fileName, 'Season')) {
+                        Log::info('Season目录');
+                        $checkSeason = self::checkFullSeasonSubZip($fullPath);
+                        if ($checkSeason) {
+                            continue;
+                        }
+                    }
+                    self::scanDir($fullPath);
+                } elseif (is_readable($fullPath)) {
+                    //可读文件
+                    $fileInfo = pathinfo($fullPath);
+                    if (!isset($fileInfo['extension'])) {
+                        //Log::debug($fullPath . '获取扩展名失败');
+                        continue;
+                    }
+                    $fileExt = $fileInfo['extension'];
+                    switch ($fileExt) {
+                        case 'mp4':
+                        case 'mkv':
+                            Log::info('找到视频文件:' . $fileName);
+                            //视频文件
+                            $subFileName = self::checkSubTitleFile($fullPath, 'zh');
+                            if ($subFileName) {
+                                Log::info('已有中文字幕文件，跳过');
+                                Log::info('更新剧集');
+                                $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                continue 2;
+                            }
+                            //中文字幕文件名
+                            $chineseSubFileName = $fileInfo['dirname'] . '/' . $fileInfo['filename'] . '.default.zh.srt';
+                            //检查是否有已下载的字幕文件
+                            $checkChineseSubZip = self::checkTvDownloadedSubZip($fullPath, true);
+                            if ($checkChineseSubZip) {
+                                Log::info('找到中文字幕包，并处理完成');
+                                Log::info('更新剧集');
+                                $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                continue 2;
+                            }
+                            //没有中文字幕
+                            $engSubFile = self::checkSubTitleFile($fullPath, 'eng');
+                            if (!$engSubFile) {
+                                //没有英文字幕
+                                Log::info('没有英文外挂字幕文件');
+                                $srtObj = new Srt();
+                                $exportSubResult = $srtObj->exportInsideSubTitle($fullPath, 'eng');
+                                if ($exportSubResult === true) {
+                                    //有内置中文字幕
+                                    Log::info('内置中文字幕处理完成');
+                                    Log::info('更新剧集');
+                                    $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                                    continue 2;
                                 }
+                                if ($exportSubResult === false) {
+                                    //导出失败
+                                    Log::info('导出内置英文字幕失败');
+                                    Log::info('更新剧集');
+                                    $videoObj->autoParseEpisode($dirPath,$fileName,false);
+                                    continue 2;
+                                }
+                                $engSubFile = $exportSubResult;
+                                Log::info('英文字幕导出成功：' . $engSubFile);
+                            } else {
+                                //有英文字幕文件
+                                Log::info('有英文字幕文件:' . $engSubFile);
+                            }
+                            $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
+
+                            if ($enableTrans === true || strtolower($enableTrans) === 'true') {
+                                Log::info('开始翻译英文字幕文件:' . $engSubFile);
+                                TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
+                                Log::info('更新剧集');
+                                $addResult = $videoObj->autoParseEpisode($dirPath,$fileName,true);
+                            } else {
+                                Log::info('翻译功能已关闭');
+                                $addResult = $videoObj->autoParseEpisode($dirPath,$fileName,false);
+                            }
+
+                            if ($addResult) {
+                                Log::info('更新数据库成功');
+                            } else {
+                                Log::info('更新数据库失败');
+                            }
+                            break;
+                        case 'srt':
+                        case 'ass':
+                            //字幕文件
+                            Log::info('找到字幕文件：' . $fileName);
+                            $fileEpisode = self::getSeasonEpisode($fileName);
+                            if (!$fileEpisode) {
+                                Log::info('字幕文件不是剧集字幕，跳过');
+                                continue 2;
+                            }
+                            $videoFileName = self::getSeasonEpisodeVideoFileByDir($fileInfo['dirname'],$dirArray,$fileEpisode);
+                            Log::info('匹配剧集：' . $videoFileName);
+                            $videoFileInfo = pathinfo($fileInfo['dirname'] . '/' . $videoFileName);
+                            if (!str_contains($fileName,$videoFileInfo['filename'])) {
+                                self::renameSubFilename($videoFileInfo,$fileInfo);
                             }
                             break;
                     }
