@@ -73,7 +73,7 @@ class Tv
     public function getTvByHash(string $pathHash): bool|Zend_Db_Table_Row_Abstract
     {
         $where = [
-            'file_path_hash = ?'    => $pathHash
+            'tv_path_hash = ?'    => $pathHash
         ];
         $row = $this->tvTable->fetchRow($where);
         if (isset($row->id)) {
@@ -427,12 +427,18 @@ class Tv
             $tvHash = $this->getTvHash(dirname($seasonPath));
             $tvRow = $this->getTvByHash($tvHash);
             if (!$tvRow) {
-                //剧集信息不存在，跳过
-                Log::err('剧集信息不存在，跳过：' . dirname($seasonPath));
-                return false;
+                //剧集信息不存在，添加剧集
+                Log::err('剧集信息不存在，添加剧集：' . dirname($seasonPath));
+                $tvId = $this->addTv(dirname($seasonPath));
+                if (!$tvId) {
+                    Log::err('剧集添加失败');
+                    return false;
+                }
+            } else {
+                $tvId = $tvRow->id;
             }
             //添加季
-            $seasonId = $this->addSeason($tvRow->id,$seasonPath);
+            $seasonId = $this->addSeason($tvId,$seasonPath);
             if (!$seasonId) {
                 Log::err('增加剧集[' . $tvRow->title . ']季信息失败');
                 return false;

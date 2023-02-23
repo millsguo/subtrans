@@ -110,7 +110,7 @@ class CheckSub
         $tvLibrary = Store::getTvLibrary();
         foreach ($tvLibrary as $dirPath) {
             Log::info('扫描剧集目录：' . $dirPath);
-            self::scanDir($dirPath,true);
+            self::scanTvDir($dirPath,true);
         }
     }
 
@@ -324,7 +324,7 @@ class CheckSub
                             continue;
                         }
                     }
-                    self::scanDir($fullPath);
+                    self::scanTvDir($fullPath);
                 } elseif (is_readable($fullPath)) {
                     //可读文件
                     $fileInfo = pathinfo($fullPath);
