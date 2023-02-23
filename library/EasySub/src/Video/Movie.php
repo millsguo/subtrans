@@ -39,7 +39,7 @@ class Movie
         }
         $pathHash = md5($filePath);
         $dirPath = $pathInfo['dirname'];
-        $fileName = $pathInfo['filename'];
+        $fileName = $pathInfo['basename'];
 
         $baseData = [
             'file_path' => $dirPath,

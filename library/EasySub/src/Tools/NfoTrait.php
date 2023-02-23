@@ -18,19 +18,27 @@ trait NfoTrait
     protected function getNfo(string $dirPath,string $fileName,string $nfoType = 'movieInfo'): array
     {
         if (!is_readable($dirPath . '/' . $fileName)) {
+            Log::err('文件不存在：' . $dirPath . '/' . $fileName);
             return [];
         }
         $fileInfo = pathinfo($dirPath . '/' . $fileName);
         if (!isset($fileInfo['filename'])) {
+            Log::err('文件名（不含扩展名）不存在：' . $dirPath . '/' . $fileName);
             return [];
         }
         $preFilename = $fileInfo['filename'];
         if (is_readable($dirPath . '/' . $preFilename . '.nfo')) {
             //EMBY 刮削信息
-            $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $fileName . '.nfo'));
+            $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $preFilename . '.nfo'));
+            if (!$fileInfo instanceof SimpleXMLElement) {
+                Log::err('NFO数据读取失败');
+                Log::debug('NFO数据');
+                Log::debug($fileInfo);
+                return [];
+            }
             return $this->getDataFromEmbyNfo($fileInfo,$nfoType);
         }
-
+        Log::err('nfo文件不存在：' . $dirPath . '/' . $preFilename . '.nfo');
         return [];
     }
 
