@@ -186,7 +186,7 @@ class Config
     public static function getDebug(): bool
     {
         $config = self::getConfig(BASE_APP_PATH . '/config/config.ini','translation',false);
-        if (isset($config->debug) && $config->debug === 'true') {
+        if (isset($config->debug) && ($config->debug === '1' || $config->debug === 1)) {
             return true;
         }
         return false;
