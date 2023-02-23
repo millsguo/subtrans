@@ -7,9 +7,20 @@
     <form action="/system/config/" method="post" id="saveConfig" name="saveConfig">
         <div class="card-body">
             <div class="form-group">
-                <label for="enable_trans">机器翻译</label>
+                <label for="enable_trans">调试日志</label>
                 <?php
                 $selectArray = ['true' => '启用','false' => '关闭'];
+                if (isset($this->config->translation->debug) && ($this->config->translation->debug === '1' || $this->config->translation->debug === 1)) {
+                    $debug = 'true';
+                } else {
+                    $debug = 'false';
+                }
+                echo $this->formSelect('debug',$debug,['class' => 'form-control'],$selectArray);
+                ?>
+            </div>
+            <div class="form-group">
+                <label for="enable_trans">机器翻译</label>
+                <?php
                 if (isset($this->config->translation->enable_trans) && ($this->config->translation->enable_trans === '1' || $this->config->translation->enable_trans === 1)) {
                     $enableTrans = 'true';
                 } else {

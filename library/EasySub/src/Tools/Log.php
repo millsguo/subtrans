@@ -17,6 +17,11 @@ class Log
     private static bool $isInit = false;
 
     /**
+     * @var bool 是否启用调试日志
+     */
+    private static bool $isDebug = false;
+
+    /**
      * 检查日志对象是否初始化
      *
      * @return void
@@ -50,6 +55,8 @@ class Log
             $writer = new Zend_Log_Writer_Stream($configFile);
             self::$logObj->addWriter($writer);
             self::$isInit = true;
+
+            self::$isDebug = Config::getDebug();
             return true;
         } catch (Zend_Log_Exception $e) {
             echo $e->getMessage();
@@ -58,6 +65,11 @@ class Log
         }
     }
 
+    /**
+     * 普通日志
+     * @param mixed $message
+     * @return void
+     */
     public static function info(mixed $message): void
     {
         self::log($message, 6);
@@ -107,6 +119,11 @@ class Log
     {
         try {
             self::checkLog();
+
+            if (!self::$isDebug && $priority > 5) {
+                //调试日志，普通信息不显示
+                return;
+            }
             if (is_string($message) || is_int($message) || is_float($message)) {
                 $message = trim($message);
             } else {

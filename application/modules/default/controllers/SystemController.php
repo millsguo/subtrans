@@ -43,6 +43,12 @@ class SystemController extends Default_Model_ControllerHelper
         }
         $configIni = \EasySub\Tools\Config::getConfig($configFilePath,'',true);
         if ($this->isPost()) {
+            if (isset($this->params['debug']) && $this->params['debug'] === 'true') {
+                $debug = true;
+            } else {
+                $debug = false;
+            }
+            $configIni->translation->debug = $debug;
             if (isset($this->params['enable_trans']) && $this->params['enable_trans'] === 'true') {
                 $enableTrans = true;
             } else {

@@ -40,7 +40,11 @@ class MovieController extends Default_Model_ControllerHelper
         $this->view->rows = $movie->autoFetch($where,'date_added DESC',30,$this->page,true);
     }
 
-    public function scanAction()
+    /**
+     * 添加扫描任务
+     * @return void
+     */
+    public function scanAction(): void
     {
         if (!isset($this->params['target'])) {
             $this->quickRedirect('未指定扫描目标','/movie/list/','warning');

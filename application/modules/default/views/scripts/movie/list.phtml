@@ -15,6 +15,17 @@
             <div class="image-box">
                 <div class="position-relative bg-gray rounded-xl overflow-hidden w-full h-full border-width-2">
                     <img src="/image/show?code=<?php echo base64_encode($row->file_path . '/poster.jpg'); ?>" alt="" class="img-fluid h-full w-full">
+                    <?php
+                    if ((int)$row->have_zh_sub === 1) {
+                    ?>
+                    <div class="ribbon-wrapper ribbon-lg">
+                        <div class="ribbon bg-success">
+                            中文字幕
+                        </div>
+                    </div>
+                    <?php
+                    }
+                    ?>
                 </div>
                 <div class="text-center"><?php echo htmlentities($row->title . '(' . $row->rating . ')');?> <br>
                     <small><?php echo $row->year;?></small>
