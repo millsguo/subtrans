@@ -11,13 +11,13 @@
                 if ((int)$row->current_month_free_count >= (int)$row->free_count_limit) {
                     $freePercent = 100;
                 } else {
-                    $freePercent = bcdiv($row->current_month_free_count,$row->free_count_limit,0);
+                    $freePercent = \EasySub\Tools\BcMath::div($row->current_month_free_count,$row->free_count_limit,0);
                 }
                 if ((int)$row->current_month_translated_count > 0) {
                     if ((int)$row->translated_count === 0) {
                         $feePercent = 0;
                     } else {
-                        $feePercent = bcdiv($row->current_month_translated_count, $row->translated_count,0);
+                        $feePercent = \EasySub\Tools\BcMath::div($row->current_month_translated_count, $row->translated_count,0);
                     }
                 } else {
                     $feePercent = 0;
