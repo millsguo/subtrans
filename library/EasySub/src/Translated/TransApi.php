@@ -64,16 +64,26 @@ class TransApi
                 $apiRow = self::getApiByAccessKey($key);
                 if (!$apiRow) {
                     $regionId = $config['region_id'] ?? 'cn-hangzhou';
+                    if ($config['use_pro'] === '1' || $config['use_pro'] === 1) {
+                        $usePro = true;
+                    } else {
+                        $usePro = false;
+                    }
+                    if (isset($config['enable_pay']) && ($config['enable_pay'] === '1' || $config['enable_pay'] === 1)) {
+                        $enablePay = true;
+                    } else {
+                        $enablePay = false;
+                    }
                     self::addApi(
-                        'ALIYUN API',
+                        '阿里云翻译接口',
                         'aliyun',
                         $config['access_key'],
                         $config['access_secret'],
-                        $config['use_pro'],
+                        $usePro,
                         $regionId,
                         1000000,
                         60,
-                        false
+                        $enablePay
                     );
                 }
             }
@@ -110,14 +120,19 @@ class TransApi
                 Log::info('[' . $accessKey . ']接口数据不在数据库中');
                 $accessSecret = $_ENV['ACCESS_SECRET'] ?? '';
                 if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
-                    $usePro = 1;
+                    $usePro = true;
                 } else {
-                    $usePro = 0;
+                    $usePro = false;
+                }
+                if (isset($_ENV['ENABLE_PAY']) && strtolower($_ENV['ENABLE_PAY']) === 'true') {
+                    $enablePay = true;
+                } else {
+                    $enablePay = false;
                 }
                 $regionId = $_ENV['REGION_ID'] ?? 'cn-hangzhou';
                 try {
                     $apiId = self::addApi(
-                        'ALIYUN API',
+                        '阿里云翻译接口',
                         'aliyun',
                         $accessKey,
                         $accessSecret,
@@ -125,7 +140,7 @@ class TransApi
                         $regionId,
                         1000000,
                         60,
-                        false
+                        $enablePay
                     );
                 } catch (Exception $e) {
                 }
@@ -141,15 +156,20 @@ class TransApi
                     //不存在此接口
                     Log::info('[' . $accessKey . ']接口数据不在数据库中');
                     $accessSecret = $_ENV['ACCESS_SECRET_' . $i] ?? '';
-                    if (isset($_ENV['USE_PRO']) && strtolower($_ENV['USE_PRO']) === 'true') {
-                        $usePro = 1;
+                    if (isset($_ENV['USE_PRO_' . $i]) && strtolower($_ENV['USE_PRO_' . $i]) === 'true') {
+                        $usePro = true;
                     } else {
-                        $usePro = 0;
+                        $usePro = false;
+                    }
+                    if (isset($_ENV['ENABLE_PAY_' . $i]) && strtolower($_ENV['ENABLE_PAY_' . $i]) === 'true') {
+                        $enablePay = true;
+                    } else {
+                        $enablePay = false;
                     }
                     $regionId = $_ENV['REGION_ID_' . $i] ?? 'cn-hangzhou';
                     try {
                         $apiId = self::addApi(
-                            'ALIYUN API',
+                            '阿里云翻译接口',
                             'aliyun',
                             $accessKey,
                             $accessSecret,
@@ -157,7 +177,7 @@ class TransApi
                             $regionId,
                             1000000,
                             60,
-                            false
+                            $enablePay
                         );
                         if ($apiId) {
                             Log::info('[' . $accessKey . ']保存至数据库成功');
@@ -191,20 +211,19 @@ class TransApi
      * @param string $apiType
      * @param string $accessKey
      * @param string $accessSecret
-     * @param int $usePro
+     * @param bool $usePro
      * @param string $regionId
      * @param int $freeCountLimit
      * @param int $feeCount
      * @param bool $enablePay
      * @return bool|int
-     * @throws Exception
      */
     public static function addApi(
         string $apiName,
         string $apiType,
         string $accessKey,
         string $accessSecret,
-        int $usePro,
+        bool $usePro,
         string $regionId,
         int $freeCountLimit,
         int $feeCount,
@@ -216,9 +235,14 @@ class TransApi
             throw new \RuntimeException('AccessKey已存在');
         }
         if ($enablePay) {
-            $enablePay = 1;
+            $enablePayValue = 1;
         } else {
-            $enablePay = 0;
+            $enablePayValue = 0;
+        }
+        if ($usePro) {
+            $useProValue = 1;
+        } else {
+            $useProValue = 0;
         }
         $data = [
             'name'  => $apiName,
@@ -226,10 +250,10 @@ class TransApi
             'api_access_key'    => $accessKey,
             'api_access_secret' => $accessSecret,
             'api_region_id'     => $regionId,
-            'api_use_pro'       => $usePro,
+            'api_use_pro'       => $useProValue,
             'free_count_limit'  => $freeCountLimit,
             'fee_count' => $feeCount,
-            'enable_pay'    => $enablePay
+            'enable_pay'    => $enablePayValue
         ];
         $apiId = self::$apiTable->insert($data);
         if ($apiId) {
@@ -314,6 +338,26 @@ class TransApi
      */
     public static function updateApiCount(int $apiId, int $translatedCount): bool
     {
+        /**
+         *
+        id                             INTEGER 翻译接口ID
+        name                           TEXT, 翻译接口名称
+        api_type                       TEXT, 翻译接口代码
+        translated_count               INTEGER default 0, 总翻译字数
+        translated_free_count          INTEGER default 0, 翻译免费字数
+        translated_fee_count           INTEGER default 0, 翻译收费字数
+        free_count_limit               INTEGER default 0, 免费翻译额度
+        fee_count                      INTEGER default 0, 付费翻译金额
+        current_month_translated_count INTEGER default 0, 当月付费翻译字数
+        current_month_free_count       INTEGER default 0, 当月免费翻译字数
+        current_month_limit            INTEGER default 0, 当月是否超过免费额度
+        current_month_str              INTEGER, 月份
+        enable_pay                     INTEGER default 0, 是否允许付费翻译
+        api_access_key                 TEXT,
+        api_access_secret              TEXT,
+        api_region_id                  TEXT, 接口区域
+        api_use_pro                    INTEGER default 0 是否使用专业翻译接口
+         */
         self::initTable();
         $apiRow = self::getApi($apiId);
         if (!$apiRow) {
@@ -334,12 +378,12 @@ class TransApi
             $apiRow = self::getApi($apiId);
         }
         $data = [
-            'current_month_translated_count'    => (int)$apiRow->current_month_translated_count + $translatedCount,
             'translated_count'                  => (int)$apiRow->translated_count + $translatedCount,
         ];
         if ($apiRow->current_month_free_count > $apiRow->free_count_limit) {
             //付费翻译
             $data['translated_fee_count'] = (int)$apiRow->translated_fee_count + $translatedCount;
+            $data['current_month_translated_count'] = (int)$apiRow->current_month_translated_count + $translatedCount;
         } else {
             //免费翻译
             $monthFreeCount = (int)$apiRow->current_month_free_count + $translatedCount;
@@ -372,5 +416,18 @@ class TransApi
             throw new \RuntimeException('接口不存在');
         }
         return self::updateApiCount($apiRow->id, $translatedCount);
+    }
+
+    /**
+     * 获取接口列表
+     * @return \Zend_Db_Table_Rowset_Abstract
+     */
+    public static function fetchApi(): \Zend_Db_Table_Rowset_Abstract
+    {
+        self::initTable();
+        $where = [
+            'id > ?'    => 0
+        ];
+        return self::$apiTable->fetchAll($where,'id ASC');
     }
 }

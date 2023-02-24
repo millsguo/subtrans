@@ -61,9 +61,15 @@ class SystemController extends Default_Model_ControllerHelper
                 } else {
                     $usePro1 = false;
                 }
+                if ($this->params['aliyun_1_enable_pay'] === 'true') {
+                    $enablePay1 = true;
+                } else {
+                    $enablePay1 = false;
+                }
                 $configIni->translation->aliyun1->access_key = $this->params['aliyun_1_access_key'];
                 $configIni->translation->aliyun1->access_secret = $this->params['aliyun_1_access_secret'];
                 $configIni->translation->aliyun1->use_pro = $usePro1;
+                $configIni->translation->aliyun1->enable_pay = $enablePay1;
             }
             if (isset($this->params['aliyun_2_access_key'],$this->params['aliyun_2_access_secret'],$this->params['aliyun_2_use_pro'])) {
                 if ($this->params['aliyun_2_use_pro'] === 'true') {
@@ -71,9 +77,15 @@ class SystemController extends Default_Model_ControllerHelper
                 } else {
                     $usePro2 = false;
                 }
+                if ($this->params['aliyun_2_enable_pay'] === 'true') {
+                    $enablePay2 = true;
+                } else {
+                    $enablePay2 = false;
+                }
                 $configIni->translation->aliyun2->access_key = $this->params['aliyun_2_access_key'];
                 $configIni->translation->aliyun2->access_secret = $this->params['aliyun_2_access_secret'];
                 $configIni->translation->aliyun2->use_pro = $usePro2;
+                $configIni->translation->aliyun2->enable_pay = $enablePay2;
             }
             $writeObj = new \Zend_Config_Writer_Ini();
             $writeObj->setConfig($configIni);

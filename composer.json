@@ -19,7 +19,8 @@
     "ext-pcntl": "*",
     "ext-gd": "*",
     "ext-simplexml": "*",
-    "ext-posix": "*"
+    "ext-posix": "*",
+    "ext-bcmath": "*"
   },
   "autoload": {
     "psr-4": {

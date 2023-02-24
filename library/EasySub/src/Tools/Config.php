@@ -149,17 +149,20 @@ class Config
         $createConfigIni->translation->aliyun1 = [
             'access_key'    => '',
             'access_secret' => '',
-            'use_pro'       => true
+            'use_pro'       => true,
+            'enable_pay'    => false
         ];
         $createConfigIni->translation->aliyun2 = [
             'access_key'    => '',
             'access_secret' => '',
-            'use_pro'       => true
+            'use_pro'       => true,
+            'enable_pay'    => false
         ];
         $createConfigIni->translation->aliyun3 = [
             'access_key'    => '',
             'access_secret' => '',
-            'use_pro'       => true
+            'use_pro'       => true,
+            'enable_pay'    => false
         ];
         for ($i = 1; $i <= 3;$i++) {
             $moviesName = 'movie-' . $i;

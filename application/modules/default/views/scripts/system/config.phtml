@@ -49,7 +49,7 @@
                         ?>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="aliyun_1_use_pro">是否调用专业翻译接口</label>
                         <?Php
@@ -59,6 +59,19 @@
                             $usePro_1 = 'false';
                         }
                         echo $this->formSelect('aliyun_1_use_pro',$usePro_1,['class' => 'form-control'],$selectArray);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="aliyun_1_use_pro">是否允许付费</label>
+                        <?Php
+                        if (isset($this->config->translation->aliyun1->enable_pay) && ($this->config->translation->aliyun1->enable_pay === 1 || $this->config->translation->aliyun1->enable_pay === '1')) {
+                            $enablePay_1 = 'true';
+                        } else {
+                            $enablePay_1 = 'false';
+                        }
+                        echo $this->formSelect('aliyun_1_enable_pay',$enablePay_1,['class' => 'form-control'],$selectArray);
                         ?>
                     </div>
                 </div>
@@ -83,7 +96,7 @@
                         ?>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label for="aliyun_2_use_pro">是否调用专业翻译接口</label>
                         <?Php
@@ -93,6 +106,19 @@
                             $usePro_2 = 'false';
                         }
                         echo $this->formSelect('aliyun_2_use_pro',$usePro_2,['class' => 'form-control'],$selectArray);
+                        ?>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="aliyun_1_use_pro">是否允许付费</label>
+                        <?Php
+                        if (isset($this->config->translation->aliyun2->enable_pay) && ($this->config->translation->aliyun2->enable_pay === 1 || $this->config->translation->aliyun2->enable_pay === '1')) {
+                            $enablePay_2 = 'true';
+                        } else {
+                            $enablePay_2 = 'false';
+                        }
+                        echo $this->formSelect('aliyun_2_enable_pay',$enablePay_2,['class' => 'form-control'],$selectArray);
                         ?>
                     </div>
                 </div>

@@ -23,5 +23,6 @@ class IndexController extends Default_Model_ControllerHelper
      */
     public function indexAction(): void
     {
+        $this->view->apiRows = \EasySub\Translated\TransApi::fetchApi();
     }
 }
