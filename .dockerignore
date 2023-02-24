@@ -1,6 +1,5 @@
-/.idea/
-.git
+/.idea/*
+/.git/*
 /logs/*
 /config/*
 /run/session/*
-/database/*

@@ -1,6 +1,5 @@
-/.idea/
+/.idea/*
 /logs/*
 /vendor/*
 /config/*
-/database/subtrans
-/run/*
+/run/session/*
