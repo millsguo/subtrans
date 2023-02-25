@@ -5,9 +5,9 @@ namespace EasyTranslation\TransInterface;
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Client\Exception\ClientException;
 use AlibabaCloud\Client\Exception\ServerException;
-use AlibabaCloud\Client\Result\Result;
 use EasySub\Tools\Log;
 use Exception;
+use RuntimeException;
 
 class AliYun implements AbstractInterface
 {
@@ -60,7 +60,7 @@ class AliYun implements AbstractInterface
             }
         } catch (ClientException $e) {
             $this->clientIsInit = false;
-            throw new Exception($e->getMessage());
+            throw new RuntimeException($e->getMessage());
         }
     }
 
@@ -157,7 +157,7 @@ class AliYun implements AbstractInterface
      * @param $text
      * @return string|false
      */
-    protected function requestTranslate($sourceLanguage, $targetLanguage, $text)
+    protected function requestTranslate($sourceLanguage, $targetLanguage, $text): bool|string
     {
         $tryTimes = 1;
         do {
@@ -189,9 +189,11 @@ class AliYun implements AbstractInterface
                 }
                 $returnArray = $result->toArray();
 
-                if (isset($returnArray['Code']) && $returnArray['Code'] == 200 && isset($returnArray['Data']['Translated'])) {
+                if (isset($returnArray['Code'], $returnArray['Data']['Translated']) && (int)$returnArray['Code'] === 200) {
                     return $returnArray['Data']['Translated'];
-                } elseif (isset($returnArray['Message'])) {
+                }
+
+                if (isset($returnArray['Message'])) {
                     Log::debug('CODE:[' . $returnArray['Code'] . '] MSG:[' . $returnArray['Message'] . ']');
                 } else {
                     Log::debug('接口返回数据格式错误[' . print_r($returnArray, true) . ']');
@@ -222,7 +224,7 @@ class AliYun implements AbstractInterface
     private function detectLanguage(string $text): string
     {
         if (!$this->clientIsInit) {
-            throw new Exception('翻译客户端未初始化');
+            throw new RuntimeException('翻译客户端未初始化');
         }
         $result = AlibabaCloud::alimt()
             ->v20181012()
@@ -234,9 +236,9 @@ class AliYun implements AbstractInterface
 
         if (isset($resultArray['GetDetectLanguageResponse']['DetectedLanguage'])) {
             return $resultArray['GetDetectLanguageResponse']['DetectedLanguage'];
-        } else {
-            throw new Exception('语种检测失败');
         }
+
+        throw new RuntimeException('语种检测失败');
     }
 
     /**
@@ -248,7 +250,7 @@ class AliYun implements AbstractInterface
      * @return array|string|false
      * @throws Exception
      */
-    public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $muleLineJson)
+    public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $muleLineJson): bool|array|string
     {
         $this->checkClientInit();
 
@@ -280,10 +282,10 @@ class AliYun implements AbstractInterface
      * @return void
      * @throws Exception
      */
-    private function checkClientInit()
+    private function checkClientInit(): void
     {
         if (!$this->clientIsInit) {
-            throw new Exception('翻译客户端未初始化');
+            throw new RuntimeException('翻译客户端未初始化');
         }
     }
 
@@ -295,7 +297,7 @@ class AliYun implements AbstractInterface
      * @param $text
      * @return array|string|false
      */
-    protected function requestBatchTranslate($sourceLanguage, $targetLanguage, $text)
+    protected function requestBatchTranslate($sourceLanguage, $targetLanguage, $text): bool|array|string
     {
         $tryTimes = 1;
         do {
@@ -303,6 +305,7 @@ class AliYun implements AbstractInterface
             try {
                 if ($this->useProApi) {
                     //专业版翻译
+                    Log::debug('使用专业版翻译接口');
                     $result = AlibabaCloud::alimt()
                         ->v20181012()
                         ->getBatchTranslate()
@@ -315,6 +318,7 @@ class AliYun implements AbstractInterface
                         ->withTargetLanguage($targetLanguage)
                         ->request();
                 } else {
+                    Log::debug('使用通用版翻译接口');
                     //通用版翻译
                     $result = AlibabaCloud::alimt()
                         ->v20181012()
@@ -331,9 +335,11 @@ class AliYun implements AbstractInterface
 
                 $returnArray = $result->toArray();
 
-                if (isset($returnArray['Code']) && $returnArray['Code'] == 200 && isset($returnArray['TranslatedList'])) {
+                if (isset($returnArray['Code'], $returnArray['TranslatedList']) && (int)$returnArray['Code'] === 200) {
                     return $returnArray['TranslatedList'];
-                } elseif (isset($returnArray['Message'])) {
+                }
+
+                if (isset($returnArray['Message'])) {
                     Log::debug('CODE:[' . $returnArray['Code'] . '] MSG:[' . $returnArray['Message'] . ']');
                 } else {
                     Log::debug('接口返回数据格式错误[' . print_r($returnArray, true) . ']');

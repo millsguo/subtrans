@@ -40,7 +40,31 @@ class TvController extends Default_Model_ControllerHelper
         $this->view->rows = $tv->autoFetchTv($where,'date_added DESC',30,$this->page,true);
     }
 
-    public function scanAction()
+    /**
+     * 剧集信息
+     * @return void
+     */
+    public function seasonAction(): void
+    {
+        if (!isset($this->params['id'])) {
+            $this->quickRedirect('参数错误', '/tv/list/','warning');
+        }
+        $tvId = (int)$this->params['id'];
+        $tv = new \EasySub\Video\Tv();
+        $tvRow = $tv->getTv($tvId);
+        if (!$tvRow) {
+            $this->quickRedirect($tv->getMessage(), '/tv/list/','warning');
+        }
+        $this->view->tvRow = $tvRow;
+        $this->view->seasonRows = $tv->fetchSeasonByTv($tvId);
+        $this->view->episodeRows = $tv->fetchEpisodeByTv($tvId);
+    }
+
+    /**
+     * 添加扫描任务
+     * @return void
+     */
+    public function scanAction(): void
     {
         if (!isset($this->params['target'])) {
             $this->quickRedirect('未指定扫描目标','/tv/list/','warning');

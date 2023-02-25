@@ -3,67 +3,84 @@
         <h3 class="card-title">翻译接口统计</h3>
     </div>
     <!-- /.card-header -->
-    <div class="card-body">
-        <?php
-        if (is_countable($this->apiRows) && count($this->apiRows) > 0) {
-            $i = 1;
-            foreach ($this->apiRows as $row) {
-                if ((int)$row->current_month_free_count >= (int)$row->free_count_limit) {
-                    $freePercent = 100;
-                } else {
-                    $freePercent = \EasySub\Tools\BcMath::div($row->current_month_free_count,$row->free_count_limit,0);
-                }
-                if ((int)$row->current_month_translated_count > 0) {
-                    if ((int)$row->translated_count === 0) {
-                        $feePercent = 0;
+    <div class="card-body" style="padding: 0;">
+        <div class="card">
+            <?php
+            if (is_countable($this->apiRows) && count($this->apiRows) > 0) {
+                $i = 1;
+                foreach ($this->apiRows as $row) {
+                    if ((int)$row->current_month_free_count >= (int)$row->free_count_limit) {
+                        $freePercent = 100;
                     } else {
-                        $feePercent = \EasySub\Tools\BcMath::div($row->current_month_translated_count, $row->translated_count,0);
+                        $freePercent = \EasySub\Tools\BcMath::div($row->current_month_free_count,$row->free_count_limit,0);
                     }
-                } else {
-                    $feePercent = 0;
+                    if ((int)$row->current_month_translated_count > 0) {
+                        if ((int)$row->translated_count === 0) {
+                            $feePercent = 0;
+                        } else {
+                            $feePercent = \EasySub\Tools\BcMath::div($row->current_month_translated_count, $row->translated_count,0);
+                        }
+                    } else {
+                        $feePercent = 0;
+                    }
+                    if ((int)$row->current_month_limit === 1) {
+                        $apiState = '<span class="badge badge-danger">当月禁用</span>';
+                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/0" class="btn btn-success btn-xs">启用</a>';
+                    } else {
+                        $apiState = '<span class="badge badge-success">当月可用</span>';
+                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/1" class="btn btn-danger btn-xs">禁用</a>';
+                    }
+                    ?>
+                    <div class="card-header">
+                        <h5 class="card-title">第<?php echo $i;?>个翻译接口 <code><?php echo $row->name;?></code><?php echo $apiState;?></h5>
+                        <div class="card-tools">
+                            <span class="badge-info"><?php echo $row->current_month_str;?></span>
+                            <?php echo $apiBtn;?>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="info-box bg-info">
+                                    <span class="info-box-icon"><i class="fab fa-creative-commons-nc-jp"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">当月免费额度</span>
+                                        <span class="info-box-number"><?php echo $row->current_month_free_count; ?></span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: <?php echo $freePercent;?>%"></div>
+                                        </div>
+                                        <span class="progress-description">已使用<?php echo $freePercent;?>%，总额度<?php echo $row->free_count_limit / 1000; ?>K字</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="info-box bg-warning">
+                                    <span class="info-box-icon"><i class="fas fa-yen-sign"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">当月付费用量</span>
+                                        <span class="info-box-number"><?php echo $row->current_month_translated_count; ?></span>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: <?php echo $feePercent;?>%"></div>
+                                        </div>
+                                        <span class="progress-description">已使用<?php echo $feePercent;?>%，总翻译<?php echo bcdiv($row->translated_count,1000,0); ?>K字</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                    $i++;
                 }
-        ?>
-        <h5 class="mt-4 mb-2">第<?php echo $i;?>个翻译接口 <code><?php echo $row->name;?></code></h5>
-        <div class="row">
-            <div class="col-md-6 col-sm-6">
-                <div class="info-box bg-info">
-                    <span class="info-box-icon"><i class="fab fa-creative-commons-nc-jp"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">当月免费额度</span>
-                        <span class="info-box-number"><?php echo $row->current_month_free_count; ?></span>
-
-                        <div class="progress">
-                            <div class="progress-bar" style="width: <?php echo $freePercent;?>%"></div>
-                        </div>
-                        <span class="progress-description">已使用<?php echo $freePercent;?>%，总额度<?php echo $row->free_count_limit / 1000; ?>K字</span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-sm-6">
-                <div class="info-box bg-warning">
-                    <span class="info-box-icon"><i class="fas fa-yen-sign"></i></span>
-
-                    <div class="info-box-content">
-                        <span class="info-box-text">当月付费用量</span>
-                        <span class="info-box-number"><?php echo $row->current_month_translated_count; ?></span>
-                        <div class="progress">
-                            <div class="progress-bar" style="width: <?php echo $feePercent;?>%"></div>
-                        </div>
-                        <span class="progress-description">已使用<?php echo $feePercent;?>%，总翻译<?php echo bcdiv($row->translated_count,1000,0); ?>K字</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php
-                $i++;
+            } else {
+                ?>
+                <h5 class="mt-4 mb-2"><code>未配置翻译接口</code></h5>
+                <?php
             }
-        } else {
-        ?>
-            <h5 class="mt-4 mb-2"><code>未配置翻译接口</code></h5>
-        <?php
-        }
-        ?>
+            ?>
+        </div>
     </div>
     <!-- /.card-body -->
 </div>

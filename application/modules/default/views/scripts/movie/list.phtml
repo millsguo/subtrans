@@ -27,9 +27,11 @@
                     }
                     ?>
                 </div>
-                <div class="text-center"><?php echo htmlentities($row->title . '(' . $row->rating . ')');?> <br>
-                    <small><?php echo $row->year;?></small>
+                <div class="video-tag-line">
+                    <div class="video-tag bg-warning"><?php echo $row->rating; ?>分</div>
+                    <div class="video-tag bg-info"><?php echo $row->year;?>年</div>
                 </div>
+                <div class="text-center"><?php echo htmlentities($row->title);?></div>
             </div>
             <?php
                 }

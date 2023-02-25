@@ -382,6 +382,19 @@ class Tv
     }
 
     /**
+     * 获取剧集所有集
+     * @param int $tvId
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function fetchEpisodeByTv(int $tvId): Zend_Db_Table_Rowset_Abstract
+    {
+        $where = [
+            'tv_id = ?' => $tvId
+        ];
+        return $this->episodeTable->fetchAll($where,['season ASC','episode ASC']);
+    }
+
+    /**
      * 获取单集hash
      * @param string $filePath
      * @param string $filename

@@ -25,7 +25,7 @@ class Command
             return false;
         }
 
-        TransApi::initApiByEnv();
+        TransApi::initApi();
         TransSub::initTranslation();
 
         $queueObj = new \EasySub\Task\Queue();

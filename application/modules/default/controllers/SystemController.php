@@ -100,4 +100,26 @@ class SystemController extends Default_Model_ControllerHelper
         }
         $this->view->config = $configIni;
     }
+
+    /**
+     * 设置翻译接口状态
+     * @return void
+     */
+    public function setapiAction(): void
+    {
+        if (!isset($this->params['id'],$this->params['state'])) {
+            $this->quickRedirect('参数错误', '/','warning');
+        }
+        if ($this->params['state'] === '1') {
+            $apiState = true;
+        } else {
+            $apiState = false;
+        }
+        $result = \EasySub\Translated\TransApi::limitApi($this->params['id'],$apiState);
+        if ($result) {
+            $this->quickRedirect('接口设置成功', '/');
+        } else {
+            $this->quickRedirect('接口设置失败','/','warning');
+        }
+    }
 }

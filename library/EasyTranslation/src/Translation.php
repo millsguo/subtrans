@@ -36,7 +36,11 @@ class Translation
                     throw new \RuntimeException('请指定阿里云AccessSecret');
                 }
                 $regionId = $config['region_id'] ?? '';
-                $usePro = $config['use_pro'] ?? false;
+                if (isset($config['use_pro']) && (int)$config['use_pro'] === 1) {
+                    $usePro = true;
+                } else {
+                    $usePro = false;
+                }
                 $aliYunConfig = [
                     'accessKey' => $config['access_key'],
                     'accessSecret'  => $config['access_secret'],
@@ -102,7 +106,7 @@ class Translation
      */
     public function batchTranslate(string $sourceLanguage, string $targetLanguage, string $multiLineJson): bool|array
     {
-        $apiConfig = TransApi::initApiByEnv();
+        $apiConfig = TransApi::initApi();
         Log::info('使用' . $apiConfig['id'] . '号接口');
         $this->setConfig($apiConfig);
 

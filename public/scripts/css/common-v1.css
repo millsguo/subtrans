@@ -28,6 +28,12 @@
     -ms-flex:0 0 200px;
     margin-bottom: 60px;
 }
+.image-box a{
+    color:#FFFFFF;
+}
+.image-box a:hover, .image-box a:active{
+    color: #6f42c1;
+}
 .overflow-hidden {
     overflow: hidden;
 }
@@ -104,4 +110,50 @@ menu,ol,ul {
     list-style: none;
     margin: 0;
     padding: 0;
+}
+.video-tag-line {
+    height: 40px;
+    position: absolute;
+    top: 260px;
+    right: 20px;
+    line-height: 1.2;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: 400;
+    display: inline-block;
+}
+.video-tag {
+    float: right;
+    margin: 0 5px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    color:#6c757d;
+    font-size: 10px;
+    padding:5px;
+    position: relative;
+    text-align: center;
+    font-weight: 400;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.media-page {
+    position: relative;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    background-size: cover;
+    background-position: 50%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-top: calc(-4rem - env(safe-area-inset-top));
+    padding-top: calc(4rem + env(safe-area-inset-top));
+}
+.media-page-bg-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -10;
 }

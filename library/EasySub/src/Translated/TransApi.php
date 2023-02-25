@@ -54,7 +54,6 @@ class TransApi
     /**
      * 初始化翻译接口
      * @return array
-     * @throws Exception
      */
     public static function initApi(): array
     {
@@ -429,5 +428,32 @@ class TransApi
             'id > ?'    => 0
         ];
         return self::$apiTable->fetchAll($where,'id ASC');
+    }
+
+    /**
+     * 设置接口当月状态
+     * @param int $apiId
+     * @param bool $limitState true 禁用，false 启用
+     * @return bool
+     */
+    public static function limitApi(int $apiId,bool $limitState = true): bool
+    {
+        self::initTable();
+        $where = [
+            'id = ?'    => $apiId
+        ];
+        if ($limitState) {
+            $limitValue = 1;
+        } else {
+            $limitValue = 0;
+        }
+        $data = [
+            'current_month_limit'   => $limitValue
+        ];
+        $result = self::$apiTable->update($data, $where);
+        if ($result) {
+            return true;
+        }
+        return false;
     }
 }
