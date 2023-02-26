@@ -27,9 +27,9 @@ class Tv
     /**
      * 增加剧集
      * @param string $tvPath
-     * @return bool
+     * @return bool|int
      */
-    public function addTv(string $tvPath): bool
+    public function addTv(string $tvPath): bool|int
     {
         if (!is_dir($tvPath)) {
             $this->message = '剧集目录不存在';
@@ -50,12 +50,12 @@ class Tv
         if ($existsRow) {
             $result = $this->tvTable->update($data,['id = ?' => $existsRow->id]);
             if ($result) {
-                return $existsRow->id;
+                return (int)$existsRow->id;
             }
         } else {
             $result = $this->tvTable->insert($data);
             if ($result) {
-                return $result;
+                return (int)$result;
             }
         }
         $this->message = $this->tvTable->getMessage();

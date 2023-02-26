@@ -157,3 +157,7 @@ menu,ol,ul {
     width: 100%;
     z-index: -10;
 }
+
+.badge {
+    margin:auto 5px;
+}

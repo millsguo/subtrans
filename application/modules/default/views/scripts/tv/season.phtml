@@ -1,8 +1,36 @@
-<div class="media-page">
-    <div class="media-page-bg-image">
-        <span class=""><img src="/image/show?code=<?php echo base64_encode($this->tvRow->tv_path . '/fanart.jpg');?>"></span>
-        <div class="media-bg-image-mask"></div>
+<div class="row">
+    <div class="col-sm-4">
+        <img src="/image/show?code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
     </div>
-    <div class="media-header"></div>
-
+    <div class="col-sm-8">
+        <h1><?php echo $this->tvRow->title;?></h1>
+        <h3><?php echo $this->tvRow->original_title;?></h3>
+        <h5><?php echo $this->tvRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->tvRow->year;?></h5>
+    </div>
+</div>
+<div class="row">
+    <?php
+    if (is_countable($this->seasonRows) && count($this->seasonRows) > 0) {
+        foreach ($this->seasonRows as $seasonRow) {
+            $episodeArray = [];
+            if (is_countable($this->episodeRows) && count($this->episodeRows) > 0) {
+                foreach ($this->episodeRows as $episodeRow) {
+                    if ($episodeRow->season_id === $seasonRow->id) {
+                        $episodeArray[] = $episodeRow;
+                    }
+                }
+            }
+    ?>
+        <div class="card card-primary">
+            <div class="card-header"><?php echo $seasonRow->title;?><small><?php echo $seasonRow->year;?></small></div>
+            <div class="card-body">
+                <?php
+                echo $this->partial('section/video-tv.phtml',['rows' => $episodeArray]);
+                ?>
+            </div>
+        </div>
+    <?php
+        }
+    }
+    ?>
 </div>

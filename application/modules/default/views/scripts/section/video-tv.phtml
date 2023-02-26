@@ -1,0 +1,38 @@
+<div class="row">
+    <?php
+    if (is_countable($this->rows) && count($this->rows) > 0) {
+        foreach ($this->rows as $row) {
+            $fullFilePath = $row->file_path . '/' . $row->file_name;
+            $fileInfo = pathinfo($fullFilePath);
+            if (isset($fileInfo['basename'])) {
+                $baseName = $fileInfo['basename'];
+            } else {
+                continue;
+            }
+            ?>
+            <div class="image-box">
+                <div class="position-relative bg-gray rounded-xl overflow-hidden w-full h-full border-width-2">
+                    <img src="/image/show?code=<?php echo base64_encode($row->file_path . '/' . $baseName . '-thumb.jpg'); ?>" alt="" class="img-fluid h-full w-full">
+                    <?php
+                    if ((int)$row->have_zh_sub === 1) {
+                        ?>
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success">
+                                中文字幕
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+                <div class="video-tag-line">
+                    <div class="video-tag bg-warning"><?php echo $row->rating; ?>分</div>
+                    <div class="video-tag bg-info"><?php echo $row->year;?>年</div>
+                </div>
+                <div class="text-center"><?php echo '第' . $row->episode . '集 ' . $row->title;?></div>
+            </div>
+            <?php
+        }
+    }
+    ?>
+</div>

@@ -32,9 +32,8 @@
                     }
                     ?>
                     <div class="card-header">
-                        <h5 class="card-title">第<?php echo $i;?>个翻译接口 <code><?php echo $row->name;?></code><?php echo $apiState;?></h5>
+                        <h5 class="card-title">第<?php echo $i;?>个翻译接口 <code><?php echo $row->name;?></code><span class="badge badge-info"><?php echo $row->current_month_str;?></span><?php echo $apiState;?></h5>
                         <div class="card-tools">
-                            <span class="badge-info"><?php echo $row->current_month_str;?></span>
                             <?php echo $apiBtn;?>
                         </div>
                     </div>
