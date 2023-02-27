@@ -88,38 +88,26 @@ class TransApi
                 }
             }
         } else {
-            $config = Config::getConfig(BASE_APP_PATH . '/config/config.ini','translation');
-            if (isset($config['aliyun1'])) {
-                $config = $config['aliyun1'];
-                if ($config['use_pro'] === 1 || $config['use_pro'] === '1') {
-                    $usePro = true;
-                } else {
-                    $usePro = false;
+            $configObj = Config::getConfig(BASE_APP_PATH . '/config/config.ini','translation');
+            $configArray = $configObj->toArray();
+            for ($i = 1;$i <= 3;$i++) {
+                $arrayKey = 'aliyun' . $i;
+                if (isset($configArray[$arrayKey])) {
+                    $config = $configArray[$arrayKey];
+                    if ($config['use_pro'] === 1 || $config['use_pro'] === '1') {
+                        $usePro = true;
+                    } else {
+                        $usePro = false;
+                    }
+                    if (isset($config['enable_pay']) && ($config['enable_pay'] === '1' || $config['enable_pay'] === 1)) {
+                        $enablePay = true;
+                    } else {
+                        $enablePay = false;
+                    }
+                    $regionId = $config['region_id'] ?? 'cn-hangzhou';
+                    self::addApiConfig($config['access_key'],$config['access_secret'],$usePro);
+                    self::addApi('阿里云翻译接口','aliyun',$config['access_key'],$config['access_secret'],$usePro,$regionId,1000000,60,$enablePay);
                 }
-                if (isset($config['enable_pay']) && ($config['enable_pay'] === '1' || $config['enable_pay'] === 1)) {
-                    $enablePay = true;
-                } else {
-                    $enablePay = false;
-                }
-                $regionId = $config['region_id'] ?? 'cn-hangzhou';
-                self::addApiConfig($config['access_key'],$config['access_secret'],$usePro);
-                self::addApi('阿里云翻译接口','aliyun',$config['access_key'],$config['access_secret'],$usePro,$regionId,1000000,60,$enablePay);
-            }
-            if (isset($config['aliyun2'])) {
-                $config = $config['aliyun2'];
-                if ($config['use_pro'] === 1 || $config['use_pro'] === '1') {
-                    $usePro = true;
-                } else {
-                    $usePro = false;
-                }
-                if (isset($config['enable_pay']) && ($config['enable_pay'] === '1' || $config['enable_pay'] === 1)) {
-                    $enablePay = true;
-                } else {
-                    $enablePay = false;
-                }
-                $regionId = $config['region_id'] ?? 'cn-hangzhou';
-                self::addApiConfig($config['access_key'],$config['access_secret'],$usePro);
-                self::addApi('阿里云翻译接口','aliyun',$config['access_key'],$config['access_secret'],$usePro,$regionId,1000000,60,$enablePay);
             }
         }
 
@@ -267,7 +255,7 @@ class TransApi
         self::initTable();
         $apiRow = self::getApiByAccessKey($accessKey);
         if ($apiRow) {
-            throw new \RuntimeException('AccessKey已存在');
+            return (int)$apiRow->id;
         }
         if ($enablePay) {
             $enablePayValue = 1;

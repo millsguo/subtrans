@@ -6,19 +6,22 @@
     <div class="card-body" style="padding: 0;">
         <div class="card">
             <?php
+
+            use EasySub\Tools\BcMath;
+
             if (is_countable($this->apiRows) && count($this->apiRows) > 0) {
                 $i = 1;
                 foreach ($this->apiRows as $row) {
                     if ((int)$row->current_month_free_count >= (int)$row->free_count_limit) {
                         $freePercent = 100;
                     } else {
-                        $freePercent = \EasySub\Tools\BcMath::div($row->current_month_free_count,$row->free_count_limit,0);
+                        $freePercent =  BcMath::mul(BcMath::div($row->current_month_free_count,$row->free_count_limit,2),100);
                     }
                     if ((int)$row->current_month_translated_count > 0) {
                         if ((int)$row->translated_count === 0) {
                             $feePercent = 0;
                         } else {
-                            $feePercent = \EasySub\Tools\BcMath::div($row->current_month_translated_count, $row->translated_count,0);
+                            $feePercent = BcMath::mul(BcMath::div($row->current_month_translated_count, $row->translated_count,2),100);
                         }
                     } else {
                         $feePercent = 0;

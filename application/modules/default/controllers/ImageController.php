@@ -48,8 +48,6 @@ class ImageController extends Default_Model_ControllerHelper
             $filePath = str_replace(array(' ', '(', ')'), array('\ ', '\(', '\)'), $filePath);
         }
         if (!is_readable($filePath)) {
-            $dirArray = scandir('/data/movies-1');
-            echo print_r($dirArray,true);
             $fileArray = scandir(dirname($filePath));
             echo print_r($fileArray,true);
             die('[' . $filePath . ']图片不存在');
