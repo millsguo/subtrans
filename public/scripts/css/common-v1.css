@@ -139,6 +139,9 @@ menu,ol,ul {
     width: 240px;
     padding:5px 10px;
 }
+.tv-episode-box a{
+    color:#FFFFFF;
+}
 .tv-episode-image {
     width:240px;
     height:160px;
