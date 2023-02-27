@@ -104,6 +104,20 @@ class Movie
     }
 
     /**
+     * 获取电影NFO数据
+     * @param int $id
+     * @return bool|array
+     */
+    public function getMovieNfo(int $id): bool|array
+    {
+        $movieRow = $this->getMovie($id);
+        if (!$movieRow) {
+            return false;
+        }
+        return $this->getNfo($movieRow->file_path,$movieRow->file_name,'movieInfo',true);
+    }
+
+    /**
      * 删除电影
      * @param int $id
      * @return bool

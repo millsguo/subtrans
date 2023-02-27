@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-sm-3">
+        <div class="rounded-xl overflow-hidden" style="width: 230px;height:340px;margin:0 auto;">
+            <img src="/image/show?w=230&h=340&code=<?php echo base64_encode($this->movieRow->file_path . '/poster.jpg');?>" class="h-full w-full">
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <h1><?php echo $this->movieRow->title;?></h1>
+        <h3><?php echo $this->movieRow->original_title;?></h3>
+        <h5><?php echo $this->movieRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->movieRow->year;?></h5>
+        <?php
+//        echo print_r($this->nfoData,true);
+        ?>
+    </div>
+    <div class="col-sm-3">
+        <div class="card card-widget widget-user-2 shadow-sm mt-5 bg-white">
+            <div class="card-header bg-info">
+                <h3 class="card-title">信息</h3>
+            </div>
+            <div class="card-body p-0 bg-white">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>时长</td>
+                            <td class="text-right"><?php echo $this->movieRow->runtime;?>分钟</span></td>
+                        </tr>
+                        <?php
+                        if (!empty($this->movieRow->imdb_id)) {
+                            ?>
+                            <tr>
+                                <td>IMDB</td>
+                                <td class="text-right"><?php echo $this->movieRow->imdb_id;?></td>
+                            </tr>
+                            <?php
+                        }
+                        if (!empty($this->movieRow->tmdb_id)) {
+                            ?>
+                            <tr>
+                                <td>TMDB</td>
+                                <td class="text-right"><?php echo $this->movieRow->tmdb_id;?></td>
+                            </tr>
+                            <?php
+                        }
+                        if (!empty($this->nfoData['releasedate'])){
+                        ?>
+                            <tr>
+                                <td>上映时间</td>
+                                <td><?php echo $this->nfoData['releasedate'];?></td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row p-2">
+</div>

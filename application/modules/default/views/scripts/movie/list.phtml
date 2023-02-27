@@ -13,6 +13,7 @@
                 foreach ($this->rows as $row) {
             ?>
             <div class="image-box">
+                <a href="/movie/show/id/<?php echo $row->id;?>">
                 <div class="position-relative bg-gray rounded-xl overflow-hidden w-full h-full border-width-2">
                     <img src="/image/show?w=185&h=300&code=<?php echo base64_encode($row->file_path . '/poster.jpg'); ?>" alt="" class="img-fluid h-full w-full">
                     <?php
@@ -32,6 +33,7 @@
                     <div class="video-tag bg-info"><?php echo $row->year;?>年</div>
                 </div>
                 <div class="text-center"><?php echo htmlentities($row->title);?></div>
+                </a>
             </div>
             <?php
                 }

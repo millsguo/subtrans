@@ -7,6 +7,8 @@
  * 作者：millsguo
  */
 
+use EasySub\Video\Movie;
+
 /**
  * 后台管理首页
  * @author MillsGuo
@@ -14,9 +16,11 @@
  */
 class MovieController extends Default_Model_ControllerHelper
 {
+    private Movie $movie;
+
     public function action_init(): void
     {
-        \EasySub\CheckSub::initLibrary();
+        $this->movie = new Movie();
     }
     
     /**
@@ -33,39 +37,28 @@ class MovieController extends Default_Model_ControllerHelper
      */
     public function listAction(): void
     {
-        $movie = new \EasySub\Video\Movie();
         $where = [
             'id > ?'    => 0
         ];
-        $this->view->rows = $movie->autoFetch($where,'date_added DESC',30,$this->page,true);
+        $this->view->rows = $this->movie->autoFetch($where,'date_added DESC',30,$this->page,true);
     }
 
     /**
-     * 添加扫描任务
+     * 电影详情页
      * @return void
      */
-    public function scanAction(): void
+    public function showAction(): void
     {
-        if (!isset($this->params['target'])) {
-            $this->quickRedirect('未指定扫描目标','/movie/list/','warning');
+        if (!isset($this->params['id'])) {
+            $this->quickRedirect('缺少电影ID','/movie/','warning');
         }
-        if (strtolower($this->params['target']) === 'all') {
-            $taskObj = new \EasySub\Task\Queue();
-            $libraryArray = \EasySub\Video\Store::getMovieLibrary();
-            if (empty($libraryArray)) {
-                $this->quickRedirect('没有添加电影库','/movie/list/','warning');
-            }
-            $message = '';
-            foreach ($libraryArray as $moviePath) {
-                $result = $taskObj->addTask('movie',$moviePath);
-                if ($result) {
-                    $message .= '电影库[' . $moviePath . ']添加成功';
-                } else {
-                    $message .= '电影库[' . $moviePath . ']添加失败：' . $taskObj->getMessage();
-                }
-            }
-            $this->quickRedirect($message, '/movie/list/');
+        $id = (int)$this->params['id'];
+        $movieRow = $this->movie->getMovie($id);
+        if (!$movieRow) {
+            $this->quickRedirect($this->movie->getMessage(),'/movie/','warning');
         }
-        $this->quickRedirect('暂不支持单独扫描', '/movie/list/','warning');
+        $this->view->movieRow = $movieRow;
+        $nfoData = $this->movie->getMovieNfo($id);
+        $this->view->nfoData = $nfoData;
     }
 }

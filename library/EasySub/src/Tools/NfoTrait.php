@@ -6,16 +6,17 @@ use SimpleXMLElement;
 
 trait NfoTrait
 {
-    protected string $message;
+    protected string $message = '';
 
     /**
      * 获取NFO信息
      * @param string $dirPath
      * @param string $fileName
      * @param string $nfoType movieInfo,tvInfo,seasonInfo,episodeInfo
+     * @param bool $useOriginData
      * @return array
      */
-    protected function getNfo(string $dirPath,string $fileName,string $nfoType = 'movieInfo'): array
+    protected function getNfo(string $dirPath,string $fileName,string $nfoType = 'movieInfo',bool $useOriginData = false): array
     {
         if (!is_readable($dirPath . '/' . $fileName)) {
             Log::err('文件不存在：' . $dirPath . '/' . $fileName);
@@ -35,6 +36,16 @@ trait NfoTrait
                 Log::debug('NFO数据');
                 Log::debug($fileInfo);
                 return [];
+            }
+            if ($useOriginData) {
+                try {
+                    return json_decode(json_encode($fileInfo, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    $this->message = $e->getMessage();
+                    Log::debug($e->getMessage());
+                    Log::debug($e->getTraceAsString());
+                    return ['message' => $e->getMessage(),'trace' => $e->getTraceAsString()];
+                }
             }
             return $this->getDataFromEmbyNfo($fileInfo,$nfoType);
         }
