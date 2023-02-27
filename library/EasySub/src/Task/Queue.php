@@ -29,6 +29,11 @@ class Queue
      */
     public function addTask(string $taskType,string $targetPath): bool
     {
+        $taskType = strtoupper($taskType);
+        if ($taskType !== 'MOVIE' && $taskType !== 'TV') {
+            $this->message = '任务类型，只支持MOVIE和TV';
+            return false;
+        }
         $taskHash = md5(strtoupper($taskType) . trim($targetPath,'/'));
         $hashRow = $this->getTaskByHash($taskHash);
         if ($hashRow) {

@@ -183,4 +183,14 @@ class Default_Model_ControllerHelper extends Zend_Controller_Action
         }
         $this->redirect($url);
     }
+
+    /**
+     * 返回JSON数据
+     * @param array $data
+     * @return void
+     */
+    public function json(array $data): void
+    {
+        $this->_helper->json($data);
+    }
 }

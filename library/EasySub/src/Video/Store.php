@@ -2,6 +2,8 @@
 
 namespace EasySub\Video;
 
+use EasySub\Tools\Config;
+
 class Store
 {
     /**
@@ -72,5 +74,25 @@ class Store
             return true;
         }
         return false;
+    }
+
+    /**
+     * 从配置文件中初始化电影库和剧集库
+     * @return void
+     */
+    public static function initLibraryFromConfig(): void
+    {
+        $config = Config::getConfig(BASE_APP_PATH . '/config/config.ini','volume');
+        $configArray = $config->toArray();
+        for ($i = 1; $i <= 3; $i++) {
+            $movieKey = 'movies-' . $i;
+            $tvKey = 'tv-' . $i;
+            if (isset($configArray[$movieKey]) && !empty($configArray[$movieKey])) {
+                self::addMovieLibrary($configArray[$movieKey]);
+            }
+            if (isset($configArray[$tvKey]) && !empty($configArray[$tvKey])) {
+                self::addTvLibrary($configArray[$tvKey]);
+            }
+        }
     }
 }
