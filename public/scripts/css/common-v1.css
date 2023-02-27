@@ -114,7 +114,18 @@ menu,ol,ul {
 .video-tag-line {
     height: 40px;
     position: absolute;
-    top: 75%;
+    top: 260px;
+    right: 20px;
+    line-height: 1.2;
+    vertical-align: middle;
+    text-align: center;
+    font-weight: 400;
+    display: inline-block;
+}
+.tv-tag-line {
+    height: 40px;
+    position: absolute;
+    top: 50%;
     right: 20px;
     line-height: 1.2;
     vertical-align: middle;
