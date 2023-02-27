@@ -123,9 +123,10 @@ menu,ol,ul {
     display: inline-block;
 }
 .tv-tag-line {
+    float: left;
     height: 40px;
     position: relative;
-    bottom: 35px;
+    top: -55px;
     left: 20px;
     line-height: 1.2;
     vertical-align: middle;

@@ -25,11 +25,11 @@
                     }
                     ?>
                 </div>
-                <div class="tv-tag-line">
+                <div class="text-center"><?php echo '第' . $row->episode . '集 ' . $row->title;?></div>
+                <span class="tv-tag-line">
                     <div class="video-tag bg-warning"><?php echo $row->rating; ?>分</div>
                     <div class="video-tag bg-info"><?php echo $row->year;?>年</div>
-                </div>
-                <div class="text-center"><?php echo '第' . $row->episode . '集 ' . $row->title;?></div>
+                </span>
             </div>
             <?php
         }

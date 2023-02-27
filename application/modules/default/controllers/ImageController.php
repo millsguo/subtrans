@@ -57,7 +57,9 @@ class ImageController extends Default_Model_ControllerHelper
             if (isset($this->params['w'], $this->params['h'])) {
                 $width = (int)$this->params['w'];
                 $height = (int)$this->params['h'];
-                $image->resize($width, $height);
+                $image->fit($width, $height,function($constraint) {
+                    $constraint->upsize();
+                });
             }
             echo $image->response('jpg', 90);
         }

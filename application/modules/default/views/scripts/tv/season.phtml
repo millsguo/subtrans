@@ -1,6 +1,8 @@
 <div class="row">
-    <div class="col-sm-3 rounded-xl overflow-hidden">
-        <img src="/image/show?w=300&h=200&code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
+    <div class="col-sm-3">
+        <div class="rounded-xl overflow-hidden" style="width: 230px;height:340px;margin:0 auto;">
+            <img src="/image/show?w=230&h=340&code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
+        </div>
     </div>
     <div class="col-sm-8">
         <h1><?php echo $this->tvRow->title;?></h1>
