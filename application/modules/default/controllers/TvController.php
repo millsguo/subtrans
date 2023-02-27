@@ -7,6 +7,8 @@
  * 作者：millsguo
  */
 
+use EasySub\Video\Tv;
+
 /**
  * 后台管理首页
  * @author MillsGuo
@@ -14,9 +16,11 @@
  */
 class TvController extends Default_Model_ControllerHelper
 {
+    private Tv $tv;
+
     public function action_init(): void
     {
-        \EasySub\CheckSub::initLibrary();
+        $this->tv = new Tv();
     }
     
     /**
@@ -33,11 +37,10 @@ class TvController extends Default_Model_ControllerHelper
      */
     public function listAction(): void
     {
-        $tv = new \EasySub\Video\Tv();
         $where = [
             'id > ?'    => 0
         ];
-        $this->view->rows = $tv->autoFetchTv($where,'date_added DESC',30,$this->page,true);
+        $this->view->rows = $this->tv->autoFetchTv($where,'date_added DESC',30,$this->page,true);
     }
 
     /**
@@ -50,42 +53,33 @@ class TvController extends Default_Model_ControllerHelper
             $this->quickRedirect('参数错误', '/tv/list/','warning');
         }
         $tvId = (int)$this->params['id'];
-        $tv = new \EasySub\Video\Tv();
-        $tvRow = $tv->getTv($tvId);
+
+        $tvRow = $this->tv->getTv($tvId);
         if (!$tvRow) {
-            $this->quickRedirect($tv->getMessage(), '/tv/list/','warning');
+            $this->quickRedirect($this->tv->getMessage(), '/tv/list/','warning');
         }
         $this->view->tvRow = $tvRow;
-        $this->view->seasonRows = $tv->fetchSeasonByTv($tvId);
-        $this->view->episodeRows = $tv->fetchEpisodeByTv($tvId);
+        $this->view->seasonRows = $this->tv->fetchSeasonByTv($tvId);
+        $this->view->episodeRows = $this->tv->fetchEpisodeByTv($tvId);
     }
 
     /**
-     * 添加扫描任务
+     * 剧集单集详情页
      * @return void
      */
-    public function scanAction(): void
+    public function showAction(): void
     {
-        if (!isset($this->params['target'])) {
-            $this->quickRedirect('未指定扫描目标','/tv/list/','warning');
+        if (!isset($this->params['id'])) {
+            $this->quickRedirect('缺少集ID','/tv/','warning');
         }
-        if (strtolower($this->params['target']) === 'all') {
-            $taskObj = new \EasySub\Task\Queue();
-            $tvLibraryArray = \EasySub\Video\Store::getTvLibrary();
-            if (!$tvLibraryArray) {
-                $this->quickRedirect('没有添加剧集库','/tv/list/','warning');
-            }
-            $message = '';
-            foreach ($tvLibraryArray as $tvPath) {
-                $result = $taskObj->addTask('tv',$tvPath);
-                if ($result) {
-                    $message .= '剧集库[' . $tvPath . ']添加成功';
-                } else {
-                    $message .= '剧集库[' . $tvPath . ']添加失败：' . $taskObj->getMessage();
-                }
-            }
-            $this->quickRedirect($message,'/tv/list/','warning');
+        $id = (int)$this->params['id'];
+        $episodeRow = $this->tv->getEpisode($id);
+        if (!$episodeRow) {
+            $this->quickRedirect($this->tv->getMessage(),'/tv/','warning');
         }
-        $this->quickRedirect('暂不支持单独扫描', '/tv/list/','warning');
+        $this->view->tvRow = $this->tv->getTv($episodeRow->tv_id);
+        $this->view->episodeRow = $episodeRow;
+        $nfoData = $this->tv->getEpisodeNfo($id);
+        $this->view->nfoData = $nfoData;
     }
 }

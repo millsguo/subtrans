@@ -352,6 +352,20 @@ class Tv
     }
 
     /**
+     * 获取单集NFO数据
+     * @param int $id
+     * @return bool|array
+     */
+    public function getEpisodeNfo(int $id): bool|array
+    {
+        $episodeRow = $this->getEpisode($id);
+        if (!$episodeRow) {
+            return false;
+        }
+        return $this->getNfo($episodeRow->file_path,$episodeRow->file_name,'episodeInfo',true);
+    }
+
+    /**
      * 删除单集信息
      * @param int $episodeId
      * @return bool

@@ -30,7 +30,7 @@ trait NfoTrait
         $preFilename = $fileInfo['filename'];
         if (is_readable($dirPath . '/' . $preFilename . '.nfo')) {
             //EMBY 刮削信息
-            $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $preFilename . '.nfo'));
+            $fileInfo = simplexml_load_string(file_get_contents($dirPath . '/' . $preFilename . '.nfo'),'SimpleXMLElement',16384);
             if (!$fileInfo instanceof SimpleXMLElement) {
                 Log::err('NFO数据读取失败');
                 Log::debug('NFO数据');
@@ -105,6 +105,7 @@ trait NfoTrait
                     'sonarrid',
                     'episode',
                     'season',
+                    'runtime'
                 ];
                 break;
             default:
