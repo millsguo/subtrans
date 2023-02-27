@@ -114,7 +114,7 @@ menu,ol,ul {
 .video-tag-line {
     height: 40px;
     position: absolute;
-    top: 260px;
+    top: 75%;
     right: 20px;
     line-height: 1.2;
     vertical-align: middle;
