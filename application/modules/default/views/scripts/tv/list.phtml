@@ -15,7 +15,7 @@
                     <div class="image-box">
                         <a href="/tv/season/id/<?php echo $row->id;?>">
                         <div class="position-relative bg-gray rounded-xl overflow-hidden w-full h-full border-width-2">
-                            <img src="/image/show?code=<?php echo base64_encode($row->tv_path . '/poster.jpg'); ?>" alt="" class="img-fluid h-full w-full">
+                            <img src="/image/show?w=185&h=300&code=<?php echo base64_encode($row->tv_path . '/poster.jpg'); ?>" alt="" class="img-fluid h-full w-full">
                         </div>
                         <div class="video-tag-line">
                             <div class="video-tag bg-warning"><?php echo $row->rating; ?>分</div>

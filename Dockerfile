@@ -12,7 +12,7 @@ RUN sed -i -E 's/(deb|security).debian.org/mirrors.aliyun.com/g' /etc/apt/source
     ca-certificates \
     wget vim procps\
     libzip-dev zlib1g-dev libfreetype6 libwebp-dev libjpeg-dev libpng-dev\
-    && /usr/local/bin/docker-php-ext-install zip gd pcntl bcmath\
+    && /usr/local/bin/docker-php-ext-install zip gd php-imagick pcntl bcmath\
     # cleanup
     && apt-get clean \
     && rm -rf \

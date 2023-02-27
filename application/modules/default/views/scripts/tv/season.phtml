@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col-sm-3 rounded-xl overflow-hidden">
-        <img src="/image/show?code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
+        <img src="/image/show?w=300&h=200&code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
     </div>
-    <div class="col-sm-8 offset-1">
+    <div class="col-sm-8">
         <h1><?php echo $this->tvRow->title;?></h1>
         <h3><?php echo $this->tvRow->original_title;?></h3>
         <h5><?php echo $this->tvRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->tvRow->year;?></h5>
