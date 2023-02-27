@@ -1,12 +1,13 @@
 <div class="row">
     <div class="col-sm-3">
         <div class="rounded-xl overflow-hidden" style="width: 230px;height:340px;margin:0 auto;">
-            <img src="/image/show?w=230&h=340&code=<?php echo base64_encode($this->tvRow->file_path . '/poster.jpg');?>" class="h-full w-full">
+            <img src="/image/show?w=230&h=340&code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
         </div>
     </div>
     <div class="col-sm-6">
         <h1><?php echo $this->episodeRow->title;?></h1>
         <h3><?php echo $this->episodeRow->original_title;?></h3>
+        <h4><?php echo '<span class="badge badge-warning">第' . $this->episodeRow->season . '季 - 第' . $this->episodeRow->episode . '集';?></h4>
         <h5><?php echo $this->episodeRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->episodeRow->year;?></h5>
         <?php
             if (!empty($this->nfoData['plot'])) {
