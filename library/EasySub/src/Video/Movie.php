@@ -41,10 +41,12 @@ class Movie
         $dirPath = $pathInfo['dirname'];
         $fileName = $pathInfo['basename'];
 
+        $fileHash = md5_file($filePath);
         $baseData = [
             'file_path' => $dirPath,
             'file_name' => $fileName,
             'file_path_hash'    => $pathHash,
+            'file_hash' => $fileHash,
             'scan_time' => time()
         ];
         if ($haveChineseSubTitle) {

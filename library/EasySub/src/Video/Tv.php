@@ -293,6 +293,8 @@ class Tv
 
         $episodeHash = $this->getEpisodeHash($episodePath, $episodeFilename);
 
+        $fileHash = md5_file($episodePath . '/' . $episodeFilename);
+
         $baseData = [
             'file_path' => $episodePath,
             'file_name' => $episodeFilename,
@@ -300,7 +302,8 @@ class Tv
             'have_zh_sub'   => $haveZhSub,
             'season_id' => $seasonId,
             'tv_id'     => $seasonRow->tv_id,
-            'tv_title'  => $seasonRow->tv_title
+            'tv_title'  => $seasonRow->tv_title,
+            'file_hash' => $fileHash
         ];
 
         $data = array_merge($baseData, $episodeData);
