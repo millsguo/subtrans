@@ -24,7 +24,7 @@ if (isset($this->subTitles) && is_countable($this->subTitles)) {
             if (!isset($subtitle['language'], $subtitle['codec'], $subtitle['default'])) {
                 continue;
             }
-            $countryName = \EasySub\Tools\Country::getNameByCode3(strtolower($subtitle['language']));
+            $countryName = \EasySub\Tools\LanguageCode::getLanguageName($subtitle['language']);
             if ($countryName === false) {
                 $countryName = $subtitle['language'];
             }
