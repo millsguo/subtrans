@@ -21,7 +21,8 @@
     "ext-simplexml": "*",
     "ext-posix": "*",
     "ext-bcmath": "*",
-    "intervention/image": "^2.7"
+    "intervention/image": "^2.7",
+    "guzzlehttp/guzzle": "^7.5"
   },
   "autoload": {
     "psr-4": {

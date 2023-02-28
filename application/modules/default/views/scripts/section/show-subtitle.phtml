@@ -1,23 +1,41 @@
 <?php
-if (isset($this->subTitles)) {
+if (isset($this->subTitles) && is_countable($this->subTitles)) {
     echo '<div class="callout callout-success"><h5>内置字幕</h5>';
-    foreach ($this->subTitles as $subtitle) {
-        switch (strtolower($subtitle['language'])) {
+    if (isset($this->subTitles['language'],$this->subTitles['codec'],$this->subTitles['default'])) {
+        switch (strtolower($this->subTitles['language'])) {
             case 'eng':
-                $languageStr = '英语(' . $subtitle['codec'] . ')';
+                $languageStr = '英语(' . $this->subTitles['codec'] . ')';
                 break;
             case 'chi':
                 $languageStr = '中文';
                 break;
             default:
-                continue 2;
+                $languageStr = $this->subTitles['language'];
+                break;
         }
-        if (isset($subtitle['default']) && $subtitle['default'] === true) {
+        if ($this->subTitles['default'] === true) {
             $tagStr = 'badge-warning';
         } else {
             $tagStr = 'badge-info';
         }
         echo '<span class="badge ' . $tagStr . '">' . $languageStr . '</span>';
+    } else {
+        foreach ($this->subTitles as $subtitle) {
+            if (!isset($subtitle['language'], $subtitle['codec'], $subtitle['default'])) {
+                continue;
+            }
+            $countryName = \EasySub\Tools\Country::getNameByCode3(strtolower($subtitle['language']));
+            if ($countryName === false) {
+                $countryName = $subtitle['language'];
+            }
+            $languageStr = $countryName . '(' . $subtitle['codec'] . ')';
+            if ($subtitle['default'] === true) {
+                $tagStr = 'badge-warning';
+            } else {
+                $tagStr = 'badge-info';
+            }
+            echo '<span class="badge ' . $tagStr . '">' . $languageStr . '</span>';
+        }
     }
     echo '</div>';
 }
