@@ -10,6 +10,7 @@
         <h5><?php echo $this->tvRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->tvRow->year;?></h5>
         <?php
         echo $this->partial('section/video-desc.phtml',['nfoData' => $this->nfoData]);
+        echo '<div class="m-2"><a href="#" class="btn btn-success" onclick="addTask(\'tv\',\'\',' . $this->tvRow->id . ');">扫描剧集</a></div>';
         ?>
     </div>
     <div class="col-sm-3">

@@ -42,6 +42,8 @@ class TaskController extends Default_Model_ControllerHelper
         if (!isset($this->params['target'])) {
             $this->json(['code' => 400,'msg' => '参数错误']);
         }
+        $tv = new \EasySub\Video\Tv();
+
         $target = strtolower($this->params['target']);
         $taskObj = new \EasySub\Task\Queue();
         switch ($target) {
@@ -93,11 +95,26 @@ class TaskController extends Default_Model_ControllerHelper
                 }
                 $this->json(['code' => 405,'msg' => $taskObj->getMessage()]);
                 break;
+            case 'tv':
+                if (!isset($this->params['id'])) {
+                    $this->json(['code' => 403,'msg' => '缺少剧集季ID']);
+                }
+
+                $tvRow = $tv->getTv((int)$this->params['id']);
+                if (!$tvRow) {
+                    $this->json(['code' => 404,'msg' => '剧集不存在，剧ID：' . $this->params['id']]);
+                }
+                $result = $taskObj->addTask('tv',$tvRow->tv_path);
+                if ($result) {
+                    $this->json(['code' => 0]);
+                }
+                $this->json(['code' => 405,'msg' => $taskObj->getMessage()]);
+                break;
             case 'season':
                 if (!isset($this->params['id'])) {
                     $this->json(['code' => 403,'msg' => '缺少剧集季ID']);
                 }
-                $tv = new \EasySub\Video\Tv();
+
                 $seasonRow = $tv->getSeason((int)$this->params['id']);
                 if (!$seasonRow) {
                     $this->json(['code' => 404,'msg' => '剧集不存在，季ID：' . $this->params['id']]);
@@ -112,7 +129,6 @@ class TaskController extends Default_Model_ControllerHelper
                 if (!isset($this->params['id'])) {
                     $this->json(['code' => 403,'msg' => '缺少剧集集ID']);
                 }
-                $tv = new \EasySub\Video\Tv();
                 $episodeRow = $tv->getEpisode((int)$this->params['id']);
                 if (!$episodeRow) {
                     $this->json(['code' => 404,'msg' => '剧集视频不存在，集ID：' . $this->params['id']]);
