@@ -31,21 +31,7 @@
                     }
                 }
             }
-    ?>
-        <div class="card card-primary w-full h-full">
-            <div class="card-header">
-                <?php echo $seasonRow->title;?><span class="badge badge-warning" style="margin-left: 20px;"><?php echo $seasonRow->year;?></span>
-                <div class="card-tools">
-                    <a href="#" onclick="addTask('season','',<?php echo $seasonRow->id;?>);" class="btn btn-success btn-sm">扫描全季</a>
-                </div>
-            </div>
-            <div class="card-body">
-                <?php
-                echo $this->partial('section/video-tv.phtml',['rows' => $episodeArray]);
-                ?>
-            </div>
-        </div>
-    <?php
+            echo $this->partial('section/tv-episode-list.phtml',['seasonRow' => $seasonRow,'episodeArray' => $episodeArray]);
         }
     }
     ?>
