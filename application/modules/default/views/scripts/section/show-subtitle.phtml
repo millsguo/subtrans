@@ -1,0 +1,23 @@
+<?php
+if (isset($this->subTitles)) {
+    echo '<div class="callout callout-success"><h5>内置字幕</h5>';
+    foreach ($this->subTitles as $subtitle) {
+        switch (strtolower($subtitle['language'])) {
+            case 'eng':
+                $languageStr = '英语(' . $subtitle['codec'] . ')';
+                break;
+            case 'chi':
+                $languageStr = '中文';
+                break;
+            default:
+                continue 2;
+        }
+        if (isset($subtitle['default']) && $subtitle['default'] === true) {
+            $tagStr = 'badge-warning';
+        } else {
+            $tagStr = 'badge-info';
+        }
+        echo '<span class="badge ' . $tagStr . '">' . $languageStr . '</span>';
+    }
+    echo '</div>';
+}

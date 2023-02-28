@@ -100,6 +100,20 @@ class Tv
     }
 
     /**
+     * 获取单集NFO数据
+     * @param int $id
+     * @return bool|array
+     */
+    public function getTvNfo(int $id): bool|array
+    {
+        $tvRow = $this->getTv($id);
+        if (!$tvRow) {
+            return false;
+        }
+        return $this->getNfo($tvRow->tv_path,'tvshow.nfo','tvInfo',true);
+    }
+
+    /**
      * 删除剧集
      * @param int $id
      * @return bool

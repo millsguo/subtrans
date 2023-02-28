@@ -9,85 +9,17 @@
         <h3><?php echo $this->movieRow->original_title;?></h3>
         <h5><?php echo $this->movieRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->movieRow->year;?></h5>
         <?php
-            if (!empty($this->nfoData['plot'])) {
-                echo '<h6>' . $this->nfoData['plot'] . '</h6>';
-            }
-            if (!empty($this->nfoData['outline'])) {
-                echo '<div class="callout callout-info"><p>' . $this->nfoData['outline'] . '</p></div>';
-            }
-            if (isset($this->nfoData['fileinfo']['streamdetails']['subtitle'])) {
-                echo '<div class="callout callout-success"><h5>内置字幕</h5>';
-                foreach ($this->nfoData['fileinfo']['streamdetails']['subtitle'] as $subtitle) {
-                    switch (strtolower($subtitle['language'])) {
-                        case 'eng':
-                            $languageStr = '英语(' . $subtitle['codec'] . ')';
-                            break;
-                        case 'chi':
-                            $languageStr = '中文';
-                            break;
-                        default:
-                            continue 2;
-                    }
-                    echo '<span class="badge badge-info">' . $languageStr . '</span>';
-                }
-            }
-            echo '<div class="m-2"><a href="#" class="btn btn-success" onclick="addTask(\'movie\',\'\',' . $this->movieRow->id . ');">处理字幕</a></div>';
-
+        echo $this->partial('section/video-desc.phtml',['nfoData' => $this->nfoData]);
+        if (isset($this->nfoData['fileinfo']['streamdetails']['subtitle'])) {
+            echo $this->partial('section/show-subtitle.phtml',['subTitles' => $this->nfoData['fileinfo']['streamdetails']['subtitle']]);
+        }
+        echo '<div class="m-2"><a href="#" class="btn btn-success" onclick="addTask(\'movie\',\'\',' . $this->movieRow->id . ');">处理字幕</a></div>';
         ?>
     </div>
     <div class="col-sm-3">
-        <div class="card card-widget widget-user-2 shadow-sm mt-5 bg-white">
-            <div class="card-header bg-info">
-                <h3 class="card-title">信息</h3>
-            </div>
-            <div class="card-body p-0 bg-white">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td>时长</td>
-                            <td class="text-right"><?php echo $this->movieRow->runtime;?>分钟</span></td>
-                        </tr>
-                        <?php
-                        if (!empty($this->movieRow->imdb_id)) {
-                            ?>
-                            <tr>
-                                <td>IMDB</td>
-                                <td class="text-right"><?php echo $this->movieRow->imdb_id;?></td>
-                            </tr>
-                            <?php
-                        }
-                        if (!empty($this->movieRow->tmdb_id)) {
-                            ?>
-                            <tr>
-                                <td>TMDB</td>
-                                <td class="text-right"><?php echo $this->movieRow->tmdb_id;?></td>
-                            </tr>
-                            <?php
-                        }
-                        if (!empty($this->nfoData['releasedate'])){
-                        ?>
-                            <tr>
-                                <td>上映时间</td>
-                                <td class="text-right"><?php echo $this->nfoData['releasedate'];?></td>
-                            </tr>
-                        <?php
-                        }
-                        if (!empty($this->nfoData['country'])) {
-                        ?>
-                            <tr>
-                                <td>国家</td>
-                                <td class="text-right"><?php echo $this->nfoData['country'];?></td>
-                            </tr>
-                        <?php
-                        }
-                        if (!empty($this->nfoData['studio'])) {
-                            echo '<tr><td>公司</td><td class="text-right">' . $this->nfoData['studio'] . '</td></tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <?php
+        echo $this->partial('section/video-info.phtml',['row' => $this->movieRow,'nfoData' => $this->nfoData]);
+        ?>
     </div>
 </div>
 <div class="row p-2">

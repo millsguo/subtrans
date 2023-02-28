@@ -4,10 +4,18 @@
             <img src="/image/show?w=230&h=340&code=<?php echo base64_encode($this->tvRow->tv_path . '/poster.jpg');?>" class="h-full w-full">
         </div>
     </div>
-    <div class="col-sm-8">
+    <div class="col-sm-5">
         <h1><?php echo $this->tvRow->title;?></h1>
         <h3><?php echo $this->tvRow->original_title;?></h3>
         <h5><?php echo $this->tvRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->tvRow->year;?></h5>
+        <?php
+        echo $this->partial('section/video-desc.phtml',['nfoData' => $this->nfoData]);
+        ?>
+    </div>
+    <div class="col-sm-3">
+        <?php
+        echo $this->partial('section/video-info.phtml',['row' => $this->tvRow,'nfoData' => $this->nfoData]);
+        ?>
     </div>
 </div>
 <div class="row p-2">

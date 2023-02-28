@@ -59,6 +59,7 @@ class TvController extends Default_Model_ControllerHelper
             $this->quickRedirect($this->tv->getMessage(), '/tv/list/','warning');
         }
         $this->view->tvRow = $tvRow;
+        $this->view->tvData = $this->tv->getTvNfo($tvId);
         $this->view->seasonRows = $this->tv->fetchSeasonByTv($tvId);
         $this->view->episodeRows = $this->tv->fetchEpisodeByTv($tvId);
     }
