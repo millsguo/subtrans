@@ -61,6 +61,7 @@ class ImageController extends Default_Model_ControllerHelper
                     $constraint->upsize();
                 });
             }
+            $this->sendCacheHeader();
             echo $image->response('jpg', 90);
         }
     }
@@ -81,6 +82,7 @@ class ImageController extends Default_Model_ControllerHelper
             $font->valign('middle');
             $font->color('#fdf6e3');
         });
+        $this->sendCacheHeader();
         return $image->response('jpg');
     }
 
@@ -98,5 +100,22 @@ class ImageController extends Default_Model_ControllerHelper
             throw new \runtimeException('没有GD或imagick库');
         }
         return $manager;
+    }
+
+    /**
+     * 增加图片缓存，如果有缓存图片
+     * @return void
+     */
+    protected function sendCacheHeader(): void
+    {
+        header('Cache-Control:private,max-age=10800,pre-check=10800');
+        header('Pragma:private');
+        header('Expires:' . date(DATE_RFC822,(time() + 3600 * 24)));
+
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            header('Last-Modified:' . $_SERVER['HTTP_IF_MODIFIED_SINCE'],true,304);
+            exit();
+        }
+
     }
 }
