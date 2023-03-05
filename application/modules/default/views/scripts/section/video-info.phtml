@@ -30,7 +30,15 @@
                 ?>
                 <tr>
                     <td>国家</td>
-                    <td class="text-right"><?php echo $this->nfoData['country'];?></td>
+                    <td class="text-right"><?php
+                        if (is_array($this->nfoData['country'])) {
+                            foreach ($this->nfoData['country'] as $country) {
+                                echo $country . ' &nbsp;';
+                            }
+                        } else {
+                            echo $this->nfoData['country'];
+                        }
+                        ?></td>
                 </tr>
                 <?php
             }
