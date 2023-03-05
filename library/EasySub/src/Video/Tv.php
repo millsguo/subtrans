@@ -293,8 +293,6 @@ class Tv
 
         $episodeHash = $this->getEpisodeHash($episodePath, $episodeFilename);
 
-        $fileHash = md5_file($episodePath . '/' . $episodeFilename);
-
         $baseData = [
             'file_path' => $episodePath,
             'file_name' => $episodeFilename,
@@ -303,18 +301,23 @@ class Tv
             'season_id' => $seasonId,
             'tv_id'     => $seasonRow->tv_id,
             'tv_title'  => $seasonRow->tv_title,
-            'file_hash' => $fileHash
         ];
 
         $data = array_merge($baseData, $episodeData);
 
         $episodeRow = $this->getEpisodeByPathHash($episodeHash);
         if (!$episodeRow) {
+            Log::debug('读取读频文件hash');
+            $data['file_hash'] = md5_file($episodePath . '/' . $episodeFilename);
             $episodeId = $this->episodeTable->insert($data);
             if ($episodeId) {
                 return (int)$episodeId;
             }
         } else {
+            if (isset($episodeRow->file_hash) && empty($episodeRow->file_hash)) {
+                Log::debug('读取读频文件hash');
+                $data['file_hash'] = md5_file($episodePath . '/' . $episodeFilename);
+            }
             $updateWhere = [
                 'id = ?'    => $episodeRow->id
             ];
@@ -327,6 +330,8 @@ class Tv
         if (empty($this->message)) {
             $this->message = '保存单集信息失败';
         }
+        Log::err($this->episodeTable->getMessage());
+        $this->message = $this->episodeTable->getMessage();
         return false;
     }
 

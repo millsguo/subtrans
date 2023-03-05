@@ -2,6 +2,7 @@
 
 namespace EasySub\Video;
 
+use EasySub\Tools\Log;
 use EasySub\Tools\NfoTrait;
 use EasySub\Tools\Table;
 use Zend_Db_Table_Row_Abstract;
@@ -41,12 +42,10 @@ class Movie
         $dirPath = $pathInfo['dirname'];
         $fileName = $pathInfo['basename'];
 
-        $fileHash = md5_file($filePath);
         $baseData = [
             'file_path' => $dirPath,
             'file_name' => $fileName,
             'file_path_hash'    => $pathHash,
-            'file_hash' => $fileHash,
             'scan_time' => time()
         ];
         if ($haveChineseSubTitle) {
@@ -60,14 +59,20 @@ class Movie
 
         $existsRow = $this->getMovieByHash($pathHash);
         if ($existsRow) {
+            if (isset($existsRow->file_hash) && empty($existsRow->file_hash)) {
+                Log::info('正在读取视频文件HASH');
+                $data['file_hash'] = md5_file($filePath);
+            }
             $result = $this->infoTable->update($data,['id = ?' => $existsRow->id]);
         } else {
+            Log::info('正在读取视频文件HASH');
+            $data['file_hash'] = md5_file($filePath);
             $result = $this->infoTable->insert($data);
         }
         if ($result) {
             return true;
         }
-
+        Log::info($this->infoTable->getMessage());
         return false;
     }
 
