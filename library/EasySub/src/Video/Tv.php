@@ -307,17 +307,11 @@ class Tv
 
         $episodeRow = $this->getEpisodeByPathHash($episodeHash);
         if (!$episodeRow) {
-            Log::debug('读取读频文件hash');
-            $data['file_hash'] = md5_file($episodePath . '/' . $episodeFilename);
             $episodeId = $this->episodeTable->insert($data);
             if ($episodeId) {
                 return (int)$episodeId;
             }
         } else {
-            if (isset($episodeRow->file_hash) && empty($episodeRow->file_hash)) {
-                Log::debug('读取读频文件hash');
-                $data['file_hash'] = md5_file($episodePath . '/' . $episodeFilename);
-            }
             $updateWhere = [
                 'id = ?'    => $episodeRow->id
             ];
