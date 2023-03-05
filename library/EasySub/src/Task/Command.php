@@ -15,6 +15,11 @@ class Command
     private static bool $scanTaskRunning = false;
 
     /**
+     * @var bool
+     */
+    private static bool $checkTaskRunning = false;
+
+    /**
      * 执行命令
      * @return bool
      */
@@ -54,6 +59,23 @@ class Command
     }
 
     /**
+     * 更新视频HASH
+     * @return bool
+     */
+    public static function checkAndSetHash(): bool
+    {
+        if (self::$checkTaskRunning) {
+            Log::log('检测视频及设置视频hash子任务正在执行');
+            return false;
+        }
+
+        CheckSub::checkAll();
+        self::stopCheck();
+        Log::log('更新视频HASH任务完成');
+        return true;
+    }
+
+    /**
      * 扫描子任务完成
      * @return void
      */
@@ -61,6 +83,17 @@ class Command
     {
         if (self::$scanTaskRunning) {
             self::$scanTaskRunning = false;
+        }
+    }
+
+    /**
+     * 检查子任务完成
+     * @return void
+     */
+    public static function stopCheck(): void
+    {
+        if (self::$checkTaskRunning) {
+            self::$checkTaskRunning = false;
         }
     }
 }

@@ -521,4 +521,73 @@ class Tv
         }
         return $episodeId;
     }
+
+    /**
+     * 设置剧集文件HASH
+     * @param int $episodeId
+     * @param string $fullPath
+     * @return bool
+     */
+    public function setEpisodeFileHash(int $episodeId,string $fullPath): bool
+    {
+        $tvRow = $this->getEpisode($episodeId);
+        if (!$tvRow) {
+            return false;
+        }
+        if (!empty($tvRow->file_hash)) {
+            return true;
+        }
+        $data = [
+            'file_hash' => md5_file($fullPath)
+        ];
+        $where = [
+            'id = ?'    => $episodeId
+        ];
+        $result = $this->episodeTable->update($data,$where);
+        if ($result) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 检查剧集文件是否存在
+     * @return void
+     */
+    public function checkEpisodeFileByDatabase(): void
+    {
+        $where = [
+            'id > ?'     => 0
+        ];
+        $count = 100;
+        $offset = 0;
+        while ($rows = $this->episodeTable->fetchAll($where,'id ASC',$count,$offset)) {
+            if (!is_countable($rows) || count($rows) < 1) {
+                break;
+            }
+            foreach ($rows as $row) {
+                $checkResult = $this->checkEpisode($row);
+                if (!$checkResult) {
+                    Log::info($row->file_path . '/' . $row->file_name . '文件不存在');
+                }
+            }
+            $offset += $count;
+        }
+    }
+
+    /**
+     * 检查视频文件是否存在
+     * @param $row
+     * @return bool
+     */
+    public function checkEpisode($row): bool
+    {
+        if (isset($row->file_path,$row->file_name)) {
+            if (is_readable($row->file_path . '/' . $row->file_name)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 }

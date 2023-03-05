@@ -3,6 +3,7 @@
 namespace EasySub;
 
 use EasySub\SubTitle\Srt;
+use EasySub\Task\Queue;
 use EasySub\Tools\Config;
 use EasySub\Tools\Log;
 use EasySub\Tools\Misc;
@@ -112,6 +113,34 @@ class CheckSub
             Log::info('扫描剧集目录：' . $dirPath);
             self::scanTvDir($dirPath,true);
         }
+    }
+
+    /**
+     * 检查并设置所有视频HASH
+     * @return void
+     */
+    public static function checkAll(): void
+    {
+        //扫描目录
+        Log::info('扫描电影库');
+        $movieLibrary = Store::getMovieLibrary();
+        foreach ($movieLibrary as $dirPath) {
+            Log::info('扫描电影目录：' . $dirPath);
+            self::checkDirAndSetMovieHash($dirPath);
+        }
+        Log::info('电影文件检查完成，开始检查数据库对应文件');
+        $movieObj = new Movie();
+        $movieObj->checkMovieFileByDatabase();
+        Log::info('扫描剧集库');
+        $tvLibrary = Store::getTvLibrary();
+        foreach ($tvLibrary as $dirPath) {
+            Log::info('扫描剧集目录：' . $dirPath);
+            self::checkDirAndSetTvHash($dirPath);
+        }
+        Log::info('剧集文件检查完成，开始检查数据库对应文件');
+        $tvObj = new Tv();
+        $tvObj->checkEpisodeFileByDatabase();
+        Log::info('剧集数据库检查完成');
     }
 
     /**
@@ -749,5 +778,162 @@ class CheckSub
         }
 
         return true;
+    }
+
+    /**
+     * 检查并更新视频HASH
+     * @param string $dirPath
+     * @return void
+     */
+    public static function checkDirAndSetMovieHash(string $dirPath): void
+    {
+        if (empty($dirPath)) {
+            Log::info('空目录');
+            return;
+        }
+        if (!is_dir($dirPath)) {
+            Log::info('不是正确的目录' . $dirPath);
+            return;
+        }
+        //电影
+        $videoObj = new Movie();
+        $queueObj = new Queue();
+        $dirPath = '/' . trim($dirPath, '/') . '/';
+        try {
+            $dirArray = Misc::scanDir($dirPath);
+            if (!$dirArray) {
+                return;
+            }
+            foreach ($dirArray as $fileName) {
+                $fullPath = $dirPath . $fileName;
+                if (is_dir($fullPath)) {
+                    //目录
+                    self::checkDirAndSetMovieHash($fullPath);
+                } elseif (is_readable($fullPath)) {
+                    //可读文件
+                    $fileInfo = pathinfo($fullPath);
+                    if (!isset($fileInfo['extension'])) {
+                        //Log::debug($fullPath . '获取扩展名失败');
+                        continue;
+                    }
+                    $fileExt = $fileInfo['extension'];
+                    switch ($fileExt) {
+                        case 'mp4':
+                        case 'mkv':
+                            Log::info('找到视频文件:' . $fileName);
+                            //视频文件
+                            $movieRow = $videoObj->getMovieByHash($fullPath);
+                            if (!$movieRow) {
+                                Log::info('数据库中没有记录');
+                                $addResult = $queueObj->addTask('movie',$fullPath);
+                                if ($addResult) {
+                                    Log::info('将视频加入识别任务');
+                                } else {
+                                    Log::info('视频加入任务失败');
+                                }
+                                continue 2;
+                            }
+                            if (empty($movieRow->file_hash)) {
+                                //视频文件没有file_hash
+                                $hashResult = $videoObj->setMovieFileHash($movieRow->id,$fullPath);
+                                if ($hashResult) {
+                                    Log::info('更新电影HASH成功');
+                                } else {
+                                    Log::info('更新电影HASH失败');
+                                }
+                            } else {
+                                Log::info('已设置HASH');
+                            }
+                            break;
+                        default:
+                            continue 2;
+                    }
+                } else {
+                    Log::info($fullPath . '权限错误');
+                }
+            }
+        } catch (Exception $e) {
+            Log::debug($e->getMessage());
+            Log::debug($e->getTraceAsString());
+        }
+    }
+
+    /**
+     * 检查目录下的剧集，并设置HASH
+     * @param string $dirPath
+     * @return void
+     */
+    public static function checkDirAndSetTvHash(string $dirPath): void
+    {
+        if (empty($dirPath)) {
+            Log::info('空目录');
+            return;
+        }
+        if (!is_dir($dirPath)) {
+            Log::info('不是正确的目录' . $dirPath);
+            return;
+        }
+        //电影
+        $videoObj = new Tv();
+        $queueObj = new Queue();
+        $dirPath = '/' . trim($dirPath, '/') . '/';
+        try {
+            $dirArray = Misc::scanDir($dirPath);
+            if (!$dirArray) {
+                return;
+            }
+            foreach ($dirArray as $fileName) {
+                $fullPath = $dirPath . $fileName;
+                if (is_dir($fullPath)) {
+                    //目录
+                    self::checkDirAndSetTvHash($fullPath);
+                } elseif (is_readable($fullPath)) {
+                    //可读文件
+                    $fileInfo = pathinfo($fullPath);
+                    if (!isset($fileInfo['extension'])) {
+                        //Log::debug($fullPath . '获取扩展名失败');
+                        continue;
+                    }
+                    $fileExt = $fileInfo['extension'];
+                    switch ($fileExt) {
+                        case 'mp4':
+                        case 'mkv':
+                            Log::info('找到视频文件:' . $fileName);
+                            //视频文件
+                            $pathHash = $videoObj->getEpisodeHash($fileInfo['dirname'],$fileInfo['basename']);
+                            $tvRow = $videoObj->getEpisodeByPathHash($pathHash);
+                            if (!$tvRow) {
+                                Log::info('数据库中没有记录');
+                                $addResult = $queueObj->addTask('tv',$fullPath);
+                                if ($addResult) {
+                                    Log::info('将视频加入识别任务');
+                                } else {
+                                    Log::info('视频加入任务失败');
+                                }
+                                continue 2;
+                            }
+                            if (empty($tvRow->file_hash)) {
+                                //视频文件没有file_hash
+                                $hashResult = $videoObj->setEpisodeFileHash($tvRow->id,$fullPath);
+                                if ($hashResult) {
+                                    Log::info('更新剧集HASH成功');
+                                } else {
+                                    Log::info('更新剧集HASH失败');
+                                }
+                            } else {
+                                Log::info('已设置HASH');
+                            }
+                            break;
+                        default:
+                            continue 2;
+                    }
+                } else {
+                    Log::info($fullPath . '权限错误');
+                }
+            }
+        } catch (Exception $e) {
+            Log::debug($e->getMessage());
+            Log::debug($e->getTraceAsString());
+        }
     }
 }

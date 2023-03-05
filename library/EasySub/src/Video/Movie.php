@@ -59,14 +59,8 @@ class Movie
 
         $existsRow = $this->getMovieByHash($pathHash);
         if ($existsRow) {
-            if (isset($existsRow->file_hash) && empty($existsRow->file_hash)) {
-                Log::info('正在读取视频文件HASH');
-                $data['file_hash'] = md5_file($filePath);
-            }
             $result = $this->infoTable->update($data,['id = ?' => $existsRow->id]);
         } else {
-            Log::info('正在读取视频文件HASH');
-            $data['file_hash'] = md5_file($filePath);
             $result = $this->infoTable->insert($data);
         }
         if ($result) {
@@ -153,5 +147,74 @@ class Movie
     public function autoFetch($where,$order,$count,$page,bool $isPage = false): bool|\Zend_Paginator|\Zend_Db_Table_Rowset_Abstract
     {
         return $this->infoTable->autoFetch($where,$order,$count,$page,$isPage);
+    }
+
+    /**
+     * 设置电影文件HASH
+     * @param int $movieId
+     * @param string $fullPath
+     * @return bool
+     */
+    public function setMovieFileHash(int $movieId,string $fullPath): bool
+    {
+        $movieRow = $this->getMovie($movieId);
+        if (!$movieRow) {
+            return false;
+        }
+        if (!empty($movieRow->file_hash)) {
+            return true;
+        }
+        $data = [
+            'file_hash' => md5_file($fullPath)
+        ];
+        $where = [
+            'id = ?'    => $movieId
+        ];
+        $result = $this->infoTable->update($data,$where);
+        if ($result) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 检查所有电影库
+     * @return void
+     */
+    public function checkMovieFileByDatabase(): void
+    {
+        $where = [
+            'id > ?'     => 0
+        ];
+        $count = 100;
+        $offset = 0;
+        while ($rows = $this->infoTable->fetchAll($where,'id ASC',$count,$offset)) {
+            if (!is_countable($rows) || count($rows) < 1) {
+                break;
+            }
+            foreach ($rows as $row) {
+                $checkResult = $this->checkMovie($row);
+                if (!$checkResult) {
+                    Log::info($row->file_path . '/' . $row->file_name . '文件不存在');
+                }
+            }
+            $offset += $count;
+        }
+    }
+
+    /**
+     * 检查视频文件是否存在
+     * @param $row
+     * @return bool
+     */
+    public function checkMovie($row): bool
+    {
+        if (isset($row->file_path,$row->file_name)) {
+            if (is_readable($row->file_path . '/' . $row->file_name)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }
