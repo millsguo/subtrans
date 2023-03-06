@@ -122,7 +122,8 @@ class CheckSub
     public static function checkAll(): void
     {
         //扫描目录
-        Log::info('扫描电影库');
+        Log::info('检查电影库');
+        Store::initLibraryFromConfig();
         $movieLibrary = Store::getMovieLibrary();
         foreach ($movieLibrary as $dirPath) {
             Log::info('扫描电影目录：' . $dirPath);

@@ -29,6 +29,7 @@ class Command
             Log::log('扫描子任务正在执行');
             return false;
         }
+        self::$scanTaskRunning = true;
 
         TransApi::initApi();
         TransSub::initTranslation();
@@ -68,6 +69,7 @@ class Command
             Log::log('检测视频及设置视频hash子任务正在执行');
             return false;
         }
+        self::$checkTaskRunning = true;
 
         CheckSub::checkAll();
         self::stopCheck();
