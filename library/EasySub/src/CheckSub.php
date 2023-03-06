@@ -826,7 +826,7 @@ class CheckSub
                             $movieRow = $videoObj->getMovieByHash(md5($fullPath));
                             if (!$movieRow) {
                                 Log::info('数据库中没有记录');
-                                $addResult = $queueObj->addTask('movie',$fullPath);
+                                $addResult = $queueObj->addTask('movie',dirname($fullPath));
                                 if ($addResult) {
                                     Log::info('将视频加入识别任务');
                                 } else {
@@ -905,7 +905,7 @@ class CheckSub
                             $tvRow = $videoObj->getEpisodeByPathHash($pathHash);
                             if (!$tvRow) {
                                 Log::info('数据库中没有记录');
-                                $addResult = $queueObj->addTask('tv',$fullPath);
+                                $addResult = $queueObj->addTask('tv',dirname($fullPath));
                                 if ($addResult) {
                                     Log::info('将视频加入识别任务');
                                 } else {
