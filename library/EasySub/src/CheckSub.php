@@ -823,7 +823,7 @@ class CheckSub
                         case 'mkv':
                             Log::info('找到视频文件:' . $fileName);
                             //视频文件
-                            $movieRow = $videoObj->getMovieByHash($fullPath);
+                            $movieRow = $videoObj->getMovieByHash(md5($fullPath));
                             if (!$movieRow) {
                                 Log::info('数据库中没有记录');
                                 $addResult = $queueObj->addTask('movie',$fullPath);
@@ -901,7 +901,7 @@ class CheckSub
                         case 'mkv':
                             Log::info('找到视频文件:' . $fileName);
                             //视频文件
-                            $pathHash = $videoObj->getEpisodeHash($fileInfo['dirname'],$fileInfo['basename']);
+                            $pathHash = $videoObj->getEpisodeHash($fullPath, '');
                             $tvRow = $videoObj->getEpisodeByPathHash($pathHash);
                             if (!$tvRow) {
                                 Log::info('数据库中没有记录');
