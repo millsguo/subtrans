@@ -33,10 +33,10 @@
                     <td class="text-right"><?php
                         if (is_array($this->nfoData['country'])) {
                             foreach ($this->nfoData['country'] as $country) {
-                                echo $country . ' &nbsp;';
+                                echo '<span class="badge badge-info">' . $country . '</span>';
                             }
                         } else {
-                            echo $this->nfoData['country'];
+                            echo '<span class="badge badge-info">' . $this->nfoData['country'] . '</span>';
                         }
                         ?></td>
                 </tr>
