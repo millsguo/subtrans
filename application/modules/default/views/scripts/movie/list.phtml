@@ -32,7 +32,13 @@
                     <div class="video-tag bg-warning"><?php echo $row->rating; ?>分</div>
                     <div class="video-tag bg-info"><?php echo $row->year;?>年</div>
                 </div>
-                <div class="text-center"><?php echo htmlentities($row->title);?></div>
+                <div class="text-center"><?php
+                    if (empty($row->title)) {
+                        echo '未识别';
+                    } else {
+                        echo htmlentities($row->title);
+                    }
+                    ?></div>
                 </a>
             </div>
             <?php

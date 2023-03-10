@@ -22,12 +22,19 @@
     "ext-posix": "*",
     "ext-bcmath": "*",
     "intervention/image": "^2.7",
-    "guzzlehttp/guzzle": "^7.5"
+    "guzzlehttp/guzzle": "^7.5",
+    "orhanerday/open-ai": "^4.6",
+    "ext-curl": "*"
+  }
+  ,
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
   },
   "autoload": {
     "psr-4": {
       "EasyTranslation\\": "library/EasyTranslation/src/",
-      "EasySub\\": "library/EasySub/src/"
+      "EasySub\\": "library/EasySub/src/",
+      "OpenAi\\": "library/OpenAi/src/"
     }
   }
 }

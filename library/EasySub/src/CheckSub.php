@@ -821,16 +821,16 @@ class CheckSub
                     switch ($fileExt) {
                         case 'mp4':
                         case 'mkv':
-                            Log::info('找到视频文件:' . $fileName);
+                            //Log::info('找到视频文件:' . $fileName);
                             //视频文件
                             $movieRow = $videoObj->getMovieByHash(md5($fullPath));
-                            if (!$movieRow) {
+                            if (!$movieRow || empty($movieRow->title)) {
                                 Log::info('数据库中没有记录');
                                 $addResult = $queueObj->addTask('movie',dirname($fullPath));
                                 if ($addResult) {
-                                    Log::info('将视频加入识别任务');
+                                    Log::info('将视频加入识别任务:' . dirname($fullPath));
                                 } else {
-                                    Log::info('视频加入任务失败');
+                                    Log::info('视频加入任务失败:' . dirname($fullPath));
                                 }
                                 continue 2;
                             }
@@ -838,12 +838,12 @@ class CheckSub
                                 //视频文件没有file_hash
                                 $hashResult = $videoObj->setMovieFileHash($movieRow->id,$fullPath);
                                 if ($hashResult) {
-                                    Log::info('更新电影HASH成功');
+                                    Log::info('更新电影HASH成功:' . $fullPath);
                                 } else {
-                                    Log::info('更新电影HASH失败');
+                                    Log::info('更新电影HASH失败:' . $fullPath);
                                 }
                             } else {
-                                Log::info('已设置HASH');
+                                //Log::info('已设置HASH');
                             }
                             break;
                         default:
@@ -899,17 +899,17 @@ class CheckSub
                     switch ($fileExt) {
                         case 'mp4':
                         case 'mkv':
-                            Log::info('找到视频文件:' . $fileName);
+                            //Log::info('找到视频文件:' . $fileName);
                             //视频文件
                             $pathHash = $videoObj->getEpisodeHash($fullPath, '');
                             $tvRow = $videoObj->getEpisodeByPathHash($pathHash);
-                            if (!$tvRow) {
+                            if (!$tvRow || empty($tvRow->title)) {
                                 Log::info('数据库中没有记录');
                                 $addResult = $queueObj->addTask('tv',dirname($fullPath));
                                 if ($addResult) {
-                                    Log::info('将视频加入识别任务');
+                                    Log::info('将视频加入识别任务:' . dirname($fullPath));
                                 } else {
-                                    Log::info('视频加入任务失败');
+                                    Log::info('视频加入任务失败:' . dirname($fullPath));
                                 }
                                 continue 2;
                             }
@@ -917,12 +917,12 @@ class CheckSub
                                 //视频文件没有file_hash
                                 $hashResult = $videoObj->setEpisodeFileHash($tvRow->id,$fullPath);
                                 if ($hashResult) {
-                                    Log::info('更新剧集HASH成功');
+                                    Log::info('更新剧集HASH成功：' . $fullPath);
                                 } else {
-                                    Log::info('更新剧集HASH失败');
+                                    Log::info('更新剧集HASH失败:' . $fullPath);
                                 }
                             } else {
-                                Log::info('已设置HASH');
+                                //Log::info('已设置HASH');
                             }
                             break;
                         default:
