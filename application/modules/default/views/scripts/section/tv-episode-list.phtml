@@ -2,7 +2,9 @@
     <div class="card-header">
         <?php echo $this->seasonRow->title ?? '';?><span class="badge badge-warning" style="margin-left: 20px;"><?php echo $this->seasonRow->year ?? '';?></span>
         <div class="card-tools">
-            <a href="#" onclick="addTask('season','',<?php echo $this->seasonRow->id ?? 0;?>);" class="btn btn-success btn-sm">扫描全季</a>
+            <a href="#" onclick="addTask('season','',<?php echo $this->seasonRow->id ?? 0;?>);" class="btn btn-success btn-sm m-2">扫描全季</a>
+            <a href="/tv/delete/id/<?php echo $this->seasonRow->id ?? 0;?>/type/record/target/season" class="btn btn-warning m-2">删除全季记录</a>
+            <a href="/tv/delete/id/<?php echo $this->seasonRow->id ?? 0;?>/type/file/target/season" class="btn btn-danger m-2">删除全季文件</a>
         </div>
     </div>
     <div class="card-body">

@@ -92,6 +92,10 @@ class TvController extends Default_Model_ControllerHelper
         $this->view->episodeArray = $episodeRows;
     }
 
+    /**
+     * 删除处理
+     * @return void
+     */
     public function deleteAction()
     {
         if (!isset($this->params['id'],$this->params['type'],$this->params['target'])) {

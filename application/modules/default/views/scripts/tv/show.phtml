@@ -14,7 +14,10 @@
         if (isset($this->nfoData['fileinfo']['streamdetails']['subtitle'])) {
             echo $this->partial('section/show-subtitle.phtml',['subTitles' => $this->nfoData['fileinfo']['streamdetails']['subtitle']]);
         }
-        echo '<div class="m-2"><a href="#" class="btn btn-success" onclick="addTask(\'episode\',\'\',' . $this->episodeRow->id . ');">处理字幕</a></div>';
+        echo '<div class="m-2"><a href="#" class="btn btn-success m-2" onclick="addTask(\'episode\',\'\',' . $this->episodeRow->id . ');">处理字幕</a>
+            <a href="/tv/delete/id/' . $this->episodeRow->id . '/type/record/target/episode" class="btn btn-warning m-2">删除记录</a>
+            <a href="/tv/delete/id/' . $this->episodeRow->id . '/type/file/target/episode" class="btn btn-danger m-2">删除文件</a>
+</div>';
         ?>
     </div>
     <div class="col-sm-3">

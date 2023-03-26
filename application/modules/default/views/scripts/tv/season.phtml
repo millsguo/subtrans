@@ -10,7 +10,10 @@
         <h5><?php echo $this->tvRow->rating;?>分 &nbsp;&nbsp;<?php echo $this->tvRow->year;?></h5>
         <?php
         echo $this->partial('section/video-desc.phtml',['nfoData' => $this->nfoData]);
-        echo '<div class="m-2"><a href="#" class="btn btn-success" onclick="addTask(\'tv\',\'\',' . $this->tvRow->id . ');">扫描剧集</a></div>';
+        echo '<div class="m-2"><a href="#" class="btn btn-success m-2" onclick="addTask(\'tv\',\'\',' . $this->tvRow->id . ');">扫描剧集</a>
+            <a href="/tv/delete/id/' . $this->tvRow->id . '/type/record/target/tv" class="btn btn-warning m-2">删除全部剧集记录</a>
+            <a href="/tv/delete/id/' . $this->tvRow->id . '/type/file/target/tv" class="btn btn-danger m-2">删除全部剧集文件</a>
+</div>';
         ?>
     </div>
     <div class="col-sm-3">
