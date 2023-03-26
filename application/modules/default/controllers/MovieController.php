@@ -61,4 +61,29 @@ class MovieController extends Default_Model_ControllerHelper
         $nfoData = $this->movie->getMovieNfo($id);
         $this->view->nfoData = $nfoData;
     }
+
+    /**
+     * 删除电影
+     * @return void
+     */
+    public function deleteAction(): void
+    {
+        if (!isset($this->params['id'],$this->params['type'])) {
+            $this->quickRedirect('缺少电影ID','/movie/','warning');
+        }
+        $id = (int)$this->params['id'];
+        if ($this->params['type'] === 'record') {
+            $deleteDirector = false;
+            $successMsg = '电影记录删除成功，稍后程序将自动扫描添加';
+        } else {
+            $deleteDirector = true;
+            $successMsg = '电影记录和文件删除成功';
+        }
+        $result = $this->movie->deleteMovie($id, $deleteDirector);
+        if ($result) {
+            $this->quickRedirect($successMsg, '/movie/');
+        } else {
+            $this->quickRedirect($this->movie->getMessage(), '/movie/show/id/' . $this->params['id'], 'danger');
+        }
+    }
 }

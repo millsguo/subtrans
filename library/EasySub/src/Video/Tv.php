@@ -3,6 +3,7 @@
 namespace EasySub\Video;
 
 use EasySub\Tools\Log;
+use EasySub\Tools\Misc;
 use EasySub\Tools\NfoTrait;
 use EasySub\Tools\Table;
 use Zend_Db_Table_Row_Abstract;
@@ -116,10 +117,15 @@ class Tv
     /**
      * 删除剧集
      * @param int $id
+     * @param bool $deleteDirector
      * @return bool
      */
-    public function deleteTv(int $id): bool
+    public function deleteTv(int $id,bool $deleteDirector = false): bool
     {
+        $tvRow = $this->getTv($id);
+        if (!$tvRow) {
+            return false;
+        }
         $where = [
             'id = ?'    => $id
         ];
@@ -130,6 +136,9 @@ class Tv
                 foreach ($seasonRows as $seasonRow) {
                     $this->deleteSeason($seasonRow->id);
                 }
+            }
+            if ($deleteDirector) {
+                Misc::deleteDirectory($tvRow->tv_path);
             }
             return true;
         }
@@ -238,10 +247,15 @@ class Tv
     /**
      * 删除季信息
      * @param int $seasonId
+     * @param bool $deleteDirector
      * @return bool
      */
-    public function deleteSeason(int $seasonId): bool
+    public function deleteSeason(int $seasonId, bool $deleteDirector = false): bool
     {
+        $seasonRow = $this->getSeason($seasonId);
+        if (!$seasonRow) {
+            return false;
+        }
         $where = [
             'id = ?'    => $seasonId
         ];
@@ -252,6 +266,9 @@ class Tv
                 'season_id = ?' => $seasonId
             ];
             $this->episodeTable->delete($episodeWhere);
+            if ($deleteDirector) {
+                Misc::deleteDirectory($seasonRow->season_path);
+            }
             return true;
         }
         return false;
@@ -384,15 +401,23 @@ class Tv
     /**
      * 删除单集信息
      * @param int $episodeId
+     * @param bool $deleteDirector
      * @return bool
      */
-    public function deleteEpisode(int $episodeId): bool
+    public function deleteEpisode(int $episodeId, bool $deleteDirector = false): bool
     {
+        $episodeRow = $this->getEpisode($episodeId);
+        if (!$episodeRow) {
+            return false;
+        }
         $where = [
             'id = ?'    => $episodeId
         ];
         $result = $this->episodeTable->delete($where);
         if ($result) {
+            if ($deleteDirector) {
+                Misc::deleteDirectory($episodeRow->file_path);
+            }
             return true;
         }
         return false;

@@ -91,4 +91,43 @@ class TvController extends Default_Model_ControllerHelper
         $this->view->seasonRow = $seasonRow;
         $this->view->episodeArray = $episodeRows;
     }
+
+    public function deleteAction()
+    {
+        if (!isset($this->params['id'],$this->params['type'],$this->params['target'])) {
+            $this->quickRedirect('缺少剧集ID','/tv/','warning');
+        }
+        $id = (int)$this->params['id'];
+
+        if ($this->params['type'] === 'record') {
+            $deleteDirector = false;
+            $successMsg = '删除成功，稍后程序将自动扫描添加';
+        } else {
+            $deleteDirector = true;
+            $successMsg = '和文件删除成功';
+        }
+        switch ($this->params['target']) {
+            case 'tv':
+                $targetName = '剧集全部';
+                $result = $this->tv->deleteTv($id, $deleteDirector);
+                break;
+            case 'season':
+                $targetName = '剧集全季';
+                $result = $this->tv->deleteSeason($id,$deleteDirector);
+                break;
+            case 'episode':
+                $targetName = '剧集';
+                $result = $this->tv->deleteEpisode($id, $deleteDirector);
+                break;
+            default:
+                $targetName = '';
+                $result = false;
+                $this->quickRedirect('目标不支持','/tv/','warning');
+        }
+        if ($result) {
+            $this->quickRedirect($targetName . $successMsg, '/tv/');
+        } else {
+            $this->quickRedirect($this->tv->getMessage(), '/tv/','error');
+        }
+    }
 }

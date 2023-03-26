@@ -3,6 +3,7 @@
 namespace EasySub\Video;
 
 use EasySub\Tools\Log;
+use EasySub\Tools\Misc;
 use EasySub\Tools\NfoTrait;
 use EasySub\Tools\Table;
 use Zend_Db_Table_Row_Abstract;
@@ -121,15 +122,23 @@ class Movie
     /**
      * 删除电影
      * @param int $id
+     * @param bool $deleteDirector
      * @return bool
      */
-    public function deleteMovie(int $id): bool
+    public function deleteMovie(int $id, bool $deleteDirector = false): bool
     {
+        $movieRow = $this->getMovie($id);
+        if (!$movieRow) {
+            return false;
+        }
         $where = [
             'id = ?'    => $id
         ];
         $result = $this->infoTable->delete($where);
         if ($result) {
+            if ($deleteDirector) {
+                Misc::deleteDirectory($movieRow->file_path);
+            }
             return true;
         }
         return false;
