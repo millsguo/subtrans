@@ -830,7 +830,7 @@ class CheckSub
                                 if ($addResult) {
                                     Log::info('将视频加入识别任务:' . dirname($fullPath));
                                 } else {
-                                    Log::info('视频加入任务失败:' . dirname($fullPath));
+                                    Log::info('视频加入任务失败:' . dirname($fullPath) . '[' . $queueObj->getMessage() . ']');
                                 }
                                 continue 2;
                             }

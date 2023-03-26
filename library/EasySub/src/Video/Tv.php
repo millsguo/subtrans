@@ -587,7 +587,8 @@ class Tv
             foreach ($rows as $row) {
                 $checkResult = $this->checkEpisode($row);
                 if (!$checkResult) {
-                    Log::info($row->file_path . '/' . $row->file_name . '文件不存在');
+                    Log::info($row->file_path . $row->file_name . '文件不存在，删除记录');
+                    $this->deleteEpisode($row->id);
                 }
             }
             $offset += $count;
@@ -602,7 +603,7 @@ class Tv
     public function checkEpisode($row): bool
     {
         if (isset($row->file_path,$row->file_name)) {
-            if (is_readable($row->file_path . '/' . $row->file_name)) {
+            if (is_readable($row->file_path . $row->file_name)) {
                 return true;
             }
             return false;
