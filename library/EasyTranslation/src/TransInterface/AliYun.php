@@ -60,6 +60,8 @@ class AliYun implements AbstractInterface
             }
         } catch (ClientException $e) {
             $this->clientIsInit = false;
+            Log::translateLog('翻译出错');
+            Log::translateLog($e->getMessage());
             throw new RuntimeException($e->getMessage());
         }
     }

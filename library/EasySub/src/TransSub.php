@@ -14,6 +14,11 @@ class TransSub
 {
     protected static Translation $translator;
 
+    /**
+     * @var bool 翻译接口出错
+     */
+    protected static bool $translatorError = false;
+
     protected static Srt $srtObj;
 
     /**
@@ -204,6 +209,9 @@ class TransSub
             } else {
                 Log::debug('批量翻译返回错误:' . print_r($transArray, true));
             }
+        } else {
+            Log::log('翻译出错');
+            self::$translatorError = true;
         }
     }
 

@@ -22,6 +22,7 @@ class Translation
     public function setConfig(array $config): void
     {
         if (!isset($config['translate_api'])) {
+            Log::translateLog('未指定翻译接口');
             throw new \RuntimeException('请先指定翻译接口');
         }
         $this->config = $config;
@@ -108,6 +109,7 @@ class Translation
     {
         $apiConfig = TransApi::initApi();
         Log::info('使用' . $apiConfig['id'] . '号接口');
+        Log::translateLog('使用' . $apiConfig['id'] . '号接口');
         $this->setConfig($apiConfig);
 
         if (!is_object($this->translateObj)) {
