@@ -278,7 +278,7 @@ class CheckSub
                             $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
 
                             if ($enableTrans === true || strtolower($enableTrans) === 'true') {
-                                Log::info('开始翻译英文字幕文件:' . $engSubFile);
+                                Log::translateLog('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
                                 $addResult = $videoObj->addMovie($fullPath,true);
                             } else {
@@ -415,9 +415,9 @@ class CheckSub
                             $enableTrans = $_ENV['ENABLE_TRANS'] ?? 'false';
 
                             if ($enableTrans === true || strtolower($enableTrans) === 'true') {
-                                Log::info('开始翻译英文字幕文件:' . $engSubFile);
+                                Log::translateLog('开始翻译英文字幕文件:' . $engSubFile);
                                 TransSub::transSubFile($engSubFile, $chineseSubFileName, 'eng', 'zh');
-                                Log::info('更新剧集');
+                                Log::info('更新信息，增加中文字幕检测结果');
                                 $addResult = $videoObj->autoParseEpisode($dirPath,$fileName,true);
                             } else {
                                 Log::info('翻译功能已关闭');

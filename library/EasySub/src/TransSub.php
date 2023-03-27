@@ -53,7 +53,7 @@ class TransSub
     public static function transSubFile(string $sourceSubFile, string $targetSubFile, string $sourceLanguage, string $targetLanguage): bool
     {
         if (!self::checkTranslation()) {
-            Log::info('翻译接口没有初始化');
+            Log::translateLog('翻译接口没有初始化');
             return false;
         }
         return self::translateByMultiLine($sourceSubFile, $targetSubFile, $sourceLanguage, $targetLanguage);
@@ -70,11 +70,11 @@ class TransSub
      */
     protected static function translateByMultiLine($sourceSubFile, $targetSubFile, $sourceLanguage, $targetLanguage): bool
     {
-        Log::info('使用批量翻译');
+        Log::translateLog('使用批量翻译');
         try {
             $subFileContentArray = self::$srtObj->readToArray($sourceSubFile);
             if (count($subFileContentArray) < 2) {
-                Log::info($sourceSubFile . '字幕文件内容为空');
+                Log::translateLog($sourceSubFile . '字幕文件内容为空');
                 return false;
             }
             $outFileArray = [];
@@ -163,14 +163,15 @@ class TransSub
                 $writeSrtArray[] = $itemData['sourceLine'] . "\r\n";
                 $writeSrtArray[] = "\r\n";
             }
-            Log::info('翻译完成，准备写入文件');
+            Log::translateLog('翻译完成，准备写入文件');
             TransApi::updateApiCountByAccessKey(self::$translator->getConfig('access_key'), $translatedCount);
             self::$srtObj->writeSrt($targetSubFile, $writeSrtArray);
-            Log::info('字幕翻译成功，保存为：' . $targetSubFile);
+            Log::translateLog('字幕翻译成功，保存为：' . $targetSubFile);
+            Log::log('字幕翻译成功，保存为：' . $targetSubFile);
             return true;
         } catch (Exception $e) {
-            Log::debug($e->getMessage());
-            Log::debug($e->getTraceAsString());
+            Log::translateLog($e->getMessage());
+            Log::translateLog($e->getTraceAsString());
             return false;
         }
     }

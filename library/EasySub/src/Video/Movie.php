@@ -204,7 +204,7 @@ class Movie
             foreach ($rows as $row) {
                 $checkResult = $this->checkMovie($row);
                 if (!$checkResult) {
-                    Log::info('文件不存在:' . $row->file_path . $row->file_name);
+                    Log::info('文件不存在:' . $row->file_path . '/' . $row->file_name);
                     $this->deleteMovie($row->id);
                 }
             }
@@ -220,7 +220,7 @@ class Movie
     public function checkMovie($row): bool
     {
         if (isset($row->file_path,$row->file_name)) {
-            if (is_readable($row->file_path . $row->file_name)) {
+            if (is_readable(Misc::linkDirAndFile($row->file_path, $row->file_name))) {
                 return true;
             }
             return false;

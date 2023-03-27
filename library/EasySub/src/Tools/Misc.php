@@ -72,4 +72,17 @@ class Misc
         return rmdir($dir);
     }
 
+    /**
+     * 返回目录和文件的完整路径
+     * @param string $dir
+     * @param string $file
+     * @return string
+     */
+    public static function linkDirAndFile(string $dir, string $file): string
+    {
+        if (substr($dir,-1) === DIRECTORY_SEPARATOR) {
+            return $dir . $file;
+        }
+        return $dir . DIRECTORY_SEPARATOR . $file;
+    }
 }

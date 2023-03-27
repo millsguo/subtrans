@@ -22,6 +22,11 @@ class Log
     private static bool $isDebug = false;
 
     /**
+     * @var Zend_Log 翻译日志对象
+     */
+    private static Zend_Log $translationLogObj;
+
+    /**
      * 检查日志对象是否初始化
      *
      * @return void
@@ -132,6 +137,31 @@ class Log
             self::$logObj->log($message, $priority);
         } catch (Zend_Log_Exception $e) {
             self::$logObj->err($e->getMessage());
+        }
+    }
+
+    /**
+     * 翻译日志
+     * @param mixed $message
+     * @return void
+     */
+    public static function translateLog(mixed $message): void
+    {
+        try {
+            if (!isset(self::$translationLogObj)) {
+                self::$translationLogObj = new Zend_Log();
+                self::$translationLogObj->addWriter(new Zend_Log_Writer_Stream('php://output'));
+                self::$translationLogObj->addWriter(new Zend_Log_Writer_Stream(BASE_APP_PATH . '/config/logs/translate-' . date('Ymd') . '.log'));
+            }
+
+            if (is_string($message) || is_int($message) || is_float($message)) {
+                $message = trim($message);
+            } else {
+                $message = print_r($message, true);
+            }
+            self::$translationLogObj->log($message, Zend_Log::INFO);
+        } catch (Zend_Log_Exception $e) {
+            self::$translationLogObj->err($e->getMessage());
         }
     }
 }
