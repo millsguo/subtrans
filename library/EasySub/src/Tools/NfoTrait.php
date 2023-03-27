@@ -50,6 +50,33 @@ trait NfoTrait
             return $this->getDataFromEmbyNfo($fileInfo,$nfoType);
         }
         Log::err('nfo文件不存在：' . $dirPath . '/' . $preFilename . '.nfo');
+        if (is_readable($dirPath . '/movie.nfo')) {
+            //emby nfo
+            $nfoContent = file_get_contents($dirPath . '/movie.nfo');
+
+            $cutPos = mb_strrpos($nfoContent,'>');
+            if ($cutPos !== false) {
+                $nfoContent = mb_substr($nfoContent,0,$cutPos);
+            }
+            $fileInfo = simplexml_load_string($nfoContent,'SimpleXMLElement',16384);
+            if (!$fileInfo instanceof SimpleXMLElement) {
+                Log::err('NFO数据读取失败');
+                Log::debug('NFO数据');
+                Log::debug($fileInfo);
+                return [];
+            }
+            if ($useOriginData) {
+                try {
+                    return json_decode(json_encode($fileInfo, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    $this->message = $e->getMessage();
+                    Log::debug($e->getMessage());
+                    Log::debug($e->getTraceAsString());
+                    return ['message' => $e->getMessage(),'trace' => $e->getTraceAsString()];
+                }
+            }
+            return $this->getDataFromEmbyNfo($fileInfo,$nfoType);
+        }
         return [];
     }
 
