@@ -122,4 +122,21 @@ class SystemController extends Default_Model_ControllerHelper
             $this->quickRedirect('接口设置失败','/','warning');
         }
     }
+
+    /**
+     * 删除翻译接口
+     * @return void
+     */
+    public function deleteapiAction()
+    {
+        if (!isset($this->params['id'])) {
+            $this->quickRedirect('参数错误', '/','warning');
+        }
+        $result = \EasySub\Translated\TransApi::deleteApi((int)$this->params['id']);
+        if ($result) {
+            $this->quickRedirect('接口删除成功', '/');
+        } else {
+            $this->quickRedirect('接口删除失败','/','warning');
+        }
+    }
 }

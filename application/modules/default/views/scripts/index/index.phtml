@@ -28,16 +28,17 @@
                     }
                     if ((int)$row->current_month_limit === 1) {
                         $apiState = '<span class="badge badge-danger">当月禁用</span>';
-                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/0" class="btn btn-success btn-xs">启用</a>';
+                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/0" class="btn btn-success btn-xs m-2">启用</a>';
                     } else {
                         $apiState = '<span class="badge badge-success">当月可用</span>';
-                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/1" class="btn btn-danger btn-xs">禁用</a>';
+                        $apiBtn = '<a href="/system/setapi/id/' . $row->id . '/state/1" class="btn btn-danger btn-xs m-2">禁用</a>';
                     }
                     ?>
                     <div class="card-header">
                         <h5 class="card-title">第<?php echo $i;?>个翻译接口 <code><?php echo $row->name;?></code><span class="badge badge-info"><?php echo $row->current_month_str;?></span><?php echo $apiState;?></h5>
                         <div class="card-tools">
                             <?php echo $apiBtn;?>
+                            <a href="/system/deleteapi/id/<?php echo $row->id;?>" class="btn btn-danger btn-xs m-2" onclick="return confirm('删除后，所有接口的统计都将清空，确定要删除吗？');">删除</a>
                         </div>
                     </div>
                     <div class="card-body">

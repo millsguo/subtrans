@@ -480,4 +480,22 @@ class TransApi
         }
         return false;
     }
+
+    /**
+     * 删除API
+     * @param int $apiId
+     * @return bool
+     */
+    public static function deleteApi(int $apiId): bool
+    {
+        self::initTable();
+        $where = [
+            'id = ?'    => $apiId
+        ];
+        $result = self::$apiTable->delete($where);
+        if ($result) {
+            return true;
+        }
+        return false;
+    }
 }
