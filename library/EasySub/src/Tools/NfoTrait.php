@@ -56,7 +56,7 @@ trait NfoTrait
 
             $cutPos = mb_strrpos($nfoContent,'>');
             if ($cutPos !== false) {
-                $nfoContent = mb_substr($nfoContent,0,$cutPos);
+                $nfoContent = mb_substr($nfoContent,0,$cutPos + 1);
             }
             $fileInfo = simplexml_load_string($nfoContent,'SimpleXMLElement',16384);
             if (!$fileInfo instanceof SimpleXMLElement) {
